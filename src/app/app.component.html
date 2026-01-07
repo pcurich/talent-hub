@@ -1,0 +1,16 @@
+<div class="app-container">
+  <header>
+    <h1>{{ title }}</h1>
+    <div class="header-actions">
+      <button class="btn-header" title="Cargar datos" (click)="onUpload()">
+        📤 Cargar
+      </button>
+      <button class="btn-header" title="Descargar datos" (click)="onDownload()">
+        📥 Descargar
+      </button>
+    </div>
+  </header>
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+</div>

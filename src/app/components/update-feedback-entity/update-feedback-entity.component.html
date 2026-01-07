@@ -1,0 +1,200 @@
+<div class="update-container">
+  <div class="form-header">
+    <h2>Actualizar Feedback</h2>
+    <button class="btn-cancel" (click)="cancel()">✕ Cancelar</button>
+  </div>
+
+  <form (ngSubmit)="onSubmit()" #feedbackForm="ngForm">
+    <!-- Información General -->
+    <section class="form-section">
+      <h3>Información General</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="number">Número *</label>
+          <input type="number" id="number" name="number" [(ngModel)]="entity.number" required>
+        </div>
+
+        <div class="form-group">
+          <label for="registration">Registro *</label>
+          <input type="text" id="registration" name="registration" [(ngModel)]="entity.registration" required>
+        </div>
+
+        <div class="form-group">
+          <label for="teamMember">Team Member *</label>
+          <input type="text" id="teamMember" name="teamMember" [(ngModel)]="entity.teamMember" required>
+        </div>
+
+        <div class="form-group">
+          <label for="company">Empresa</label>
+          <select id="company" name="company" [(ngModel)]="entity.company">
+            <option *ngFor="let company of companies" [value]="company">{{ company }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="seniority">Seniority</label>
+          <select id="seniority" name="seniority" [(ngModel)]="entity.seniority">
+            <option *ngFor="let seniority of seniorities" [value]="seniority">{{ seniority }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="squad">Squad</label>
+          <input type="text" id="squad" name="squad" [(ngModel)]="entity.squad">
+        </div>
+
+        <div class="form-group">
+          <label for="productOwner">Product Owner</label>
+          <input type="text" id="productOwner" name="productOwner" [(ngModel)]="entity.productOwner">
+        </div>
+
+        <div class="form-group">
+          <label for="focalPoint">Focal Point</label>
+          <input type="text" id="focalPoint" name="focalPoint" [(ngModel)]="entity.focalPoint">
+        </div>
+
+        <div class="form-group">
+          <label for="poclacDate">Fecha POCLAC</label>
+          <input type="date" id="poclacDate" name="poclacDate" [(ngModel)]="entity.poclacDate">
+        </div>
+
+        <div class="form-group">
+          <label for="feedbackProvider">Proveedor de Feedback</label>
+          <input type="text" id="feedbackProvider" name="feedbackProvider" [(ngModel)]="entity.feedbackProvider">
+        </div>
+      </div>
+    </section>
+
+    <!-- Calificación General -->
+    <section class="form-section">
+      <h3>Calificación General</h3>
+      <div class="form-group">
+        <label for="generalRating">Calificación</label>
+        <select id="generalRating" name="generalRating" [(ngModel)]="entity.generalRating">
+          <option *ngFor="let rating of generalRatings" [value]="rating">{{ rating }}</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Desempeño -->
+    <section class="form-section">
+      <h3>Desempeño</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="performanceWhat">¿Cumple con la entrega del backlog?</label>
+          <select id="performanceWhat" name="performanceWhat" [(ngModel)]="entity.performanceWhat">
+            <option *ngFor="let level of performanceLevels" [value]="level">{{ level }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="performanceHow">¿Vive los principios Samay?</label>
+          <select id="performanceHow" name="performanceHow" [(ngModel)]="entity.performanceHow">
+            <option *ngFor="let level of performanceLevels" [value]="level">{{ level }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="performanceAchievements">Logros y resultados</label>
+          <select id="performanceAchievements" name="performanceAchievements" [(ngModel)]="entity.performanceAchievements">
+            <option *ngFor="let level of performanceLevels" [value]="level">{{ level }}</option>
+          </select>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="performanceDetails">Detalles del Desempeño</label>
+          <textarea id="performanceDetails" name="performanceDetails" [(ngModel)]="entity.performanceDetails" rows="3"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feedback -->
+    <section class="form-section">
+      <h3>Feedback (SBI)</h3>
+      <div class="form-group">
+        <label for="feedbackType">Tipo de Feedback</label>
+        <select id="feedbackType" name="feedbackType" [(ngModel)]="entity.feedbackType">
+          <option *ngFor="let type of feedbackTypes" [value]="type">{{ type }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="situation">Situación</label>
+        <textarea id="situation" name="situation" [(ngModel)]="entity.feedbackDetails.situation" rows="3" placeholder="Describe la situación específica..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="behavior">Comportamiento</label>
+        <textarea id="behavior" name="behavior" [(ngModel)]="entity.feedbackDetails.behavior" rows="3" placeholder="Describe el comportamiento observado..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="impact">Impacto</label>
+        <textarea id="impact" name="impact" [(ngModel)]="entity.feedbackDetails.impact" rows="3" placeholder="Describe el impacto generado..."></textarea>
+      </div>
+    </section>
+
+    <!-- Expectativas -->
+    <section class="form-section">
+      <h3>Expectativas del Usuario</h3>
+      <div class="form-group">
+        <label for="userExpectations">Expectativas</label>
+        <textarea id="userExpectations" name="userExpectations" [(ngModel)]="entity.userExpectations" rows="4"></textarea>
+      </div>
+    </section>
+
+    <!-- Plan de Acción -->
+    <section class="form-section">
+      <div class="section-header">
+        <h3>Plan de Acción</h3>
+        <button type="button" class="btn-add" (click)="addActionPlan()">+ Agregar Acción</button>
+      </div>
+
+      <div class="action-plans">
+        <div *ngFor="let action of entity.actionPlan; let i = index; trackBy: trackByIndex" class="action-plan-card">
+          <div class="card-header">
+            <h4>Acción {{ i + 1 }}</h4>
+            <button type="button" class="btn-remove" (click)="removeActionPlan(i)">✕</button>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label [for]="'actionable-' + i">Accionable</label>
+              <input type="text" [id]="'actionable-' + i" [name]="'actionable-' + i" [(ngModel)]="action.actionable">
+            </div>
+
+            <div class="form-group">
+              <label [for]="'responsible-' + i">Responsable</label>
+              <select [id]="'responsible-' + i" [name]="'responsible-' + i" [(ngModel)]="action.responsible">
+                <option *ngFor="let resp of actionResponsibles" [value]="resp">{{ resp }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label [for]="'commitmentDate-' + i">Fecha de Compromiso</label>
+              <input type="date" [id]="'commitmentDate-' + i" [name]="'commitmentDate-' + i" [(ngModel)]="action.commitmentDate">
+            </div>
+
+            <div class="form-group">
+              <label [for]="'status-' + i">Estado</label>
+              <select [id]="'status-' + i" [name]="'status-' + i" [(ngModel)]="action.status">
+                <option *ngFor="let status of actionStatuses" [value]="status">{{ status }}</option>
+              </select>
+            </div>
+
+            <div class="form-group full-width">
+              <label [for]="'details-' + i">Detalles</label>
+              <textarea [id]="'details-' + i" [name]="'details-' + i" [(ngModel)]="action.details" rows="2"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Botones de acción -->
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="cancel()">Cancelar</button>
+      <button type="submit" class="btn-primary" [disabled]="!feedbackForm.form.valid">Actualizar Feedback</button>
+    </div>
+  </form>
+</div>

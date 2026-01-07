@@ -1,0 +1,122 @@
+/* ========================================
+   Variables CSS - Tema Corporativo BCP
+   ======================================== */
+
+:root {
+  /* Colores Primarios BCP */
+  --color-primary: #002A8D;           /* Midnight Blue - Color principal BCP */
+  --color-primary-dark: #002DA0;      /* Dark Blue */
+  --color-primary-medium: #0030B3;    /* Medium Blue */
+  --color-primary-light: #0A47F0;     /* Royal Blue */
+  --color-royal-blue: #0B43C7;        /* Royal Blue Variant */
+
+  /* Colores Secundarios */
+  --color-secondary: #2C89E9;         /* Dodger Blue */
+  --color-accent: #3FB9E3;            /* Medium Turquoise */
+
+  /* Colores de Estado */
+  --color-success: #37A500;           /* Forest Green */
+  --color-success-light: #6AC90F;     /* Yellow Green */
+  --color-warning: #FF7800;           /* Dark Orange */
+  --color-warning-light: #FF961F;     /* Dark Orange Light */
+  --color-error: #E30425;             /* Crimson */
+  --color-error-dark: #FF0000;        /* Red */
+  --color-danger: #FC4439;            /* Tomato */
+  --color-accent-magenta: #D3017F;    /* Medium Violet Red */
+
+  /* Colores de Texto */
+  --color-text-primary: #202E44;      /* Dark Slate Gray */
+  --color-text-secondary: #222222;    /* Dark Slate Gray Variant */
+  --color-text-muted: #4D5B70;        /* Dim Gray */
+  --color-text-light: #606C7F;        /* Dim Gray Light */
+  --color-text-lighter: #6982A3;      /* Light Slate Gray */
+  --color-text-disabled: #868F9E;     /* Light Slate Gray Variant */
+
+  /* Colores de Fondo */
+  --color-bg-primary: #FFFFFF;        /* White */
+  --color-bg-secondary: #FDFDFD;      /* White Variant */
+  --color-bg-light: #F2F8FF;          /* Alice Blue */
+  --color-bg-lighter: #EBF4FF;        /* Alice Blue Variant */
+  --color-bg-soft: #ECF3FA;           /* Alice Blue Light */
+  --color-bg-subtle: #D9EBFD;         /* Lavender */
+  --color-bg-muted: #E5E7EB;          /* Lavender Gray */
+  --color-bg-warning: #FCEFE5;        /* Linen */
+
+  /* Colores de Bordes */
+  --color-border: #D2D5DC;            /* Light Gray */
+  --color-border-light: #D8DFEA;      /* Gainsboro */
+  --color-border-lighter: #CCCCCC;    /* Light Gray Variant */
+  --color-border-dark: #99A1AD;       /* Dark Gray */
+  --color-border-darker: #ACB2BD;     /* Dark Gray Variant */
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 42, 141, 0.1), 0 2px 4px -1px rgba(0, 42, 141, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 42, 141, 0.1), 0 4px 6px -2px rgba(0, 42, 141, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 42, 141, 0.1), 0 10px 10px -5px rgba(0, 42, 141, 0.04);
+
+  /* Espaciado */
+  --spacing-xs: 0.25rem;   /* 4px */
+  --spacing-sm: 0.5rem;    /* 8px */
+  --spacing-md: 1rem;      /* 16px */
+  --spacing-lg: 1.5rem;    /* 24px */
+  --spacing-xl: 2rem;      /* 32px */
+  --spacing-2xl: 3rem;     /* 48px */
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  /* Tipografía */
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 2rem;      /* 32px */
+
+  /* Transiciones */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.3s ease;
+}
+
+/* ========================================
+   Estilos Globales
+   ======================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-light);
+}
+
+/* ========================================
+   Utilidades de Texto
+   ======================================== */
+
+.text-primary { color: var(--color-primary); }
+.text-secondary { color: var(--color-secondary); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-error { color: var(--color-error); }
+.text-muted { color: var(--color-text-muted); }
+
+/* ========================================
+   Utilidades de Fondo
+   ======================================== */
+
+.bg-primary { background-color: var(--color-primary); }
+.bg-light { background-color: var(--color-bg-light); }
+.bg-white { background-color: var(--color-bg-primary); }

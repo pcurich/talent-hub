@@ -1,0 +1,78 @@
+<div class="table-container">
+  @if (entities().length === 0) {
+    <div class="empty-state">
+      <p>No se encontraron registros</p>
+    </div>
+  } @else {
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>N°</th>
+          <th>Registro</th>
+          <th>Team Member</th>
+          <th>Empresa</th>
+          <th>Seniority</th>
+          <th>Squad</th>
+          <th>Product Owner</th>
+          <th>Fecha POCLAC</th>
+          <th>Calificación</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (entity of entities(); track entity.id) {
+          <tr>
+            <td>{{ entity.number }}</td>
+            <td>{{ entity.registration }}</td>
+            <td>{{ entity.teamMember }}</td>
+            <td>
+              <span class="badge" [class.badge-bcp]="entity.company === 'BCP'"
+                                   [class.badge-proveedor]="entity.company === 'Proveedor'">
+                {{ entity.company }}
+              </span>
+            </td>
+            <td>{{ entity.seniority }}</td>
+            <td>{{ entity.squad }}</td>
+            <td>{{ entity.productOwner }}</td>
+            <td>{{ formatDate(entity.poclacDate) }}</td>
+            <td>
+              <span class="rating"
+                    [class.rating-excellent]="entity.generalRating === 'Excelente'"
+                    [class.rating-good]="entity.generalRating === 'Muy Bueno' || entity.generalRating === 'Bueno'"
+                    [class.rating-regular]="entity.generalRating === 'Regular'"
+                    [class.rating-poor]="entity.generalRating === 'Necesita Mejorar'">
+                {{ entity.generalRating }}
+              </span>
+            </td>
+            <td class="actions">
+              <button class="btn btn-view" (click)="onView(entity)" title="Ver detalles">
+                👁️
+              </button>
+              <button class="btn btn-edit" (click)="onEdit(entity)" title="Editar">
+                ✏️
+              </button>
+              <button class="btn btn-delete" (click)="onDeleteClick(entity)" title="Eliminar">
+                🗑️
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+@if (showDeleteModal) {
+  <div class="modal-overlay" (click)="closeDeleteModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2>Confirmar Eliminación</h2>
+      <p>¿Está seguro que desea eliminar el registro de <strong>{{ entityToDelete?.teamMember }}</strong>?</p>
+      <p class="warning">Esta acción no se puede deshacer.</p>
+      <div class="modal-actions">
+        <button class="btn btn-cancel" (click)="closeDeleteModal()">Cancelar</button>
+        <button class="btn btn-confirm-delete" (click)="confirmDelete()">Eliminar</button>
+      </div>
+    </div>
+  </div>
+}

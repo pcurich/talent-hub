@@ -1,0 +1,46 @@
+<div class="home-container">
+  <header class="header">
+    <div class="header-content">
+      <p class="subtitle">Sistema de Gestión de Feedback y Evaluaciones</p>
+    </div>
+    <button class="btn-create" (click)="navigateToCreate()">
+      ✚ Nuevo Feedback
+    </button>
+  </header>
+
+  <div class="content">
+    <!-- Componente de búsqueda -->
+    <div class="search-section">
+      <app-search-entity (search)="onSearch($event)"></app-search-entity>
+    </div>
+
+    <!-- Estadísticas rápidas -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-value">{{ allEntities().length }}</div>
+        <div class="stat-label">Total Feedbacks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ filteredEntities().length }}</div>
+        <div class="stat-label">Resultados Filtrados</div>
+      </div>
+    </div>
+
+    <!-- Tabla de datos -->
+    <div class="table-section">
+      <app-data-table-entity
+        [entities]="filteredEntities()"
+        (view)="onView($event)"
+        (edit)="onEdit($event)"
+        (delete)="onDelete($event)">
+      </app-data-table-entity>
+    </div>
+  </div>
+
+  <!-- Modal para ver detalles -->
+  <app-modal-entity
+    [entity]="selectedEntity"
+    [isOpen]="isModalOpen"
+    (close)="onCloseModal()">
+  </app-modal-entity>
+</div>

@@ -1,0 +1,259 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 42, 141, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--spacing-lg);
+  backdrop-filter: blur(4px);
+}
+
+.modal-container {
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-xl);
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--color-border-light);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-xl);
+  border-bottom: 2px solid var(--color-primary);
+  position: sticky;
+  top: 0;
+  background: linear-gradient(180deg, var(--color-bg-primary) 0%, var(--color-bg-soft) 100%);
+  z-index: 10;
+
+  h2 {
+    margin: 0;
+    font-size: var(--font-size-2xl);
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: var(--font-size-2xl);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
+
+    &:hover {
+      background: var(--color-bg-lighter);
+      color: var(--color-primary);
+    }
+  }
+}
+
+.modal-body {
+  padding: var(--spacing-xl);
+}
+
+.info-section {
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border-light);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  h3 {
+    margin: 0 0 var(--spacing-md) 0;
+    font-size: var(--font-size-lg);
+    color: var(--color-primary);
+    font-weight: 600;
+    border-left: 4px solid var(--color-secondary);
+    padding-left: var(--spacing-md);
+  }
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  span, p {
+    font-size: var(--font-size-base);
+    color: var(--color-text-primary);
+    font-weight: 500;
+  }
+}
+
+.details-text {
+  margin: var(--spacing-sm) 0 0 0;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.badge {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-xl);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+
+  &.badge-bcp {
+    background: linear-gradient(135deg, var(--color-bg-lighter) 0%, var(--color-bg-subtle) 100%);
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+  }
+
+  &.badge-proveedor {
+    background: linear-gradient(135deg, #FEF3E7 0%, #FCE4D6 100%);
+    color: var(--color-warning);
+    border: 1px solid var(--color-warning-light);
+  }
+
+  &.badge-feedback {
+    &.badge-positive {
+      background: linear-gradient(135deg, #E7F9EF 0%, #D1F2DF 100%);
+      color: var(--color-success);
+      border: 1px solid var(--color-success-light);
+    }
+
+    &.badge-constructive {
+      background: linear-gradient(135deg, var(--color-bg-lighter) 0%, var(--color-bg-subtle) 100%);
+      color: var(--color-secondary);
+      border: 1px solid var(--color-accent);
+    }
+
+    &.badge-negative {
+      background: linear-gradient(135deg, #FFEBE9 0%, #FFDCD9 100%);
+      color: var(--color-error);
+      border: 1px solid var(--color-danger);
+    }
+  }
+}
+
+.rating-display {
+  margin-top: var(--spacing-sm);
+}
+
+.rating-badge {
+  display: inline-block;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-xl);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+
+  &.rating-excellent {
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-light) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(55, 165, 0, 0.3);
+  }
+
+  &.rating-good {
+    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-accent) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(44, 137, 233, 0.3);
+  }
+
+  &.rating-regular {
+    background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-warning-light) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(255, 120, 0, 0.3);
+  }
+
+  &.rating-poor {
+    background: linear-gradient(135deg, var(--color-error) 0%, var(--color-danger) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(227, 4, 37, 0.3);
+  }
+}
+
+.performance-level {
+  padding: var(--spacing-xs) var(--spacing-md);
+  background-color: var(--color-bg-lighter);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  display: inline-block;
+  border: 1px solid var(--color-border);
+}
+
+.feedback-type {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+
+  label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+}
+
+.action-plans-section {
+  .action-plan-item {
+    background: var(--color-bg-soft);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-md);
+    border-left: 4px solid var(--color-secondary);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+
+    &.status-pendiente {
+      background: #FFF3CD;
+      color: #856404;
+    }
+
+    &.status-en-progreso {
+      background: var(--color-bg-subtle);
+      color: var(--color-secondary);
+    }
+
+    &.status-completado {
+      background: #D1FAE5;
+      color: var(--color-success);
+    }
+
+    &.status-cancelado {
+      background: #FFEBE9;
+      color: var(--color-error);
+    }
+  }
+}

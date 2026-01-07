@@ -1,0 +1,21 @@
+<div class="search-container">
+  <div class="search-box">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchChange()"
+      placeholder="Buscar por nombre, squad, registro, PO o FP..."
+      class="search-input"
+    />
+    @if (searchTerm) {
+      <button
+        type="button"
+        class="clear-btn"
+        (click)="clearSearch()"
+        title="Limpiar búsqueda"
+      >
+        ✕
+      </button>
+    }
+  </div>
+</div>

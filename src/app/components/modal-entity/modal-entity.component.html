@@ -1,0 +1,176 @@
+@if (isOpen() && entity()) {
+  <div class="modal-overlay" (click)="onClose()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Detalles del Feedback</h2>
+        <button class="close-btn" (click)="onClose()" title="Cerrar">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Información General -->
+        <section class="info-section">
+          <h3>Información General</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>N° Registro:</label>
+              <span>{{ entity()!.number }}</span>
+            </div>
+            <div class="info-item">
+              <label>Registro:</label>
+              <span>{{ entity()!.registration }}</span>
+            </div>
+            <div class="info-item">
+              <label>Team Member:</label>
+              <span>{{ entity()!.teamMember }}</span>
+            </div>
+            <div class="info-item">
+              <label>Empresa:</label>
+              <span class="badge" [class.badge-bcp]="entity()!.company === 'BCP'"
+                                   [class.badge-proveedor]="entity()!.company === 'Proveedor'">
+                {{ entity()!.company }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Seniority:</label>
+              <span>{{ entity()!.seniority }}</span>
+            </div>
+            <div class="info-item">
+              <label>Squad:</label>
+              <span>{{ entity()!.squad }}</span>
+            </div>
+            <div class="info-item">
+              <label>Product Owner:</label>
+              <span>{{ entity()!.productOwner }}</span>
+            </div>
+            <div class="info-item">
+              <label>Focal Point:</label>
+              <span>{{ entity()!.focalPoint }}</span>
+            </div>
+            <div class="info-item">
+              <label>Fecha POCLAC:</label>
+              <span>{{ formatDate(entity()!.poclacDate) }}</span>
+            </div>
+            <div class="info-item">
+              <label>Proveedor de Feedback:</label>
+              <span>{{ entity()!.feedbackProvider }}</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Calificación -->
+        <section class="info-section">
+          <h3>Calificación General</h3>
+          <div class="rating-display">
+            <span class="rating-badge"
+                  [class.rating-excellent]="entity()!.generalRating === 'Excelente'"
+                  [class.rating-good]="entity()!.generalRating === 'Muy Bueno' || entity()!.generalRating === 'Bueno'"
+                  [class.rating-regular]="entity()!.generalRating === 'Regular'"
+                  [class.rating-poor]="entity()!.generalRating === 'Necesita Mejorar'">
+              {{ entity()!.generalRating }}
+            </span>
+          </div>
+        </section>
+
+        <!-- Desempeño -->
+        <section class="info-section">
+          <h3>Evaluación de Desempeño</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>¿Cumple con la entrega del backlog?</label>
+              <span class="performance-level">{{ entity()!.performanceWhat }}</span>
+            </div>
+            <div class="info-item">
+              <label>¿Vive los principios Samay?</label>
+              <span class="performance-level">{{ entity()!.performanceHow }}</span>
+            </div>
+            <div class="info-item">
+              <label>Logros y resultados:</label>
+              <span class="performance-level">{{ entity()!.performanceAchievements }}</span>
+            </div>
+          </div>
+          @if (entity()!.performanceDetails) {
+            <div class="info-item full-width">
+              <label>Detalles de desempeño:</label>
+              <p class="details-text">{{ entity()!.performanceDetails }}</p>
+            </div>
+          }
+        </section>
+
+        <!-- Feedback (SBI) -->
+        <section class="info-section">
+          <h3>Feedback - Método SBI</h3>
+          <div class="feedback-type">
+            <label>Tipo de Feedback:</label>
+            <span class="badge badge-feedback"
+                  [class.badge-positive]="entity()!.feedbackType === 'Positivo'"
+                  [class.badge-constructive]="entity()!.feedbackType === 'Constructivo'"
+                  [class.badge-negative]="entity()!.feedbackType === 'Negativo'">
+              {{ entity()!.feedbackType }}
+            </span>
+          </div>
+          <div class="sbi-container">
+            <div class="sbi-item">
+              <label>Situación:</label>
+              <p>{{ entity()!.feedbackDetails.situation }}</p>
+            </div>
+            <div class="sbi-item">
+              <label>Comportamiento:</label>
+              <p>{{ entity()!.feedbackDetails.behavior }}</p>
+            </div>
+            <div class="sbi-item">
+              <label>Impacto:</label>
+              <p>{{ entity()!.feedbackDetails.impact }}</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Expectativas -->
+        @if (entity()!.userExpectations) {
+          <section class="info-section">
+            <h3>Expectativas del Usuario</h3>
+            <p class="details-text">{{ entity()!.userExpectations }}</p>
+          </section>
+        }
+
+        <!-- Plan de Acción -->
+        @if (entity()!.actionPlan && entity()!.actionPlan.length > 0) {
+          <section class="info-section">
+            <h3>Plan de Acción</h3>
+            <div class="action-plan-list">
+              @for (action of entity()!.actionPlan; track $index) {
+                <div class="action-item">
+                  <div class="action-header">
+                    <h4>{{ action.actionable }}</h4>
+                    <span class="status-badge" [ngClass]="getActionPlanStatusClass(action.status)">
+                      {{ action.status }}
+                    </span>
+                  </div>
+                  <div class="action-details">
+                    <div class="action-info">
+                      <label>Responsable:</label>
+                      <span>{{ action.responsible }}</span>
+                    </div>
+                    <div class="action-info">
+                      <label>Fecha de Compromiso:</label>
+                      <span>{{ formatDate(action.commitmentDate) }}</span>
+                    </div>
+                  </div>
+                  @if (action.details) {
+                    <div class="action-description">
+                      <label>Detalles:</label>
+                      <p>{{ action.details }}</p>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </section>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-close" (click)="onClose()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+}
