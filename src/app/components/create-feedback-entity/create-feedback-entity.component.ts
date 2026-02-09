@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FeedbackEntity, FeedbackType, ActionableStatus, ActionResponsible, Seniority, CompanyType, GeneralRating, PerformanceLevel } from '@pcurich/client-storage-indexeddb';
-import { FeedbackRepository } from '../../services/feedback.service';
+import { FeedbackRepository } from '../../repository/feedback.indexeddb.repository';
 
 @Component({
   selector: 'app-create-feedback-entity',

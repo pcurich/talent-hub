@@ -1,0 +1,294 @@
+<div class="excel-settings-container">
+  <header class="header">
+    <div class="header-content">
+      <h1>⚙️ Configuración de Mapeo de Excel</h1>
+      <p class="subtitle">Configure cómo se mapean las celdas del Excel a los campos del sistema</p>
+    </div>
+  </header>
+
+  <div class="content">
+    <!-- Estadísticas (Dashboard Principal) -->
+    <section class="stats-section">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ availableFields.length }}</div>
+            <div class="stat-label">Campos Disponibles</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ getMappedCount() }}</div>
+            <div class="stat-label">Campos Mapeados</div>
+          </div>
+        </div>
+
+        <div class="stat-card warning">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ getMappedRequiredCount() }} / {{ getRequiredCount() }}</div>
+            <div class="stat-label">Requeridos Mapeados</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">🕐</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ config.lastUpdated | date: 'short' }}</div>
+            <div class="stat-label">Última Actualización</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tabs -->
+    <section class="tabs-section">
+      <div class="tabs-header">
+        <button class="tab-button" [class.active]="activeTab === 'general'" (click)="activeTab = 'general'">
+          📋 Configuración General
+        </button>
+        <button class="tab-button" [class.active]="activeTab === 'mapping'" (click)="activeTab = 'mapping'">
+          🔍 Mapeo de Celdas
+        </button>
+        <button class="tab-button" [class.active]="activeTab === 'example'" (click)="activeTab = 'example'">
+          💡 Ejemplo de uso
+        </button>
+        <button class="tab-button" *ngIf="importState.status === 'completed'"
+          [class.active]="activeTab === 'loaded-data'" (click)="activeTab = 'loaded-data'">
+          📦 Datos Cargados ({{ loadedRowResults.length }})
+        </button>
+      </div>
+
+      <div class="tabs-content">
+        <!-- Tab: Configuración General -->
+        <div class="tab-panel" [class.active]="activeTab === 'general'">
+          <div class="general-settings">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="sheetName">Nombre de la Hoja</label>
+                <input type="text" id="sheetName" [(ngModel)]="config.sheetName" placeholder="ej: Feedbacks, Hoja1">
+                <small>Nombre de la hoja del Excel donde están los datos</small>
+              </div>
+
+              <div class="form-group">
+                <label for="dataStartRow">Fila de Inicio de Datos</label>
+                <input type="number" id="dataStartRow" [(ngModel)]="config.dataStartRow" min="1" max="100">
+                <small>Número de fila donde comienzan los datos</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Mapeo de Celdas -->
+        <div class="tab-panel" [class.active]="activeTab === 'mapping'">
+          <div class="filters-header">
+            <div class="filter-controls">
+              <input type="text" class="search-input" [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()"
+                placeholder="🔍 Buscar campo...">
+
+              <label class="checkbox-filter">
+                <input type="checkbox" [(ngModel)]="showOnlyRequired" (ngModelChange)="applyFilters()">
+                Solo Requeridos
+              </label>
+
+              <label class="checkbox-filter">
+                <input type="checkbox" [(ngModel)]="showOnlyMapped" (ngModelChange)="applyFilters()">
+                Solo Mapeados
+              </label>
+            </div>
+          </div>
+
+          <div class="mapping-table-container">
+            <table class="mapping-table">
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Campo del Sistema</th>
+                  <th>Celda Excel</th>
+                  <th>Descripción</th>
+                  <th>Req.</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let field of filteredFields; trackBy: trackByField" [class.required-field]="field.required"
+                  [class.mapped-field]="field.excelCell.trim() !== ''">
+                  <td class="type-cell">
+                    <span class="field-type-icon" [title]="field.fieldType">
+                      {{ getFieldTypeIcon(field.fieldType) }}
+                    </span>
+                  </td>
+                  <td class="field-name-cell">
+                    <strong>{{ field.label }}</strong>
+                    <code>{{ field.entityField }}</code>
+                  </td>
+                  <td class="excel-cell-input-cell">
+                    <input type="text" class="excel-cell-input" [(ngModel)]="field.excelCell"
+                      placeholder="ej: A1, B2, C3 o Nombre"
+                      [class.required-empty]="field.required && field.excelCell.trim() === ''">
+                  </td>
+                  <td class="description-cell">
+                    <small>{{ field.description }}</small>
+                  </td>
+                  <td class="required-cell">
+                    <span *ngIf="field.required" class="required-badge">SÍ</span>
+                    <span *ngIf="!field.required" class="optional-badge">NO</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div *ngIf="filteredFields.length === 0" class="no-results">
+              <p>📭 No se encontraron campos que coincidan con los filtros</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Ejemplo de uso -->
+        <div class="tab-panel" [class.active]="activeTab === 'example'">
+          <div class="example-content">
+            <p>Si tu Excel tiene esta estructura:</p>
+            <table class="example-table">
+              <thead>
+                <tr>
+                  <th>A</th>
+                  <th>B</th>
+                  <th>C</th>
+                  <th>D</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Registro</td>
+                  <td>Nombre</td>
+                  <td>Squad</td>
+                  <td>Empresa</td>
+                </tr>
+                <tr>
+                  <td>12345</td>
+                  <td>Juan Pérez</td>
+                  <td>Alpha</td>
+                  <td>BCP</td>
+                </tr>
+              </tbody>
+            </table>
+            <p>Debes mapear las celdas considerando fila y columna:</p>
+            <ul>
+              <li><code>registration</code> → <strong>A1</strong> (Fila 1, Columna A - "Registro")</li>
+              <li><code>teamMember</code> → <strong>B1</strong> (Fila 1, Columna B - "Nombre")</li>
+              <li><code>squad</code> → <strong>C1</strong> (Fila 1, Columna C - "Squad")</li>
+              <li><code>company</code> → <strong>D1</strong> (Fila 1, Columna D - "Empresa")</li>
+            </ul>
+            <p><strong>Nota:</strong> La celda identifica exactamente dónde está el encabezado en tu Excel (combinación
+              de
+              fila y columna).</p>
+          </div>
+        </div>
+
+        <!-- Tab: Datos Cargados -->
+        <div class="tab-panel" [class.active]="activeTab === 'loaded-data'">
+          <div class="loaded-data-content">
+            <div class="loaded-data-header">
+              <h2>📦 Datos Pre-cargados</h2>
+              <p>Revise y edite los datos antes de guardarlos en la base de datos</p>
+
+              <div class="data-filter-controls">
+                <input type="text" class="search-input" [(ngModel)]="dataSearchTerm"
+                  placeholder="🔍 Buscar en datos...">
+
+                <div class="data-stats">
+                  <span class="stat-badge valid">✅ {{ importState.result?.validRows || 0 }} válidos</span>
+                  <span class="stat-badge invalid">❌ {{ importState.result?.invalidRows || 0 }} inválidos</span>
+                  <span class="stat-badge total">📊 {{ loadedRowResults.length }} en vista</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="loaded-data-table-container">
+              <table class="loaded-data-table">
+                <thead>
+                  <tr>
+                    <th *ngFor="let column of getTableColumns()">{{ column.label }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of getFilteredLoadedEntities(); let i = index; trackBy: trackByEntity"
+                    [class.invalid-row]="!row.isValid" [class.valid-row]="row.isValid">
+
+                    <ng-container *ngFor="let column of getTableColumns()">
+                      <!-- Columna # -->
+                      <td *ngIf="column.key === 'rowNumber'">{{ row.rowNumber }}</td>
+
+                      <!-- Columna Estado -->
+                      <td *ngIf="column.key === 'status'" class="status-cell">
+                        <span *ngIf="row.isValid" class="status-badge valid" title="Fila válida">✅</span>
+                        <span *ngIf="!row.isValid && row.errors.length > 0" class="status-badge invalid"
+                          [title]="getErrorMessages(row.errors)">❌</span>
+                      </td>
+
+                      <!-- Columnas de datos dinámicas -->
+                      <td *ngIf="column.key !== 'rowNumber' && column.key !== 'status' && column.key !== 'actions'">
+                        <input type="text" class="editable-cell" [value]="getNestedValue(row.data, column.field)" readonly
+                          (input)="setNestedValue(row.data, column.field, $any($event.target).value)">
+                      </td>
+
+                      <!-- Columna Acciones -->
+                      <td *ngIf="column.key === 'actions'" class="actions-cell">
+                        <button class="btn-delete" (click)="removeLoadedRow(i)" title="Eliminar fila">
+                          🗑️
+                        </button>
+                      </td>
+                    </ng-container>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div *ngIf="getFilteredLoadedEntities().length === 0" class="no-results">
+                <p>📭 No se encontraron datos</p>
+              </div>
+            </div>
+
+            <div class="loaded-data-actions">
+              <button class="btn btn-primary" (click)="saveLoadedData()">
+                💾 Guardar {{ getValidRowsCount() }} Registros Válidos
+              </button>
+              <button class="btn btn-danger" (click)="clearLoadedData()">
+                🗑️ Descartar Datos
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Acciones -->
+    <section class="actions-section">
+      <div class="action-buttons">
+        <button class="btn btn-primary" (click)="saveConfiguration()">
+          💾 Guardar Configuración
+        </button>
+
+        <button class="btn btn-secondary" (click)="exportConfiguration()">
+          📥 Exportar Configuración
+        </button>
+
+        <div class="import-select-wrapper">
+          <select class="btn btn-secondary import-select-button" [(ngModel)]="importType" (change)="triggerFileInput()">
+            <option value="" disabled>📤 Cargar archivo</option>
+            <option value="excel">📊 Cargar Excel</option>
+            <option value="json">📋 Cargar JSON</option>
+          </select>
+        </div>
+
+        <input #fileInput type="file" [accept]="importType === 'excel' ? '.xlsx,.xls' : '.json'"
+          (change)="handleImport($event)" style="display: none">
+
+        <button class="btn btn-danger" (click)="resetConfiguration()">
+          🔄 Restablecer
+        </button>
+      </div>
+    </section>
+  </div>
+</div>

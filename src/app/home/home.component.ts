@@ -7,7 +7,7 @@ import { SearchEntityComponent } from '../components/search-entity/search-entity
 import { DataTableEntityComponent } from '../components/data-table-entity/data-table-entity.component';
 import { ModalEntityComponent } from '../components/modal-entity/modal-entity.component';
 
-import { FeedbackRepository } from '../services/feedback.service';
+import { FeedbackRepository } from '../repository/feedback.indexeddb.repository';
 
 @Component({
   selector: 'app-home',
@@ -27,18 +27,18 @@ export class HomeComponent {
 
   // Signals
   private searchTerm = signal<string>('');
-  
+
   // Datos - se actualizan automáticamente cuando entities cambie en el servicio
   allEntities = this.feedbackService.getEntities();
-  
+
   filteredEntities = computed(() => {
     const term = this.searchTerm().toLowerCase().trim();
     const entities = this.allEntities();
-    
+
     if (!term) {
       return entities;
     }
-    
+
     return entities.filter(entity =>
       entity.teamMember?.toLowerCase().includes(term) ||
       entity.registration?.toLowerCase().includes(term) ||
@@ -73,9 +73,5 @@ export class HomeComponent {
   onCloseModal() {
     this.isModalOpen = false;
     this.selectedEntity = null;
-  }
-
-  navigateToCreate() {
-    this.router.navigate(['/create-feedback']);
   }
 }

@@ -1,0 +1,36 @@
+<nav class="navbar" [class.open]="isSidebarOpen">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2>Menú</h2>
+    </div>
+
+    <ul class="nav-menu">
+      <li>
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          🏠 Inicio
+        </a>
+      </li>
+      <li>
+        <a routerLink="/create-feedback" routerLinkActive="active">
+          ➕ Crear Feedback
+        </a>
+      </li>
+      <li class="menu-section">
+        <span class="section-title">⚙️ Configuración</span>
+        <ul class="submenu">
+          <li>
+            <a routerLink="/excel-settings" routerLinkActive="active">
+              📊 Excel
+            </a>
+          </li>
+          <li>
+            <a routerLink="/field-options" routerLinkActive="active">
+              🎛️ Opciones
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav>
+

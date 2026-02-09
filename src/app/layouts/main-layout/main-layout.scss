@@ -1,0 +1,66 @@
+.app-container {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+  width: 100%;
+
+  app-navbar {
+    flex-shrink: 0;
+  }
+
+  .content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow-x: hidden;
+  }
+}
+
+header {
+  background-color: #002a8d;
+  color: white;
+  padding: 1rem 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  gap: 1rem;
+
+  .hamburger-header {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0.5rem;
+    gap: 5px;
+
+    span {
+      width: 24px;
+      height: 3px;
+      background-color: #ff7800;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+      display: block;
+    }
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    flex: 1;
+  }
+}
+
+main {
+  flex: 1;
+  padding: 1rem 2rem;
+  overflow-y: auto;
+}

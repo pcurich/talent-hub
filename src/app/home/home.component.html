@@ -1,14 +1,9 @@
 <div class="home-container">
-  <header class="header">
-    <div class="header-content">
-      <p class="subtitle">Sistema de Gestión de Feedback y Evaluaciones</p>
-    </div>
-    <button class="btn-create" (click)="navigateToCreate()">
-      ✚ Nuevo Feedback
-    </button>
-  </header>
+
 
   <div class="content">
+    <h1> Sistema de Gestión de Feedback y Evaluaciones </h1>
+
     <!-- Componente de búsqueda -->
     <div class="search-section">
       <app-search-entity (search)="onSearch($event)"></app-search-entity>
@@ -28,19 +23,13 @@
 
     <!-- Tabla de datos -->
     <div class="table-section">
-      <app-data-table-entity
-        [entities]="filteredEntities()"
-        (view)="onView($event)"
-        (edit)="onEdit($event)"
+      <app-data-table-entity [entities]="filteredEntities()" (view)="onView($event)" (edit)="onEdit($event)"
         (delete)="onDelete($event)">
       </app-data-table-entity>
     </div>
   </div>
 
   <!-- Modal para ver detalles -->
-  <app-modal-entity
-    [entity]="selectedEntity"
-    [isOpen]="isModalOpen"
-    (close)="onCloseModal()">
+  <app-modal-entity [entity]="selectedEntity" [isOpen]="isModalOpen" (close)="onCloseModal()">
   </app-modal-entity>
 </div>

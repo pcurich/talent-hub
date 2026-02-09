@@ -1,0 +1,108 @@
+// Variables
+$primary-color: #001429;
+$secondary-color: #3498db;
+$text-color: #ecf0f1;
+$hover-color: #34495e;
+$transition-speed: 0.3s;
+$sidebar-width: 250px;
+
+.navbar {
+  display: flex;
+  flex-direction: column;
+  width: $sidebar-width;
+  height: 100vh;
+  background-color: $primary-color;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  transition: width $transition-speed ease;
+
+  &:not(.open) {
+    width: 0;
+    overflow: hidden;
+    box-shadow: none;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    background: transparent;
+    padding: 0;
+    position: static;
+    box-shadow: none;
+    min-width: $sidebar-width;
+
+    .sidebar-header {
+      display: flex;
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba($text-color, 0.1);
+
+      h2 {
+        margin: 0;
+        color: $text-color;
+        font-size: 1.3rem;
+      }
+    }
+
+    .nav-menu {
+      list-style: none;
+      padding: 1rem 0;
+      margin: 0;
+
+      li {
+        margin: 0;
+
+        a {
+          display: block;
+          padding: 0.75rem 1.5rem;
+          color: $text-color;
+          text-decoration: none;
+          transition: all $transition-speed ease;
+          font-size: 0.95rem;
+          border-left: 3px solid transparent;
+
+          &:hover {
+            background-color: $hover-color;
+            border-left-color: $secondary-color;
+            padding-left: 1.75rem;
+          }
+
+          &.active {
+            background-color: $hover-color;
+            border-left-color: $secondary-color;
+            color: $secondary-color;
+            font-weight: bold;
+          }
+        }
+
+        &.menu-section {
+          .section-title {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: $text-color;
+            font-weight: 600;
+            font-size: 0.95rem;
+          }
+
+          .submenu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+
+            li {
+              a {
+                padding-left: 2.5rem;
+
+                &:hover {
+                  padding-left: 2.75rem;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

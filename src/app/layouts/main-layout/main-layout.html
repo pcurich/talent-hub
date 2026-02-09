@@ -1,0 +1,16 @@
+<div class="app-container">
+  <app-navbar #navbar></app-navbar>
+  <div class="content-wrapper">
+    <header>
+      <button class="hamburger-header" (click)="navbar.toggleSidebar()" title="Alternar menú">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <h2>{{ title }}</h2>
+    </header>
+    <main>
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
