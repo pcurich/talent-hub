@@ -1,0 +1,231 @@
+<div class="wizard-container">
+  <div class="wizard-header">
+    <h1>Configuración Inicial del Sistema</h1>
+    <div class="progress-bar">
+      <div class="progress-step" [class.active]="currentStep() >= 1" [class.completed]="currentStep() > 1">
+        <div class="step-number">1</div>
+        <div class="step-label">Introducción</div>
+      </div>
+      <div class="progress-step" [class.active]="currentStep() >= 2" [class.completed]="currentStep() > 2">
+        <div class="step-number">2</div>
+        <div class="step-label">Configuración</div>
+      </div>
+      <div class="progress-step" [class.active]="currentStep() >= 3">
+        <div class="step-number">3</div>
+        <div class="step-label">Resumen</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wizard-content">
+    <!-- FASE 1: INTRODUCCIÓN -->
+    <div class="step-content" *ngIf="currentStep() === 1">
+      <h2>Bienvenido al Sistema de Gestión de Feedback</h2>
+      <div class="intro-placeholder">
+        <p>Aquí irá la explicación del funcionamiento del sistema...</p>
+        <p><!-- TODO: Agregar contenido explicativo --></p>
+      </div>
+    </div>
+
+    <!-- FASE 2: CONFIGURACIÓN -->
+    <div class="step-content" *ngIf="currentStep() === 2">
+      <h2>Información Base del Sistema</h2>
+
+      <!-- Usuario -->
+      <section class="config-section">
+        <h3>👤 Información del Usuario</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" [(ngModel)]="wizardData.user.name" placeholder="Ingrese su nombre completo">
+          </div>
+          <div class="form-group">
+            <label>Matrícula *</label>
+            <input type="text" [(ngModel)]="wizardData.user.registration" placeholder="Ej: 12345">
+          </div>
+          <div class="form-group">
+            <label>Correo *</label>
+            <input type="email" [(ngModel)]="wizardData.user.email" placeholder="usuario@ejemplo.com">
+          </div>
+        </div>
+      </section>
+
+      <!-- Jefe Directo -->
+      <section class="config-section">
+        <h3>👔 Información del Jefe Directo</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" [(ngModel)]="wizardData.directManager.name" placeholder="Nombre del jefe directo">
+          </div>
+          <div class="form-group">
+            <label>Matrícula *</label>
+            <input type="text" [(ngModel)]="wizardData.directManager.registration" placeholder="Ej: 67890">
+          </div>
+          <div class="form-group">
+            <label>Correo *</label>
+            <input type="email" [(ngModel)]="wizardData.directManager.email" placeholder="jefe@ejemplo.com">
+          </div>
+        </div>
+      </section>
+
+      <!-- Squads -->
+      <section class="config-section">
+        <div class="section-header">
+          <h3>👥 Squads Asignados</h3>
+          <button type="button" class="btn-add-new-squad" (click)="startNewSquad()"
+            [disabled]="wizardData.squads.length === 0 && isCreatingSquad">
+            ➕ Agregar Squad
+          </button>
+        </div>
+
+        <!-- Formulario Nuevo Squad -->
+        <div class="new-squad-form" *ngIf="isCreatingSquad">
+          <div class="form-header">
+            <h4>Nuevo Squad</h4>
+            <div class="form-header-actions">
+              <button type="button" class="btn-cancel" (click)="cancelNewSquad()">✕ Cancelar</button>
+              <button type="button" class="btn-add-squad" (click)="saveSquad()" [disabled]="!isSquadValid(newSquad)">
+                ✅ Guardar Squad
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Nombre del Squad *</label>
+            <input type="text" [(ngModel)]="newSquad.name" placeholder="Ej: Squad Alpha">
+          </div>
+
+          <h5>Product Owner</h5>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Nombre *</label>
+              <input type="text" [(ngModel)]="newSquad.productOwner.name" placeholder="Nombre del PO">
+            </div>
+            <div class="form-group">
+              <label>Matrícula *</label>
+              <input type="text" [(ngModel)]="newSquad.productOwner.registration" placeholder="Matrícula">
+            </div>
+            <div class="form-group">
+              <label>Correo *</label>
+              <input type="email" [(ngModel)]="newSquad.productOwner.email" placeholder="po@ejemplo.com">
+            </div>
+          </div>
+
+          <h5>Team Members</h5>
+
+          <!-- Team Members Agregados -->
+          <div class="team-members-list" *ngIf="newSquad.teamMembers.length > 0">
+            <div class="team-member-item" *ngFor="let member of newSquad.teamMembers; let i = index">
+              <span>{{ member.name }} - ({{ member.registration }}) - [{{ member.email }}]</span>
+              <button type="button" class="btn-remove-sm" (click)="removeTeamMember(i)">✕</button>
+            </div>
+          </div>
+
+          <!-- Formulario Nuevo Team Member -->
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Nombre</label>
+              <input type="text" [(ngModel)]="newTeamMember.name" placeholder="Nombre del Team Member">
+            </div>
+            <div class="form-group">
+              <label>Matrícula</label>
+              <input type="text" [(ngModel)]="newTeamMember.registration" placeholder="Matrícula">
+            </div>
+            <div class="form-group">
+              <label>Correo</label>
+              <input type="email" [(ngModel)]="newTeamMember.email" placeholder="member@ejemplo.com">
+            </div>
+          </div>
+          <button type="button" class="btn-add-member" (click)="addTeamMember()"
+            [disabled]="!isPersonValid(newTeamMember)">
+            ➕ Agregar Team Member
+          </button>
+        </div>
+
+        <!-- Squads Agregados -->
+        <div class="squads-list" *ngIf="wizardData.squads.length > 0">
+          <div class="squad-card" *ngFor="let squad of wizardData.squads; let i = index">
+            <div class="squad-header">
+              <h4>{{ squad.name }}</h4>
+              <button type="button" class="btn-remove" (click)="removeSquad(i)">✕</button>
+            </div>
+            <div class="squad-info">
+              <p><strong>PO:</strong> {{ squad.productOwner.name }} ({{ squad.productOwner.registration }}) [{{
+                squad.productOwner.email }}]</p>
+              <p><strong>Team Members:</strong> {{ squad.teamMembers.length }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mensaje cuando no hay squads -->
+        <div class="empty-state" *ngIf="wizardData.squads.length === 0 && !isCreatingSquad">
+          <p>No hay squads agregados. Haz clic en "Agregar Squad" para comenzar.</p>
+        </div>
+
+
+      </section>
+    </div>
+
+    <!-- FASE 3: RESUMEN -->
+    <div class="step-content" *ngIf="currentStep() === 3">
+      <h2>Resumen de Configuración</h2>
+
+      <section class="summary-section">
+        <h3>Usuario</h3>
+        <div class="summary-item">
+          <p><strong>Nombre:</strong> {{ wizardData.user.name }}</p>
+          <p><strong>Matrícula:</strong> {{ wizardData.user.registration }}</p>
+          <p><strong>Correo:</strong> {{ wizardData.user.email }}</p>
+        </div>
+      </section>
+
+      <section class="summary-section">
+        <h3>Jefe Directo</h3>
+        <div class="summary-item">
+          <p><strong>Nombre:</strong> {{ wizardData.directManager.name }}</p>
+          <p><strong>Matrícula:</strong> {{ wizardData.directManager.registration }}</p>
+          <p><strong>Correo:</strong> {{ wizardData.directManager.email }}</p>
+        </div>
+      </section>
+
+      <section class="summary-section">
+        <h3>Squads ({{ wizardData.squads.length }})</h3>
+        <div class="summary-squad" *ngFor="let squad of wizardData.squads">
+          <h4>{{ squad.name }}</h4>
+          <div class="summary-item">
+            <p><strong>Product Owner:</strong> {{ squad.productOwner.name }}</p>
+            <p><strong>Matrícula PO:</strong> {{ squad.productOwner.registration }}</p>
+            <p><strong>Correo PO:</strong> {{ squad.productOwner.email }}</p>
+          </div>
+          <div class="summary-item">
+            <p><strong>Team Members ({{ squad.teamMembers.length }}):</strong></p>
+            <ul>
+              <li *ngFor="let member of squad.teamMembers">
+                {{ member.name }} - {{ member.registration }} - {{ member.email }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="wizard-footer">
+    <button type="button" class="btn-secondary" (click)="previousStep()" *ngIf="currentStep() > 1">
+      ← Anterior
+    </button>
+
+    <button type="button" class="btn-primary" (click)="nextStep()" *ngIf="currentStep() < 3" [disabled]="!canProceed()">
+      Siguiente →
+    </button>
+
+    <button type="button" class="btn-success" (click)="finish()" *ngIf="currentStep() === 3">
+      ✓ Finalizar e Iniciar Sistema
+    </button>
+  </div>
+</div>
+
+
+{{wizardData | json}}

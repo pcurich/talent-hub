@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FeedbackRepository } from '../../services/feedback.service';
+import { FeedbackRepository } from '../../repository/feedback.indexeddb.repository';
 import { FeedbackEntity, FeedbackType, ActionableStatus, ActionResponsible, Seniority, CompanyType, GeneralRating, PerformanceLevel } from '@pcurich/client-storage-indexeddb';
 
 @Component({

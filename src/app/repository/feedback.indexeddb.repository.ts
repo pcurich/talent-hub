@@ -45,7 +45,7 @@ export class FeedbackRepository implements IFeedbackRepository {
   // Método para refrescar el caché desde IndexedDB
   private async refreshEntities() {
     try {
-      debugger;
+      // debugger;
       const feedbacks = await this.feedbackService.getAllFeedbacks();
       this.entities.set(feedbacks || []);
       console.log(`${feedbacks?.length || 0} feedbacks cargados desde IndexedDB`);

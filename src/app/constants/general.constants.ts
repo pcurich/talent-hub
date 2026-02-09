@@ -1,0 +1,23 @@
+export const STORAGE_KEYS = {
+  CURRENT_REGISTRATION: 'CURRENT_REGISTRATION',
+  CURRENT_EMAIL: 'CURRENT_EMAIL'
+} as const;
+
+export const API_ENDPOINTS = {
+  // tus endpoints aquí
+} as const;
+
+export const APP_CONFIG = {
+  // configuraciones generales aquí
+} as const;
+
+export const SERVICE_CODES = {
+  SC_GET_CURRENT_USER: 'CURRENT_USER',
+  
+} as const;
+
+export const ERROR_MESSAGES = {
+  INVALID_INPUT: 'Entrada inválida. Por favor, verifica los datos.',
+  DB_INIT_FAILED: 'Error al inicializar la base de datos. Intenta nuevamente.',
+  USER_NOT_FOUND: 'Usuario no encontrado. Por favor, regístrate primero.'
+} as const;
