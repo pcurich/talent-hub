@@ -5,7 +5,7 @@
       <p>Ingresa tu matrícula y correo para iniciar</p>
     </div>
 
-    <form class="login-form" (ngSubmit)="save()">
+    <form class="login-form" #loginForm="ngForm" (ngSubmit)="save()">
       <div class="form-group">
         <label for="registration">Matrícula</label>
         <input
@@ -32,7 +32,7 @@
 
       <div class="form-error" *ngIf="errorMessage">{{ errorMessage }}</div>
 
-      <button type="submit" class="btn-primary">
+      <button type="submit" class="btn-primary" [disabled]="!registration || !email || loginForm.invalid">
         Entrar
       </button>
     </form>

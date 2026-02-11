@@ -1,3 +1,13 @@
+import { BaseEntity } from "@pcurich/client-storage-indexeddb";
+
+export type PersonRole = 'user' | 'directManager' | 'teamMember' | null;
+
+export interface PersonMatch {
+  person: Person | null;
+  role: PersonRole;
+  squadName?: string;
+}
+
 export interface Person {
   name: string;
   registration: string;
@@ -14,7 +24,7 @@ export interface Squad {
   teamMembers: TeamMember[];
 }
 
-export interface CurrentUser {
+export interface CurrentUser extends BaseEntity {
   user: Person;
   directManager: Person;
   squads: Squad[];

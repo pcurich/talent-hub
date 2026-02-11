@@ -3,7 +3,7 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CURRENT_USER_REPOSITORY, INIT_APP_REPOSITORY } from '../../tokens/repository.tokens';
-import { STORAGE_KEYS } from '../../constants/general.constants';
+import { ERROR_MESSAGES, STORAGE_KEYS } from '../../constants/general.constants';
 
 @Component({
   selector: 'app-login',
@@ -29,7 +29,7 @@ export class LoginComponent {
     const email = this.email.trim();
 
     if (!registration || !email) {
-      this.errorMessage = 'Completa matrícula y correo.';
+      this.errorMessage = ERROR_MESSAGES.LOGIN_VALIDATION_FAILED;
       return;
     }
 
@@ -37,20 +37,18 @@ export class LoginComponent {
       localStorage.setItem(STORAGE_KEYS.CURRENT_REGISTRATION, registration);
       localStorage.setItem(STORAGE_KEYS.CURRENT_EMAIL, email);
 
-
       await this.initRepo.initializeDatabase(registration);
       let existingUser = await this.currentUserRepo.exists(registration);
+      debugger;
 
       if (!existingUser) {
         this.router.navigate(['/init']);
         return Promise.resolve();
       }
 
-      console.log('Base de datos inicializada, navegando a home...');
       this.router.navigate(['/']);
-    } catch (err) {
-      console.error('Error al inicializar la base de datos:', err);
-      this.errorMessage = 'Error al inicializar la base de datos. Intenta nuevamente.';
+    } catch (err: any) {
+      this.errorMessage = ERROR_MESSAGES.DB_INIT_FAILED(err);
     }
   }
 }

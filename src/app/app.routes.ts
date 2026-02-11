@@ -10,6 +10,9 @@ import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout';
 import { authGuard } from './guards/auth.guard';
 import { WizardLayoutComponent } from './layouts/wizard-layout/wizard-layout';
+import { CurrentUserComponent } from './components/current-user/current-user.component';
+import { NotificationsComponent } from './components/notifications/notifications.component';
+import { SystemConfigComponent } from './components/system-config/system-config.component';
 
 export const routes: Routes = [
 
@@ -41,10 +44,13 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: '', component: HomeComponent },
+      { path: 'profile', component: CurrentUserComponent },
+      { path: 'notifications', component: NotificationsComponent },
       { path: 'create-feedback', component: CreateFeedbackEntityComponent },
       { path: 'update-feedback/:id', component: UpdateFeedbackEntityComponent },
       { path: 'excel-settings', component: ExcelSettingsComponent },
-      { path: 'field-options', component: FieldOptionsManagerComponent }
+      { path: 'field-options', component: FieldOptionsManagerComponent },
+      { path: 'settings', component: SystemConfigComponent }
     ]
   },
 

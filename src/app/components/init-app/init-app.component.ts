@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Person, Squad, TeamMember, CurrentUser } from '../../model/current-user.model';
 import { Router } from '@angular/router';
+import { CURRENT_USER_REPOSITORY } from '../../tokens/repository.tokens';
 
 @Component({
   selector: 'app-init-app',
@@ -12,22 +13,29 @@ import { Router } from '@angular/router';
   styleUrl: './init-app.component.scss'
 })
 export class InitAppComponent {
+
+  // ✅ Inyección a nivel de clase (contexto de inyección válido)
+  private currentUserRepo = inject(CURRENT_USER_REPOSITORY);
+  private router = inject(Router);
+
   currentStep = signal(1);
-  isCreatingSquad = false;
+  isCreatingSquad = true;
 
   wizardData: CurrentUser = {
     user: { name: 'Pedro Curich', registration: 'T10541', email: 'pedrocurich@example.com' },
     directManager: { name: 'Brayan', registration: 'T10542', email: 'brayan@example.com' },
-    squads: []
+    squads: [],
+    id: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    updateTimestamp: function (): void {
+      throw new Error('Function not implemented.');
+    }
   };
 
   newSquad: Squad = this.createEmptySquad();
   newTeamMember: TeamMember = this.createEmptyPerson();
 
-  constructor(private router: Router) {
-    // Inicia con el formulario de squad visible
-    this.isCreatingSquad = true;
-  }
 
   // ============ NAVIGATION ============
   nextStep(): void {
@@ -83,6 +91,9 @@ export class InitAppComponent {
 
   saveSquad(): void {
     if (this.isSquadValid(this.newSquad)) {
+      if (!this.wizardData.squads) {
+        this.wizardData.squads = [];
+      }
       this.wizardData.squads.push({ ...this.newSquad });
       this.isCreatingSquad = false;
       this.newSquad = this.createEmptySquad();
@@ -125,15 +136,10 @@ export class InitAppComponent {
     };
   }
 
-  // ============ FINALIZE ============
   async finish(): Promise<void> {
     try {
-      // TODO: Guardar datos en IndexedDB
-      console.log('Datos a guardar:', this.wizardData);
-
-      // TODO: Inicializar el sistema con estos datos
-
-      // Navegar al home
+      delete (this.wizardData as any).id;
+      await this.currentUserRepo.create(this.wizardData);
       await this.router.navigate(['/']);
     } catch (error) {
       console.error('Error al inicializar el sistema:', error);
