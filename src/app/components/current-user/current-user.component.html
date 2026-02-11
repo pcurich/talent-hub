@@ -1,0 +1,178 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <div class="profile-avatar">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+      </svg>
+    </div>
+    <div class="profile-info">
+      <h2>{{ currentUser.user.name || 'Usuario' }}</h2>
+      <span class="registration">{{ currentUser.user.registration }}</span>
+      <span class="email">{{ currentUser.user.email }}</span>
+    </div>
+    <button class="btn-edit" (click)="toggleEdit()">
+      <svg *ngIf="!isEditing" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+      </svg>
+      <svg *ngIf="isEditing" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+      </svg>
+      {{ isEditing ? 'Cancelar' : 'Editar' }}
+    </button>
+  </div>
+
+  <div class="profile-sections">
+    <!-- Información Personal -->
+    <section class="profile-section">
+      <h3>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+        </svg>
+        Información Personal
+      </h3>
+      <div class="section-content">
+        <div class="field-group">
+          <label>Nombre</label>
+          <input *ngIf="isEditing" type="text" [(ngModel)]="editableUser.name" />
+          <span *ngIf="!isEditing">{{ currentUser.user.name }}</span>
+        </div>
+        <div class="field-group">
+          <label>Matrícula</label>
+          <span>{{ currentUser.user.registration }}</span>
+        </div>
+        <div class="field-group">
+          <label>Correo</label>
+          <input *ngIf="isEditing" type="email" [(ngModel)]="editableUser.email" />
+          <span *ngIf="!isEditing">{{ currentUser.user.email }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Manager Directo -->
+    <section class="profile-section">
+      <h3>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+          <path d="M12 5.9c1.16 0 2.1.94 2.1 2.1s-.94 2.1-2.1 2.1S9.9 9.16 9.9 8s.94-2.1 2.1-2.1m0 9c2.97 0 6.1 1.46 6.1 2.1v1.1H5.9V17c0-.64 3.13-2.1 6.1-2.1M12 4C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 9c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z"/>
+        </svg>
+        Manager Directo
+      </h3>
+      <div class="section-content">
+        <div class="field-group">
+          <label>Nombre</label>
+          <input *ngIf="isEditing" type="text" [(ngModel)]="editableManager.name" />
+          <span *ngIf="!isEditing">{{ currentUser.directManager.name || 'No asignado' }}</span>
+        </div>
+        <div class="field-group">
+          <label>Matrícula</label>
+          <span>{{ currentUser.directManager.registration || '-' }}</span>
+        </div>
+        <div class="field-group">
+          <label>Correo</label>
+          <input *ngIf="isEditing" type="email" [(ngModel)]="editableManager.email" />
+          <span *ngIf="!isEditing">{{ currentUser.directManager.email || '-' }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Squads -->
+    <section class="profile-section">
+      <h3>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+          <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+        </svg>
+        Squads ({{ isEditing ? editableSquads.length : (currentUser.squads?.length || 0) }})
+        <button *ngIf="isEditing" class="btn-add-small" (click)="addSquad()" title="Agregar Squad">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+          </svg>
+        </button>
+      </h3>
+
+      <!-- Vista de solo lectura -->
+      <div class="squads-list" *ngIf="!isEditing && currentUser.squads?.length">
+        <div class="squad-card" *ngFor="let squad of currentUser.squads">
+          <div class="squad-header">
+            <h4>{{ squad.name }}</h4>
+            <span class="member-count">{{ getSquadMembersCount(squad) }} miembros</span>
+          </div>
+          <div class="squad-info">
+            <div class="po-info">
+              <strong>Product Owner:</strong>
+              <span>{{ squad.productOwner?.name || 'No asignado' }}</span>
+            </div>
+            <div class="team-members-preview" *ngIf="squad.teamMembers?.length">
+              <strong>Miembros:</strong>
+              <span class="members-list">
+                <ng-container *ngFor="let member of squad.teamMembers | slice:0:3; let last = last">
+                  {{ member.name }}{{ !last ? ', ' : '' }}
+                </ng-container>
+                <span *ngIf="squad.teamMembers.length > 3"> +{{ squad.teamMembers.length - 3 }} más</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vista de edición -->
+      <div class="squads-list editable" *ngIf="isEditing">
+        <div class="squad-card editable" *ngFor="let squad of editableSquads; let squadIndex = index">
+          <div class="squad-header">
+            <input type="text" [(ngModel)]="squad.name" placeholder="Nombre del Squad" class="squad-name-input" />
+            <button class="btn-remove" (click)="removeSquad(squadIndex)" title="Eliminar Squad">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Product Owner -->
+          <div class="squad-section">
+            <label class="section-label">Product Owner</label>
+            <div class="person-fields">
+              <input type="text" [(ngModel)]="squad.productOwner.name" placeholder="Nombre" />
+              <input type="text" [(ngModel)]="squad.productOwner.registration" placeholder="Matrícula" />
+              <input type="email" [(ngModel)]="squad.productOwner.email" placeholder="Correo" />
+            </div>
+          </div>
+
+          <!-- Team Members -->
+          <div class="squad-section">
+            <div class="section-header">
+              <label class="section-label">Team Members ({{ squad.teamMembers?.length || 0 }})</label>
+              <button class="btn-add-small" (click)="addTeamMember(squadIndex)" title="Agregar Miembro">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+                Agregar
+              </button>
+            </div>
+            <div class="team-members-list">
+              <div class="team-member-row" *ngFor="let member of squad.teamMembers; let memberIndex = index">
+                <input type="text" [(ngModel)]="member.name" placeholder="Nombre" />
+                <input type="text" [(ngModel)]="member.registration" placeholder="Matrícula" />
+                <input type="email" [(ngModel)]="member.email" placeholder="Correo" />
+                <button class="btn-remove-small" (click)="removeTeamMember(squadIndex, memberIndex)" title="Eliminar">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                  </svg>
+                </button>
+              </div>
+              <p *ngIf="!squad.teamMembers?.length" class="no-members">Sin miembros. Haz clic en "Agregar" para añadir.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="add-squad-placeholder" *ngIf="!editableSquads.length">
+          <p>No hay squads. Haz clic en + para agregar uno.</p>
+        </div>
+      </div>
+
+      <p *ngIf="!isEditing && !currentUser.squads?.length" class="no-data">No perteneces a ningún squad</p>
+    </section>
+  </div>
+
+  <div class="profile-actions" *ngIf="isEditing">
+    <button class="btn-cancel" (click)="toggleEdit()">Cancelar</button>
+    <button class="btn-save" (click)="saveChanges()">Guardar Cambios</button>
+  </div>
+</div>

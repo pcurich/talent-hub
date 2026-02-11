@@ -1,9 +1,11 @@
 import { Signal } from "@angular/core";
-import { CurrentUser } from "../model/current-user.model";
+import { CurrentUser, PersonMatch } from "../model/current-user.model";
+import { IInitializable } from "./initializable.interface";
 
-export interface ICurrentUserRepository {
+export interface ICurrentUserRepository extends IInitializable {
   exists(registration: string): Promise<boolean>;
-  get(registration: string): Signal<CurrentUser>;
+  get(): Signal<CurrentUser>;
+  findByRegistration(registration: string): PersonMatch;
   create(currentUser: CurrentUser): Promise<boolean>;
   update(currentUser: CurrentUser): Promise<boolean>;
 }

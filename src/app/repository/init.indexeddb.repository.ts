@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { IInitAppRepository } from '../interfaces/init.repository.interface';
 import { createIndexedDbServices, databaseExists, HttpMockService } from '@pcurich/client-storage-indexeddb';
 import { HTTP_MOCK_DB_CONFIG } from '@pcurich/client-storage-indexeddb';
+import { getIndexedDbConfigWithRegistration } from '../util/indexeddb-config.util';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ export class InitAppIndexeddbRepository implements IInitAppRepository {
   private httpService!: HttpMockService;
 
   async initializeDatabase(registration: string): Promise<void> {
-    this.cfg.stores[0].name = HTTP_MOCK_DB_CONFIG.stores[0].name + '-' + registration;
+    this.cfg = getIndexedDbConfigWithRegistration(registration);
     debugger;
     const isInit = await this.isInitialized();
 

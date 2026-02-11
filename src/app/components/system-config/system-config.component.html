@@ -1,0 +1,421 @@
+<div class="config-container">
+  <div class="config-header">
+    <h1>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
+        <path
+          d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z" />
+      </svg>
+      Configuración del Sistema
+    </h1>
+    <p class="config-description">Personaliza el comportamiento y apariencia de la aplicación</p>
+  </div>
+
+  <div class="config-layout">
+    <!-- Sidebar de grupos -->
+    <aside class="config-sidebar">
+      <nav class="config-nav">
+        <button *ngFor="let group of configGroups" class="nav-item" [class.active]="activeGroupKey() === group.key"
+          (click)="selectGroup(group.key)">
+          <span class="nav-icon">
+            <ng-container [ngSwitch]="group.icon">
+              <svg *ngSwitchCase="'feedback'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                fill="currentColor">
+                <path
+                  d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12h-2v-2h2v2zm0-4h-2V6h2v4z" />
+              </svg>
+              <svg *ngSwitchCase="'people'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+              </svg>
+              <svg *ngSwitchCase="'notifications'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                fill="currentColor">
+                <path
+                  d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+              </svg>
+              <svg *ngSwitchCase="'assessment'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                fill="currentColor">
+                <path
+                  d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+              </svg>
+              <svg *ngSwitchCase="'palette'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
+              </svg>
+              <svg *ngSwitchDefault xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+              </svg>
+            </ng-container>
+          </span>
+          <span class="nav-label">{{ group.label }}</span>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main class="config-content" *ngIf="activeGroup">
+      <div class="group-header">
+        <h2>{{ activeGroup.label }}</h2>
+        <p *ngIf="activeGroup.description">{{ activeGroup.description }}</p>
+      </div>
+
+      <div class="fields-list">
+        <div class="field-item" *ngFor="let field of activeGroup.fields">
+          <div class="field-header">
+            <div class="field-header-left">
+              <label [for]="field.key">{{ field.label }}</label>
+              <button class="help-btn" (mouseenter)="showTooltip(field.key)" (mouseleave)="hideTooltip()"
+                (focus)="showTooltip(field.key)" (blur)="hideTooltip()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                  <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" />
+                </svg>
+              </button>
+              <div class="tooltip" *ngIf="activeTooltip() === field.key">
+                {{ field.description }}
+              </div>
+            </div>
+            <!-- Botón editar opciones (solo para select y multi-select) -->
+            <button *ngIf="field.type === 'select' || field.type === 'multi-select'"
+              class="edit-options-btn" (click)="openFieldEditor(field)" title="Editar opciones">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+              </svg>
+              <span class="options-count-badge">{{ field.options?.length || 0 }}</span>
+            </button>
+          </div>
+
+          <div class="field-control">
+            <!-- Select -->
+            <ng-container *ngIf="field.type === 'select'">
+              <select [id]="field.key" [value]="getValue(field.key)" (change)="onSelectChange(field, $event)">
+                <option *ngFor="let opt of field.options" [value]="opt.value">
+                  {{ opt.label }}
+                </option>
+              </select>
+              <p class="option-description"
+                *ngIf="getOptionByValue(field.options!, getValue(field.key)) as selectedOption">
+                {{ selectedOption.description }}
+              </p>
+            </ng-container>
+
+            <!-- Multi-select -->
+            <ng-container *ngIf="field.type === 'multi-select'">
+              <div class="checkbox-group">
+                <label *ngFor="let opt of field.options" class="checkbox-option">
+                  <input type="checkbox" [checked]="isOptionSelected(field, opt.value)"
+                    (change)="onMultiSelectChange(field, opt, $event)" />
+                  <span class="checkbox-label">{{ opt.label }}</span>
+                  <span class="checkbox-desc" *ngIf="opt.description">({{ opt.description }})</span>
+                </label>
+              </div>
+            </ng-container>
+
+            <!-- Boolean / Toggle -->
+            <ng-container *ngIf="field.type === 'boolean'">
+              <label class="toggle-switch">
+                <input type="checkbox" [id]="field.key" [checked]="getValue(field.key)"
+                  (change)="onBooleanChange(field, $event)" />
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">{{ getValue(field.key) ? 'Habilitado' : 'Deshabilitado' }}</span>
+              </label>
+            </ng-container>
+
+            <!-- Text -->
+            <ng-container *ngIf="field.type === 'text'">
+              <input type="text" [id]="field.key" [value]="getValue(field.key)" [placeholder]="field.placeholder || ''"
+                (input)="onTextChange(field, $event)" />
+            </ng-container>
+
+            <!-- Number -->
+            <ng-container *ngIf="field.type === 'number'">
+              <div class="number-input-wrapper">
+                <input type="number" [id]="field.key" [value]="getValue(field.key)" [min]="field.min" [max]="field.max"
+                  (input)="onNumberChange(field, $event)" />
+                <span class="number-hint" *ngIf="field.min !== undefined || field.max !== undefined">
+                  <ng-container *ngIf="field.min !== undefined">Mín: {{ field.min }}</ng-container>
+                  <ng-container *ngIf="field.min !== undefined && field.max !== undefined"> | </ng-container>
+                  <ng-container *ngIf="field.max !== undefined">Máx: {{ field.max }}</ng-container>
+                </span>
+              </div>
+            </ng-container>
+
+            <!-- Color -->
+            <ng-container *ngIf="field.type === 'color'">
+              <div class="color-input-wrapper">
+                <input type="color" [id]="field.key" [value]="getValue(field.key)"
+                  (input)="onColorChange(field, $event)" />
+                <input type="text" [value]="getValue(field.key)" (input)="onTextChange(field, $event)"
+                  class="color-text" pattern="^#[0-9A-Fa-f]{6}$" />
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Barra de acciones -->
+  <footer class="config-actions" [class.has-changes]="hasChanges()">
+    <div class="actions-left">
+      <button class="btn-reset" (click)="resetToDefaults()" [disabled]="isSaving()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+          <path
+            d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" />
+        </svg>
+        Restaurar valores por defecto
+      </button>
+    </div>
+    <div class="actions-right">
+      <span class="changes-indicator" *ngIf="hasChanges()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+          <circle cx="12" cy="12" r="8" />
+        </svg>
+        Cambios sin guardar
+      </span>
+      <button class="btn-cancel" (click)="cancelChanges()" [disabled]="!hasChanges() || isSaving()">
+        Cancelar
+      </button>
+      <button class="btn-save" (click)="saveConfig()" [disabled]="!hasChanges() || isSaving()">
+        <svg *ngIf="isSaving()" class="spinner" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+          fill="currentColor" width="18" height="18">
+          <path
+            d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
+        </svg>
+        {{ isSaving() ? 'Guardando...' : 'Guardar cambios' }}
+      </button>
+    </div>
+  </footer>
+</div>
+
+<!-- Modal de Edición de Opciones -->
+@if (editorPresenter.isModalOpen()) {
+  <div class="modal-overlay" (click)="closeFieldEditor()">
+    <div class="modal-container field-editor-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-section">
+          <h2>Editar Opciones</h2>
+          <span class="field-name-badge">{{ editorPresenter.currentField()?.label }}</span>
+        </div>
+        <button class="close-btn" (click)="closeFieldEditor()" title="Cerrar">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Info del campo -->
+        <div class="field-info-section">
+          <p class="field-description">{{ editorPresenter.currentField()?.description }}</p>
+          <div class="field-stats">
+            <span class="stat-item">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+              </svg>
+              {{ editorPresenter.getOptionsCount() }} opciones
+            </span>
+            <span class="stat-item">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              </svg>
+              {{ editorPresenter.getActiveOptionsCount() }} activas
+            </span>
+          </div>
+        </div>
+
+        <!-- Toolbar de opciones -->
+        <div class="options-toolbar">
+          <button class="btn-add-option" (click)="editorPresenter.startAddOption()"
+            [disabled]="editorPresenter.isAddingOption() || editorPresenter.isEditingOption()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+            Agregar opción
+          </button>
+        </div>
+
+        <!-- Formulario de agregar/editar opción -->
+        @if (editorPresenter.isAddingOption() || editorPresenter.isEditingOption()) {
+          <div class="option-form-section">
+            <h4>{{ editorPresenter.isAddingOption() ? 'Nueva Opción' : 'Editar Opción' }}</h4>
+            <div class="option-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="optionValue">Valor (interno) *</label>
+                  <input type="text" id="optionValue"
+                    [value]="editorPresenter.optionForm().value"
+                    (input)="onOptionFormChange('value', $event)"
+                    placeholder="ej: draft, pending">
+                </div>
+                <div class="form-group">
+                  <label for="optionLabel">Etiqueta (visible) *</label>
+                  <input type="text" id="optionLabel"
+                    [value]="editorPresenter.optionForm().label"
+                    (input)="onOptionFormChange('label', $event)"
+                    placeholder="ej: Borrador, Pendiente">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="optionDescription">Descripción</label>
+                  <input type="text" id="optionDescription"
+                    [value]="editorPresenter.optionForm().description"
+                    (input)="onOptionFormChange('description', $event)"
+                    placeholder="Descripción de la opción">
+                </div>
+                <div class="form-group form-group-small">
+                  <label for="optionColor">Color</label>
+                  <div class="color-input-group">
+                    <input type="color" id="optionColor"
+                      [value]="editorPresenter.optionForm().color || '#6c757d'"
+                      (input)="onOptionFormChange('color', $event)">
+                    <input type="text" class="color-text-input"
+                      [value]="editorPresenter.optionForm().color"
+                      (input)="onOptionFormChange('color', $event)"
+                      placeholder="#RRGGBB">
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group form-group-checkbox">
+                  <label class="checkbox-label">
+                    <input type="checkbox"
+                      [checked]="editorPresenter.optionForm().disabled"
+                      (change)="onOptionDisabledChange($event)">
+                    Deshabilitada
+                  </label>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button class="btn-cancel-form" (click)="editorPresenter.cancelEdit()">
+                  Cancelar
+                </button>
+                <button class="btn-save-form" (click)="saveCurrentOption()">
+                  {{ editorPresenter.isAddingOption() ? 'Agregar' : 'Guardar' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Lista de opciones -->
+        <div class="options-list-section">
+          <h4>Opciones configuradas</h4>
+          @if (editorPresenter.workingOptions().length === 0) {
+            <div class="empty-options">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
+                <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
+              </svg>
+              <p>No hay opciones configuradas</p>
+              <span>Haz clic en "Agregar opción" para crear la primera</span>
+            </div>
+          } @else {
+            <div class="options-table-container">
+              <table class="options-table">
+                <thead>
+                  <tr>
+                    <th class="col-order">#</th>
+                    <th class="col-value">Valor</th>
+                    <th class="col-label">Etiqueta</th>
+                    <th class="col-color">Color</th>
+                    <th class="col-status">Estado</th>
+                    <th class="col-actions">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (option of editorPresenter.workingOptions(); track option.value; let i = $index) {
+                    <tr [class.disabled-row]="option.disabled"
+                        [class.editing-row]="editorPresenter.editingOptionIndex() === i">
+                      <td class="col-order">
+                        <div class="order-controls">
+                          <button class="btn-reorder" (click)="moveOptionUp(i)" [disabled]="i === 0" title="Mover arriba">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                              <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
+                            </svg>
+                          </button>
+                          <span>{{ i + 1 }}</span>
+                          <button class="btn-reorder" (click)="moveOptionDown(i)"
+                            [disabled]="i === editorPresenter.workingOptions().length - 1" title="Mover abajo">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                              <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                      <td class="col-value"><code>{{ option.value }}</code></td>
+                      <td class="col-label">{{ option.label }}</td>
+                      <td class="col-color">
+                        @if (option.color) {
+                          <span class="color-preview" [style.background-color]="option.color"></span>
+                          <code>{{ option.color }}</code>
+                        } @else {
+                          <span class="no-color">—</span>
+                        }
+                      </td>
+                      <td class="col-status">
+                        <span class="status-badge" [class.active]="!option.disabled" [class.disabled]="option.disabled">
+                          {{ option.disabled ? 'Deshabilitada' : 'Activa' }}
+                        </span>
+                      </td>
+                      <td class="col-actions">
+                        <div class="action-buttons">
+                          <button class="btn-action btn-edit" (click)="editorPresenter.startEditOption(i)"
+                            [disabled]="editorPresenter.isAddingOption() || editorPresenter.isEditingOption()"
+                            title="Editar">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                            </svg>
+                          </button>
+                          <button class="btn-action btn-toggle" (click)="toggleOptionDisabled(i)"
+                            [title]="option.disabled ? 'Habilitar' : 'Deshabilitar'">
+                            @if (option.disabled) {
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                              </svg>
+                            } @else {
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                                <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
+                              </svg>
+                            }
+                          </button>
+                          <button class="btn-action btn-delete" (click)="deleteOption(i)" title="Eliminar">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div class="footer-left">
+          @if (editorPresenter.hasUnsavedChanges()) {
+            <span class="unsaved-indicator">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                <circle cx="12" cy="12" r="8"/>
+              </svg>
+              Cambios sin guardar
+            </span>
+          }
+        </div>
+        <div class="footer-right">
+          <button class="btn-reset-changes" (click)="resetEditorChanges()"
+            [disabled]="!editorPresenter.hasUnsavedChanges()">
+            Descartar cambios
+          </button>
+          <button class="btn-save-all" (click)="saveFieldOptions()"
+            [disabled]="!editorPresenter.hasUnsavedChanges()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+              <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+            </svg>
+            Guardar opciones
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
