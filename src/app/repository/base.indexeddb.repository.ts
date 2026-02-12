@@ -16,6 +16,23 @@ import { getIndexedDbConfigWithRegistration } from "../util/indexeddb-config.uti
  * - Dependency Inversion: Depende de abstracciones (IInitializable)
  */
 export abstract class BaseIndexeddbRepository<T> implements IInitializable {
+  /**
+   * Singleton: Instancia compartida del servicio IndexedDB.
+   * Se crea una sola vez y se comparte entre todos los repositorios.
+   */
+  private static sharedHttpMockService: HttpMockService | null = null;
+
+  /**
+   * Promesa de inicialización para evitar race conditions.
+   * Garantiza que createIndexedDbServices se ejecute solo una vez.
+   */
+  private static initializationPromise: Promise<void> | null = null;
+
+  /**
+   * Indica si la base de datos global ya fue inicializada.
+   */
+  private static globalInitialized = false;
+
   protected httpMockService: HttpMockService | null = null;
   protected entity: WritableSignal<T>;
   protected isInitialized = false;
@@ -55,26 +72,66 @@ export abstract class BaseIndexeddbRepository<T> implements IInitializable {
    * Asegura que la base de datos exista y que httpMockService esté configurado.
    * Si la BD no existe, la crea. Si ya existe, solo abre la conexión.
    * Este método es idempotente y puede usarse en todos los métodos transaccionales.
+   *
+   * IMPORTANTE: createIndexedDbServices se ejecuta UNA SOLA VEZ en todo el ciclo de vida
+   * del sistema, compartiendo la conexión entre todos los repositorios.
    */
   protected async ensureDatabase(registration: string = ''): Promise<void> {
+    // Si esta instancia ya está inicializada, no hacer nada
     if (this.isInitialized && this.httpMockService) {
       return;
     }
 
+    // Si ya existe una inicialización global en progreso, esperar a que termine
+    if (BaseIndexeddbRepository.initializationPromise) {
+      await BaseIndexeddbRepository.initializationPromise;
+      this.httpMockService = BaseIndexeddbRepository.sharedHttpMockService;
+      this.isInitialized = true;
+      console.log(`[${this.constructor.name}] Usando conexión compartida existente`);
+      return;
+    }
+
+    // Si ya está inicializado globalmente, usar la instancia compartida
+    if (BaseIndexeddbRepository.globalInitialized && BaseIndexeddbRepository.sharedHttpMockService) {
+      this.httpMockService = BaseIndexeddbRepository.sharedHttpMockService;
+      this.isInitialized = true;
+      console.log(`[${this.constructor.name}] Usando conexión compartida existente`);
+      return;
+    }
+
+    // Primera inicialización: crear la promesa para evitar race conditions
+    BaseIndexeddbRepository.initializationPromise = this.initializeSharedDatabase(registration);
+
+    try {
+      await BaseIndexeddbRepository.initializationPromise;
+      this.httpMockService = BaseIndexeddbRepository.sharedHttpMockService;
+      this.isInitialized = true;
+      console.log(`[${this.constructor.name}] Database inicializada (primera vez)`);
+    } finally {
+      // Limpiar la promesa después de completar
+      BaseIndexeddbRepository.initializationPromise = null;
+    }
+  }
+
+  /**
+   * Inicializa la base de datos compartida. Solo se ejecuta una vez.
+   */
+  private async initializeSharedDatabase(registration: string): Promise<void> {
     const cfg = getIndexedDbConfigWithRegistration(registration);
     const dataTableName = cfg.stores[0].name;
     const keyPath = cfg.stores[0].keyPath;
 
+    // Esta línea solo se ejecuta UNA VEZ en todo el ciclo de vida del sistema
     const services = await createIndexedDbServices(cfg);
+    console.log('[BaseIndexeddbRepository] createIndexedDbServices ejecutado (única vez)');
 
     if ((services as any).httpMockService) {
-      this.httpMockService = (services as any).httpMockService;
+      BaseIndexeddbRepository.sharedHttpMockService = (services as any).httpMockService;
     } else {
-      this.httpMockService = new HttpMockService(services['dbContext'], dataTableName, keyPath);
+      BaseIndexeddbRepository.sharedHttpMockService = new HttpMockService(services['dbContext'], dataTableName, keyPath);
     }
 
-    this.isInitialized = true;
-    console.log(`[${this.constructor.name}] Database asegurada correctamente`);
+    BaseIndexeddbRepository.globalInitialized = true;
   }
 
   /**

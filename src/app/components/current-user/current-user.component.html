@@ -80,7 +80,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
           <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
         </svg>
-        Squads ({{ isEditing ? editableSquads.length : (currentUser.squads?.length || 0) }})
+        Squads ({{ isEditing ? editableSquads.length : (currentUser.squads.length || 0) }})
         <button *ngIf="isEditing" class="btn-add-small" (click)="addSquad()" title="Agregar Squad">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
             <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
@@ -89,7 +89,7 @@
       </h3>
 
       <!-- Vista de solo lectura -->
-      <div class="squads-list" *ngIf="!isEditing && currentUser.squads?.length">
+      <div class="squads-list" *ngIf="!isEditing && currentUser.squads.length">
         <div class="squad-card" *ngFor="let squad of currentUser.squads">
           <div class="squad-header">
             <h4>{{ squad.name }}</h4>
@@ -98,9 +98,9 @@
           <div class="squad-info">
             <div class="po-info">
               <strong>Product Owner:</strong>
-              <span>{{ squad.productOwner?.name || 'No asignado' }}</span>
+              <span>{{ squad.productOwner.name || 'No asignado' }}</span>
             </div>
-            <div class="team-members-preview" *ngIf="squad.teamMembers?.length">
+            <div class="team-members-preview" *ngIf="squad.teamMembers.length">
               <strong>Miembros:</strong>
               <span class="members-list">
                 <ng-container *ngFor="let member of squad.teamMembers | slice:0:3; let last = last">
@@ -138,7 +138,7 @@
           <!-- Team Members -->
           <div class="squad-section">
             <div class="section-header">
-              <label class="section-label">Team Members ({{ squad.teamMembers?.length || 0 }})</label>
+              <label class="section-label">Team Members ({{ squad.teamMembers.length || 0 }})</label>
               <button class="btn-add-small" (click)="addTeamMember(squadIndex)" title="Agregar Miembro">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
                   <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
@@ -151,13 +151,19 @@
                 <input type="text" [(ngModel)]="member.name" placeholder="Nombre" />
                 <input type="text" [(ngModel)]="member.registration" placeholder="Matrícula" />
                 <input type="email" [(ngModel)]="member.email" placeholder="Correo" />
+                <select [value]="member.companyKey || ''" (change)="onCompanyChange(member, $event)" class="company-select">
+                  <option value="">Seleccionar empresa</option>
+                  <option *ngFor="let opt of companyOptions" [value]="opt.value" [selected]="opt.value === member.companyKey">
+                    {{ opt.label }}
+                  </option>
+                </select>
                 <button class="btn-remove-small" (click)="removeTeamMember(squadIndex, memberIndex)" title="Eliminar">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
                     <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
                   </svg>
                 </button>
               </div>
-              <p *ngIf="!squad.teamMembers?.length" class="no-members">Sin miembros. Haz clic en "Agregar" para añadir.</p>
+              <p *ngIf="!squad.teamMembers.length" class="no-members">Sin miembros. Haz clic en "Agregar" para añadir.</p>
             </div>
           </div>
         </div>
@@ -167,7 +173,7 @@
         </div>
       </div>
 
-      <p *ngIf="!isEditing && !currentUser.squads?.length" class="no-data">No perteneces a ningún squad</p>
+      <p *ngIf="!isEditing && !currentUser.squads.length" class="no-data">No perteneces a ningún squad</p>
     </section>
   </div>
 
