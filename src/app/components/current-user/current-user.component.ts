@@ -1,8 +1,10 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CURRENT_USER_REPOSITORY } from '../../tokens/repository.tokens';
+import { CURRENT_USER_REPOSITORY, SYSTEM_CONFIG_REPOSITORY } from '../../tokens/repository.tokens';
 import { CurrentUser, Person, Squad, TeamMember } from '../../model/current-user.model';
+import { FieldOption } from '../../model/system-config.model';
+import { SYSTEM_CONFIG_KEYS } from '../../constants/general.constants';
 
 @Component({
   selector: 'app-current-user',
@@ -13,9 +15,13 @@ import { CurrentUser, Person, Squad, TeamMember } from '../../model/current-user
 })
 export class CurrentUserComponent implements OnInit {
   private currentUserRepo = inject(CURRENT_USER_REPOSITORY);
+  private systemConfigRepo = inject(SYSTEM_CONFIG_REPOSITORY);
 
   currentUser : CurrentUser = this.currentUserRepo.get()();
   isEditing = false;
+
+  // Opciones de company para team members
+  companyOptions: FieldOption[] = [];
 
   // Campos editables
   editableUser: Person = { name: '', registration: '', email: '' };
@@ -27,7 +33,16 @@ export class CurrentUserComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadCompanyOptions();
     this.loadCurrentUser();
+  }
+
+  loadCompanyOptions(): void {
+    const field = this.systemConfigRepo.getField(
+      SYSTEM_CONFIG_KEYS.TEAM_MEMBERS_CONFIG_GROUP_KEY,
+      SYSTEM_CONFIG_KEYS.TEAM_MEMBERS_CONFIG_FIELD_KEY
+    );
+    this.companyOptions = field?.options || [];
   }
 
   loadCurrentUser(): void {
@@ -76,8 +91,17 @@ export class CurrentUserComponent implements OnInit {
     this.editableSquads[squadIndex].teamMembers.push({
       name: '',
       registration: '',
-      email: ''
+      email: '',
+      companyKey: '',
+      companyValue: ''
     });
+  }
+
+  onCompanyChange(member: TeamMember, event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const selectedOption = this.companyOptions.find(opt => opt.value === select.value);
+    member.companyKey = selectedOption?.value || '';
+    member.companyValue = selectedOption?.label || '';
   }
 
   removeTeamMember(squadIndex: number, memberIndex: number): void {

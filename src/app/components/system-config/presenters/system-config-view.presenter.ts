@@ -2,7 +2,6 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import {
   ConfigGroup,
   ConfigField,
-  ConfigValue,
   SystemConfig,
   ALL_CONFIG_GROUPS,
   createDefaultSystemConfig,
@@ -140,8 +139,12 @@ export class SystemConfigViewPresenter {
     const config = this.systemConfigRepo.get()();
     const values = new Map<string, any>();
 
-    if (config?.values) {
-      config.values.forEach(v => values.set(v.fieldKey, v.value));
+    if (config?.groups) {
+      for (const group of config.groups) {
+        for (const field of group.fields || []) {
+          values.set(field.key, field.defaultValue);
+        }
+      }
     } else {
       this.loadDefaultValues();
       return;
@@ -156,7 +159,11 @@ export class SystemConfigViewPresenter {
   private loadDefaultValues(): void {
     const defaultConfig = createDefaultSystemConfig();
     const values = new Map<string, any>();
-    defaultConfig.values.forEach(v => values.set(v.fieldKey, v.value));
+    for (const group of defaultConfig.groups) {
+      for (const field of group.fields || []) {
+        values.set(field.key, field.defaultValue);
+      }
+    }
     this.configValues.set(values);
   }
 
@@ -280,19 +287,23 @@ export class SystemConfigViewPresenter {
     this.isSaving.set(true);
 
     try {
-      const values: ConfigValue[] = [];
-      this.configValues().forEach((value, fieldKey) => {
-        values.push({
-          fieldKey,
-          value,
-          updatedAt: new Date()
-        });
-      });
-
       const currentConfig = this.systemConfigRepo.get()();
+
+      // Clonar los grupos y actualizar los valores de los campos
+      const groups = structuredClone(currentConfig?.groups || ALL_CONFIG_GROUPS);
+
+      for (const group of groups) {
+        for (const field of group.fields || []) {
+          const newValue = this.configValues().get(field.key);
+          if (newValue !== undefined) {
+            field.defaultValue = newValue;
+          }
+        }
+      }
+
       const config: SystemConfig = {
         id: currentConfig?.id || 1,
-        values,
+        groups,
         version: '1.0.0',
         createdAt: currentConfig?.createdAt || new Date(),
         updatedAt: new Date(),

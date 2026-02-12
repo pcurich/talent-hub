@@ -62,12 +62,14 @@ export const REPOSITORY_INITIALIZER: ApplicationConfig = {
       const repositories = inject(INITIALIZABLE_REPOSITORIES, { optional: true }) || [];
       const registration = localStorage.getItem(STORAGE_KEYS.CURRENT_REGISTRATION) || '';
 
-      // Inicializar todos los repositorios en paralelo con el registration
-      await Promise.all(
-        repositories.map(repo => repo.initService(registration))
-      );
-
-      console.log(`${repositories.length} repositorio(s) inicializado(s) para: ${registration || 'sin registro'}`);
+      if (registration.length > 0) {
+        // Inicializar todos los repositorios en paralelo con el registration
+        debugger;
+        await Promise.all(
+          repositories.map(repo => repo.initService(registration))
+        );
+        console.log(`${repositories.length} repositorio(s) inicializado(s) para: ${registration || 'sin registro'}`);
+      }
     })
   ]
 };

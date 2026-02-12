@@ -19,6 +19,11 @@ export const SERVICE_CODES = {
 
 } as const;
 
+export const SYSTEM_CONFIG_KEYS = {
+  TEAM_MEMBERS_CONFIG_GROUP_KEY: 'team_members',
+  TEAM_MEMBERS_CONFIG_FIELD_KEY: 'team_members_company'
+} as const
+
 export const ERROR_MESSAGES = {
   LOGIN_VALIDATION_FAILED: 'Completa matrícula y correo.',
   INVALID_INPUT: 'Entrada inválida. Por favor, verifica los datos.',

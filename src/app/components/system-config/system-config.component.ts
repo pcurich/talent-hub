@@ -5,13 +5,14 @@ import {
   ALL_CONFIG_GROUPS,
   ConfigField,
   ConfigGroup,
-  ConfigValue,
   createDefaultSystemConfig,
   FieldOption,
   SystemConfig
 } from '../../model/system-config.model';
 import { SYSTEM_CONFIG_REPOSITORY } from '../../tokens/repository.tokens';
 import { SystemConfigFieldEditorPresenter } from './presenters/system-config-field-editor.presenter';
+import { STORAGE_KEYS } from '../../constants/general.constants';
+import { ToastService } from '../toast/toast.service';
 
 @Component({
   selector: 'app-system-config',
@@ -23,6 +24,7 @@ import { SystemConfigFieldEditorPresenter } from './presenters/system-config-fie
 })
 export class SystemConfigComponent implements OnInit {
   private systemConfigRepo = inject(SYSTEM_CONFIG_REPOSITORY);
+  private toastService = inject(ToastService);
 
   // Presenter para edición de opciones de campo
   readonly editorPresenter = inject(SystemConfigFieldEditorPresenter);
@@ -76,8 +78,12 @@ export class SystemConfigComponent implements OnInit {
     const config = this.systemConfigRepo.get()();
     const values = new Map<string, any>();
 
-    if (config?.values) {
-      config.values.forEach(v => values.set(v.fieldKey, v.value));
+    if (config?.groups) {
+      for (const group of config.groups) {
+        for (const field of group.fields || []) {
+          values.set(field.key, field.defaultValue);
+        }
+      }
     } else {
       this.loadDefaultValues();
       return;
@@ -92,7 +98,11 @@ export class SystemConfigComponent implements OnInit {
   private loadDefaultValues(): void {
     const defaultConfig = createDefaultSystemConfig();
     const values = new Map<string, any>();
-    defaultConfig.values.forEach(v => values.set(v.fieldKey, v.value));
+    for (const group of defaultConfig.groups) {
+      for (const field of group.fields || []) {
+        values.set(field.key, field.defaultValue);
+      }
+    }
     this.configValues.set(values);
   }
 
@@ -175,23 +185,31 @@ export class SystemConfigComponent implements OnInit {
     this.isSaving.set(true);
 
     try {
-      const values: ConfigValue[] = [];
-      this.configValues().forEach((value, fieldKey) => {
-        values.push({
-          fieldKey,
-          value,
-          updatedAt: new Date()
-        });
-      });
-
       const currentConfig = this.systemConfigRepo.get()();
+      // Clonar los grupos y actualizar los valores de los campos
+      const groups = structuredClone(this.configGroups || ALL_CONFIG_GROUPS);
+
+      for (const group of groups) {
+        for (const field of group.fields || []) {
+          const newValue = this.configValues().get(field.key);
+          if (newValue !== undefined) {
+            field.defaultValue = newValue;
+          }
+        }
+      }
+
+      // Calcular nueva versión automáticamente (incrementar minor)
+      const currentVersion = currentConfig?.version || '1.0.0';
+      const [major, minor, patch] = currentVersion.split('.').map(Number);
+      const newVersion = `${major}.${minor + 1}.${patch}`;
+
       const config: SystemConfig = {
         id: currentConfig?.id || 1,
-        values,
-        version: '1.0.0',
+        groups,
+        version: newVersion,
         createdAt: currentConfig?.createdAt || new Date(),
         updatedAt: new Date(),
-        updateTimestamp: function() { this.updatedAt = new Date(); }
+        updateTimestamp: function () { this.updatedAt = new Date(); }
       };
 
       // Guardar en IndexedDB mediante repositorio
@@ -199,11 +217,15 @@ export class SystemConfigComponent implements OnInit {
 
       if (success) {
         this.hasChanges.set(false);
+        this.toastService.success(`Configuración guardada correctamente (v${newVersion})`);
         console.log('[SystemConfigComponent] Configuración guardada correctamente');
+
       } else {
+        this.toastService.error('Error al guardar la configuración. Inténtalo de nuevo.');
         console.error('[SystemConfigComponent] Error al guardar configuración');
       }
     } catch (error) {
+      this.toastService.error('Error inesperado al guardar la configuración.');
       console.error('[SystemConfigComponent] Error al guardar configuración:', error);
     } finally {
       this.isSaving.set(false);
@@ -352,7 +374,7 @@ export class SystemConfigComponent implements OnInit {
       alert('Error: No se pudo identificar el campo a actualizar');
       return;
     }
-
+    debugger
     // Actualizar en ALL_CONFIG_GROUPS (en memoria)
     const group = this.configGroups.find(g => g.key === groupKey);
     if (group) {
@@ -369,5 +391,6 @@ export class SystemConfigComponent implements OnInit {
     this.hasChanges.set(true);
 
     console.log(`[SystemConfigComponent] Opciones de ${fieldKey} actualizadas. Recuerda guardar la configuración.`);
+    this.editorPresenter.closeModal();
   }
 }

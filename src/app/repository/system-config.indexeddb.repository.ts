@@ -3,24 +3,14 @@ import { HttpStatusCode } from "@angular/common/http";
 import { HttpMockEntity } from "@pcurich/client-storage-indexeddb";
 import { ISystemConfigRepository } from "../interfaces/system-config.repository.interface";
 import {
+  ConfigField,
+  ConfigGroup,
   SystemConfig,
-  ConfigValue,
   createDefaultSystemConfig
 } from "../model/system-config.model";
 import { APP_CONFIG, SERVICE_CODES } from "../constants/general.constants";
 import { BaseIndexeddbRepository } from "./base.indexeddb.repository";
 
-/**
- * Repositorio IndexedDB para la configuración del sistema.
- * Gestiona el CRUD de SystemConfig, que contiene ConfigGroups y FieldOptions.
- *
- * Principios SOLID aplicados:
- * - Single Responsibility: Solo maneja persistencia de SystemConfig
- * - Open/Closed: Extiende BaseIndexeddbRepository sin modificarlo
- * - Liskov Substitution: Implementa ISystemConfigRepository completamente
- * - Interface Segregation: Interface específica para config del sistema
- * - Dependency Inversion: Depende de abstracciones (ISystemConfigRepository)
- */
 @Injectable({
   providedIn: 'root'
 })
@@ -35,12 +25,8 @@ export class SystemConfigIndexeddbRepository
     return createDefaultSystemConfig();
   }
 
-  /**
-   * Verifica si existe una configuración guardada en IndexedDB.
-   */
   async exists(): Promise<boolean> {
     try {
-      await this.ensureDatabase();
       const entities = await this.httpMockService!.findByServiceCode(this.SERVICE_CODE);
 
       if (!entities || entities.length === 0) {
@@ -55,10 +41,6 @@ export class SystemConfigIndexeddbRepository
     }
   }
 
-  /**
-   * Crea una nueva configuración del sistema en IndexedDB.
-   * Si no existe, crea con valores por defecto.
-   */
   async create(config: SystemConfig): Promise<boolean> {
     try {
       const entityToSave = { ...config };
@@ -67,8 +49,6 @@ export class SystemConfigIndexeddbRepository
         entityToSave.createdAt = new Date();
       }
       entityToSave.updatedAt = new Date();
-
-      await this.ensureDatabase();
 
       const newEntity: Partial<HttpMockEntity> = {
         serviceCode: this.SERVICE_CODE,
@@ -91,13 +71,9 @@ export class SystemConfigIndexeddbRepository
     }
   }
 
-  /**
-   * Actualiza la configuración del sistema existente.
-   */
   async update(config: SystemConfig): Promise<boolean> {
     try {
-      await this.ensureDatabase();
-
+      debugger;
       const entities = await this.httpMockService!.findByServiceCode(this.SERVICE_CODE);
 
       if (!entities || entities.length === 0) {
@@ -109,7 +85,7 @@ export class SystemConfigIndexeddbRepository
       const updatedConfig: SystemConfig = {
         ...config,
         updatedAt: new Date(),
-        updateTimestamp: function() { this.updatedAt = new Date(); }
+        updateTimestamp: function () { this.updatedAt = new Date(); }
       };
 
       const updatedEntity = {
@@ -124,24 +100,24 @@ export class SystemConfigIndexeddbRepository
 
     } catch (error) {
       console.error('[SystemConfigRepository] Error al actualizar config:', error);
-      return false;
+      return await this.create(config);
     }
   }
 
-  /**
-   * Obtiene el valor de un campo específico de la configuración.
-   * @param fieldKey - Key del campo a buscar
-   */
-  getFieldValue(fieldKey: string): ConfigValue | undefined {
+  getGroup(keyGroup: string): ConfigGroup | undefined {
     const config = this.entity();
-    return config.values?.find(v => v.fieldKey === fieldKey);
+    return config.groups?.find(g => g.key === keyGroup);
   }
 
-  /**
-   * Actualiza el valor de un campo específico.
-   * @param fieldKey - Key del campo a actualizar
-   * @param value - Nuevo valor
-   */
+
+  getField(keyGroup: string, keyConfigField: string): ConfigField | undefined {
+    const group = this.getGroup(keyGroup);
+    if (!group) {
+      return undefined;
+    }
+    return group.fields?.find(f => f.key === keyConfigField);
+  }
+
   async updateFieldValue(
     fieldKey: string,
     value: string | number | boolean | string[] | null
@@ -150,24 +126,24 @@ export class SystemConfigIndexeddbRepository
       const currentEntity = this.entity();
       const config: SystemConfig = {
         ...currentEntity,
-        updateTimestamp: function() { this.updatedAt = new Date(); }
+        groups: structuredClone(currentEntity.groups),
+        updateTimestamp: function () { this.updatedAt = new Date(); }
       };
-      const valueIndex = config.values.findIndex(v => v.fieldKey === fieldKey);
 
-      if (valueIndex === -1) {
-        // Campo no existe, agregarlo
-        config.values.push({
-          fieldKey,
-          value,
-          updatedAt: new Date()
-        });
-      } else {
-        // Actualizar campo existente
-        config.values[valueIndex] = {
-          ...config.values[valueIndex],
-          value,
-          updatedAt: new Date()
-        };
+      // Buscar y actualizar el campo en los grupos
+      let fieldFound = false;
+      for (const group of config.groups || []) {
+        const fieldIndex = group.fields?.findIndex(f => f.key === fieldKey) ?? -1;
+        if (fieldIndex !== -1) {
+          group.fields[fieldIndex].defaultValue = value;
+          fieldFound = true;
+          break;
+        }
+      }
+
+      if (!fieldFound) {
+        console.warn(`[SystemConfigRepository] Campo '${fieldKey}' no encontrado en ningún grupo`);
+        return false;
       }
 
       return await this.update(config);
@@ -178,25 +154,10 @@ export class SystemConfigIndexeddbRepository
     }
   }
 
-  /**
-   * Resetea la configuración a los valores por defecto.
-   */
   async resetToDefaults(): Promise<boolean> {
     try {
       const defaultConfig = createDefaultSystemConfig();
-
-      // Mantener el ID si existe una config previa
-      const currentConfig = this.entity();
-      if (currentConfig?.id) {
-        defaultConfig.id = currentConfig.id;
-      }
-
-      const exists = await this.exists();
-      if (exists) {
-        return await this.update(defaultConfig);
-      } else {
-        return await this.create(defaultConfig);
-      }
+      return await this.update(defaultConfig);
 
     } catch (error) {
       console.error('[SystemConfigRepository] Error al resetear config:', error);
@@ -204,9 +165,6 @@ export class SystemConfigIndexeddbRepository
     }
   }
 
-  /**
-   * Sobrescribe refreshEntities para crear config por defecto si no existe.
-   */
   protected override async refreshEntities(): Promise<void> {
     try {
       const httpMocks = await this.httpMockService?.findByServiceCode(this.SERVICE_CODE);

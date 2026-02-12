@@ -14,7 +14,10 @@ export interface Person {
   email: string;
 }
 
-export interface TeamMember extends Person {}
+export interface TeamMember extends Person {
+  companyKey?: string;
+  companyValue?: string;
+}
 
 export interface ProductOwner extends Person {}
 

@@ -1,17 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink } from '@angular/router';
+import { Router, RouterOutlet, RouterLink } from '@angular/router';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
+import { ToastComponent } from '../../components/toast/toast.component';
 import { Notification } from '../../model/notification.model';
+import { deleteDatabase } from '@pcurich/client-storage-indexeddb';
+import { getIndexedDbConfigWithRegistration } from '../../util/indexeddb-config.util';
+import { STORAGE_KEYS } from '../../constants/general.constants';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, NavbarComponent],
+  imports: [CommonModule, RouterOutlet, RouterLink, NavbarComponent, ToastComponent],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.scss',
 })
 export class MainLayoutComponent {
+  private router = inject(Router);
+
   title = 'Talent Hub';
   showNotificationsDropdown = false;
 
@@ -57,5 +63,35 @@ export class MainLayoutComponent {
       'error': 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z'
     };
     return icons[type] || icons['info'];
+  }
+
+  /**
+   * Restaura el sistema: elimina la base de datos IndexedDB,
+   * limpia localStorage y redirecciona al inicio.
+   */
+  async restoreSystem(): Promise<void> {
+    if (!confirm('¿Estás seguro de restaurar el sistema? Se eliminarán todos los datos.')) {
+      return;
+    }
+
+    try {
+      // Obtener el registration actual
+      const registration = localStorage.getItem(STORAGE_KEYS.CURRENT_REGISTRATION) || '';
+
+      // Obtener configuración y eliminar la base de datos
+      const config = getIndexedDbConfigWithRegistration(registration);
+      await deleteDatabase(config);
+      console.log('[MainLayout] Base de datos eliminada correctamente');
+
+      // Limpiar localStorage
+      localStorage.clear();
+      console.log('[MainLayout] localStorage limpiado');
+
+      // Redireccionar al root
+      this.router.navigate(['/auth/login']);
+    } catch (error) {
+      console.error('[MainLayout] Error al restaurar sistema:', error);
+      alert('Error al restaurar el sistema. Por favor, inténtalo de nuevo.');
+    }
   }
 }
