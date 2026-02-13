@@ -2,11 +2,11 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import {
   ConfigGroup,
   ConfigField,
-  SystemConfig,
+  SystemConfigEntity,
   ALL_CONFIG_GROUPS,
   createDefaultSystemConfig,
   FieldOption
-} from '../../../model/system-config.model';
+} from '../../../model/system-config-entity.model';
 import { SYSTEM_CONFIG_REPOSITORY } from '../../../tokens/repository.tokens';
 import { FieldViewState, OptionViewState } from '../models/system-config-view.models';
 
@@ -301,7 +301,7 @@ export class SystemConfigViewPresenter {
         }
       }
 
-      const config: SystemConfig = {
+      const config: SystemConfigEntity = {
         id: currentConfig?.id || 1,
         groups,
         version: '1.0.0',

@@ -39,7 +39,6 @@ export class LoginComponent {
 
       await this.initRepo.initializeDatabase(registration);
       let existingUser = await this.currentUserRepo.exists(registration);
-      debugger;
 
       if (!existingUser) {
         this.router.navigate(['/init']);

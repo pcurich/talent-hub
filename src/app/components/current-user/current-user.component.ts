@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CURRENT_USER_REPOSITORY, SYSTEM_CONFIG_REPOSITORY } from '../../tokens/repository.tokens';
 import { CurrentUser, Person, Squad, TeamMember } from '../../model/current-user.model';
-import { FieldOption } from '../../model/system-config.model';
+import { FieldOption } from '../../model/system-config-entity.model';
 import { SYSTEM_CONFIG_KEYS } from '../../constants/general.constants';
 
 @Component({

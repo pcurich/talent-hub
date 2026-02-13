@@ -2,16 +2,13 @@ import { Signal } from "@angular/core";
 import { FeedbackEntity } from "@pcurich/client-storage-indexeddb";
 
 export interface IFeedbackRepository {
-  getEntities(): Signal<FeedbackEntity[]>;
-  getAll(): FeedbackEntity[];
-  getById(id: number): FeedbackEntity | undefined;
-  getSelectedEntity(): Signal<FeedbackEntity | undefined>;
-  setSelectedEntity(entity: FeedbackEntity | undefined): void;
+  exists(): Promise<boolean>;
+  get(): Signal<FeedbackEntity[]>;
 
-  create(entity: FeedbackEntity): FeedbackEntity;
-  update(entity: FeedbackEntity): void;
-  delete(id: number): void;
+  create(feedBack: FeedbackEntity): Promise<boolean>;
+  update(feedBack: FeedbackEntity): Promise<boolean>;
+  // delete(id: number): Promise<boolean>;
 
-  searchEntities(searchTerm: string): FeedbackEntity[];
-  downloadAllFeedbacks(): void;
+  // searchEntities(searchTerm: string): FeedbackEntity[];
+  // downloadAllFeedbacks(): void;
 }

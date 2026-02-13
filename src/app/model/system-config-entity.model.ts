@@ -38,7 +38,7 @@ export interface ConfigGroup {
   fields: ConfigField[];
 }
 
-export interface SystemConfig extends BaseEntity {
+export interface SystemConfigEntity extends BaseEntity {
   groups: ConfigGroup[];
   version: string;
 }
@@ -48,6 +48,30 @@ export const TEAM_MEMBERS_COMPANY_OPTIONS: FieldOption[] = [
   { value: 'company_internal', label: 'Bcp', description: 'Colaborador interno del BCP', order: 2 },
   { value: 'company_external', label: 'Proveedor', description: 'Colaborador externo que trabaja por contrato de servicio', order: 3 }
 ]
+
+export const TEAM_MEMBERS_SENIORITY_OPTIONS: FieldOption[] = [
+  { value: '1', label: 'Novato', description: 'Nuevo en el trabajo. Constantemente acompañado y mentoreado. Realiza tareas asignadas. La expectativa principal es su potencial e impulso para aprender', color: '#6c757d', order: 1 },
+  { value: '2', label: 'Principiante Avanzado', description: 'Independiente en la entrega de valor. Solo mentoreado en situaciones desafiantes. Nivel medio con varios años de experiencia', color: '#17a2b8', order: 2 },
+  { value: '3', label: 'Competente', description: 'Senior, toma decisiones y orienta a juniors. Estructura el trabajo del equipo y delega tareas. Mentorea novatos y principiantes avanzados', color: '#007bff', order: 3 },
+  { value: '4', label: 'Proficiente', description: 'Ejecutor y fuerza visionaria de la solución técnica. Referente del departamento/organización. Imparte cursos y establece estándares', color: '#28a745', order: 4 },
+  { value: '5', label: 'Master', description: 'Experto que guía el futuro de las prácticas. Reconocido fuera de la organización. Habla en conferencias y marca tendencia en su campo', color: '#ffc107', order: 5 },
+  { value: '0', label: '---------------', description: 'No se ha especificado un nivel de seniority', color: '#ffffff', order: 6 }
+];
+
+export const FEEDBACK_PROVIDER_OPTIONS: FieldOption[] = [
+  { value: 'CL', label: 'Chapter Lead', description: 'Líder técnico responsable del desarrollo profesional del equipo', icon: 'school', color: '#007bff', order: 1 },
+  { value: 'PO', label: 'Product Owner', description: 'Responsable de maximizar el valor del producto y gestionar el backlog', icon: 'inventory', color: '#28a745', order: 2 },
+  { value: 'FP', label: 'Focal Point', description: 'Punto de contacto principal entre el equipo y stakeholders', icon: 'support_agent', color: '#17a2b8', order: 3 },
+  { value: 'AC', label: 'Agile Coach', description: 'Facilitador de prácticas ágiles y mejora continua del equipo', icon: 'psychology', color: '#ffc107', order: 4 },
+  { value: 'blank', label: '---------------', description: 'No se ha especificado quién brinda el feedback', color: '#ffffff', order: 5 }
+];
+
+export const FEEDBACK_GENERAL_RATING_OPTIONS: FieldOption[] = [
+  { value: 'exceeds', label: 'Excede expectativas', description: 'El colaborador supera consistentemente lo esperado en su rol', icon: 'arrow_upward', color: '#28a745', order: 1 },
+  { value: 'meets', label: 'Cumple expectativas', description: 'El colaborador cumple satisfactoriamente con lo esperado en su rol', icon: 'check_circle', color: '#007bff', order: 2 },
+  { value: 'below', label: 'Por debajo de las expectativas', description: 'El colaborador no alcanza lo esperado y requiere mejoras', icon: 'arrow_downward', color: '#dc3545', order: 3 },
+  { value: 'blank', label: '---------------', description: 'No se ha especificado una calificación general', color: '#ffffff', order: 4 }
+];
 
 export const FEEDBACK_STATUS_OPTIONS: FieldOption[] = [
   { value: 'draft', label: 'Borrador', description: 'Feedback en preparación, no visible para el destinatario', color: '#6c757d', order: 1 },
@@ -59,10 +83,10 @@ export const FEEDBACK_STATUS_OPTIONS: FieldOption[] = [
 ];
 
 export const FEEDBACK_TYPE_OPTIONS: FieldOption[] = [
-  { value: 'recognition', label: 'Reconocimiento', description: 'Reconocer logros y buen desempeño', icon: 'star', color: '#ffc107', order: 1 },
-  { value: 'improvement', label: 'Área de Mejora', description: 'Identificar oportunidades de crecimiento', icon: 'trending_up', color: '#17a2b8', order: 2 },
-  { value: 'goal', label: 'Objetivo', description: 'Definir metas y expectativas', icon: 'flag', color: '#28a745', order: 3 },
-  { value: 'general', label: 'General', description: 'Comentarios generales', icon: 'comment', color: '#6c757d', order: 4 }
+  { value: 'appreciative', label: 'Apreciativo', description: 'Reconocer logros y buen desempeño', icon: 'star', color: '#ffc107', order: 1 },
+  { value: 'constructive', label: 'Constructivo', description: 'Identificar oportunidades de crecimiento', icon: 'trending_up', color: '#17a2b8', order: 2 },
+  { value: 'neutral', label: 'Neutro', description: 'Sin connotación positiva ni negativa.', icon: 'flag', color: '#6c757d', order: 3 },
+  { value: 'blank', label: '----------------', description: 'Seleccione un tipo de feedback', icon: 'comment', color: '#ffffff', order: 4 }
 ];
 
 export const PRIORITY_OPTIONS: FieldOption[] = [
@@ -106,6 +130,15 @@ export const EVALUATION_PERIOD_OPTIONS: FieldOption[] = [
   { value: 'annual', label: 'Anual', description: 'Evaluación del año completo', order: 7 }
 ];
 
+export const PERFORMANCE_LEVEL_OPTIONS: FieldOption[] = [
+  { value: '5', label: 'Sobresaliente', description: 'El colaborador excede clara y sostenidamente los objetivos, expectativas y comportamientos esperados', color: '#28a745', order: 1 },
+  { value: '4', label: 'Destacado', description: 'El colaborador excede varios de los objetivos, expectativas y comportamientos esperados', color: '#17a2b8', order: 2 },
+  { value: '3', label: 'Muy bueno', description: 'El colaborador cumple con los objetivos, expectativas y comportamientos esperados', color: '#007bff', order: 3 },
+  { value: '2', label: 'Necesita mejorar', description: 'El colaborador cumple con algunos objetivos, expectativas y comportamientos esperados', color: '#ffc107', order: 4 },
+  { value: '1', label: 'Bajo desempeño', description: 'El colaborador no cumple con la mayoría de los objetivos, expectativas y comportamientos esperados', color: '#dc3545', order: 5 },
+  { value: '0', label: '---------------', description: 'No se ha especificado un nivel de desempeño', color: '#ffffff', order: 6 },
+];
+
 export const TEAM_MEMBERS_CONFIG_GROUP: ConfigGroup = {
   key: 'team_members',
   label: 'Team Members',
@@ -124,8 +157,19 @@ export const TEAM_MEMBERS_CONFIG_GROUP: ConfigGroup = {
       group: 'team_members',
       order: 1
     },
+    {
+      key: 'team_members_seniority',
+      label: 'Nivel de Seniority',
+      description: 'Nivel de experiencia y madurez profesional del colaborador',
+      type: 'select',
+      defaultValue: '0',
+      options: TEAM_MEMBERS_SENIORITY_OPTIONS,
+      required: true,
+      group: 'team_members',
+      order: 2
+    },
   ]
-}
+};
 
 export const FEEDBACK_CONFIG_GROUP: ConfigGroup = {
   key: 'feedback',
@@ -135,6 +179,39 @@ export const FEEDBACK_CONFIG_GROUP: ConfigGroup = {
   order: 1,
   fields: [
     {
+      key: 'performance_level',
+      label: 'Nivel de Desempeño',
+      description: 'Configuración de los niveles de evaluación de desempeño',
+      type: 'select',
+      defaultValue: 'draft',
+      options: PERFORMANCE_LEVEL_OPTIONS,
+      required: true,
+      group: 'feedback',
+      order: 1
+    },
+    {
+      key: 'feedback_provider',
+      label: 'Quién brinda el feedback',
+      description: 'Rol de la persona que proporciona el feedback',
+      type: 'select',
+      defaultValue: 'blank',
+      options: FEEDBACK_PROVIDER_OPTIONS,
+      required: true,
+      group: 'feedback',
+      order: 2
+    },
+    {
+      key: 'feedback_general_rating',
+      label: 'Calificación General',
+      description: 'Evaluación global del desempeño del colaborador',
+      type: 'select',
+      defaultValue: 'blank',
+      options: FEEDBACK_GENERAL_RATING_OPTIONS,
+      required: true,
+      group: 'feedback',
+      order: 3
+    },
+    {
       key: 'feedback_default_status',
       label: 'Estado por defecto',
       description: 'Estado inicial asignado a nuevos feedbacks',
@@ -143,14 +220,14 @@ export const FEEDBACK_CONFIG_GROUP: ConfigGroup = {
       options: FEEDBACK_STATUS_OPTIONS,
       required: true,
       group: 'feedback',
-      order: 1
+      order: 4
     },
     {
       key: 'feedback_default_type',
       label: 'Tipo por defecto',
       description: 'Tipo inicial sugerido para nuevos feedbacks',
       type: 'select',
-      defaultValue: 'general',
+      defaultValue: 'blank',
       options: FEEDBACK_TYPE_OPTIONS,
       required: true,
       group: 'feedback',
@@ -357,7 +434,7 @@ export function getOptionColor(options: FieldOption[], value: string): string | 
   return option?.color;
 }
 
-export function createDefaultSystemConfig(): SystemConfig {
+export function createDefaultSystemConfig(): SystemConfigEntity {
   return {
     id: 1,
     groups: structuredClone(ALL_CONFIG_GROUPS),

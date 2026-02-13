@@ -20,23 +20,6 @@ export class CurrentUserIndexeddbRepository
     return {} as CurrentUser;
   }
 
-  async exists(registration: string): Promise<boolean> {
-    try {
-      await this.ensureDatabase(registration);
-      const entities = await this.httpMockService!.findByServiceCode(this.SERVICE_CODE);
-
-      if (!entities || entities.length === 0) {
-        return false;
-      }
-
-      const userSignal = this.toSignal(entities, 'GET');
-      return !!userSignal();
-    } catch (error) {
-      console.error('Error en exists():', error);
-      return false;
-    }
-  }
-
   async create(currentUser: CurrentUser): Promise<boolean> {
     try {
       const entityToSave = { ...currentUser };

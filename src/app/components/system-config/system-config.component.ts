@@ -7,8 +7,8 @@ import {
   ConfigGroup,
   createDefaultSystemConfig,
   FieldOption,
-  SystemConfig
-} from '../../model/system-config.model';
+  SystemConfigEntity
+} from '../../model/system-config-entity.model';
 import { SYSTEM_CONFIG_REPOSITORY } from '../../tokens/repository.tokens';
 import { SystemConfigFieldEditorPresenter } from './presenters/system-config-field-editor.presenter';
 import { STORAGE_KEYS } from '../../constants/general.constants';
@@ -203,7 +203,7 @@ export class SystemConfigComponent implements OnInit {
       const [major, minor, patch] = currentVersion.split('.').map(Number);
       const newVersion = `${major}.${minor + 1}.${patch}`;
 
-      const config: SystemConfig = {
+      const config: SystemConfigEntity = {
         id: currentConfig?.id || 1,
         groups,
         version: newVersion,

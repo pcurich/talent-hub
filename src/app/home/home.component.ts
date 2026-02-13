@@ -29,7 +29,7 @@ export class HomeComponent {
   private searchTerm = signal<string>('');
 
   // Datos - se actualizan automáticamente cuando entities cambie en el servicio
-  allEntities = this.feedbackService.getEntities();
+  allEntities = this.feedbackService.get();
 
   filteredEntities = computed(() => {
     const term = this.searchTerm().toLowerCase().trim();
@@ -67,7 +67,7 @@ export class HomeComponent {
   }
 
   onDelete(entity: FeedbackEntity) {
-    this.feedbackService.delete(entity.id);
+    // this.feedbackService.delete(entity.id);
   }
 
   onCloseModal() {

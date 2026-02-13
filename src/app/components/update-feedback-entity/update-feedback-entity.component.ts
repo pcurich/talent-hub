@@ -37,13 +37,13 @@ export class UpdateFeedbackEntityComponent implements OnInit {
   }
 
   loadEntity() {
-    const entity = this.feedbackService.getById(this.entityId);
-    if (entity) {
-      this.entity = entity;
-    } else {
-      alert('Entidad no encontrada');
-      this.router.navigate(['/']);
-    }
+    // const entity = this.feedbackService.getById(this.entityId);
+    // if (entity) {
+    //   this.entity = entity;
+    // } else {
+    //   alert('Entidad no encontrada');
+    //   this.router.navigate(['/']);
+    // }
   }
 
   onSubmit() {
