@@ -2,7 +2,7 @@
  * Modelos para la vista de configuración del sistema
  */
 
-import { ConfigField, ConfigGroup, FieldOption } from '../../../model/system-config.model';
+import { ConfigField, ConfigGroup, FieldOption } from '../../../model/system-config-entity.model';
 
 /**
  * Estado de un campo en la vista

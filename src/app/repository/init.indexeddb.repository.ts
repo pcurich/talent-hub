@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
-import { IInitAppRepository } from '../interfaces/init.repository.interface';
 import { createIndexedDbServices, databaseExists, HttpMockService } from '@pcurich/client-storage-indexeddb';
-import { HTTP_MOCK_DB_CONFIG } from '@pcurich/client-storage-indexeddb';
+
+import { IInitAppRepository } from '../interfaces/init.repository.interface';
 import { getIndexedDbConfigWithRegistration } from '../util/indexeddb-config.util';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InitAppIndexeddbRepository implements IInitAppRepository {
-  cfg = HTTP_MOCK_DB_CONFIG
+
   private httpService!: HttpMockService;
+  cfg: any;
 
   async initializeDatabase(registration: string): Promise<void> {
     this.cfg = getIndexedDbConfigWithRegistration(registration);

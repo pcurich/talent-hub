@@ -175,4 +175,23 @@ export abstract class BaseIndexeddbRepository<T> implements IInitializable {
 
     return signal(this.DEFAULT_VALUE).asReadonly();
   }
+
+  /**
+   * Verifica si existe al menos una entidad con el SERVICE_CODE actual.
+   */
+  async exists(): Promise<boolean> {
+    try {
+      const entities = await this.httpMockService!.findByServiceCode(this.SERVICE_CODE);
+
+      if (!entities || entities.length === 0) {
+        return false;
+      }
+
+      const configSignal = this.toSignal(entities, 'GET');
+      return !!(configSignal() as any)?.id;
+    } catch (error) {
+      console.error(`[${this.constructor.name}] Error en exists():`, error);
+      return false;
+    }
+  }
 }

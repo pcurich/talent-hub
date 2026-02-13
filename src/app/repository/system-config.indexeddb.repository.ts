@@ -5,9 +5,9 @@ import { ISystemConfigRepository } from "../interfaces/system-config.repository.
 import {
   ConfigField,
   ConfigGroup,
-  SystemConfig,
+  SystemConfigEntity,
   createDefaultSystemConfig
-} from "../model/system-config.model";
+} from "../model/system-config-entity.model";
 import { APP_CONFIG, SERVICE_CODES } from "../constants/general.constants";
 import { BaseIndexeddbRepository } from "./base.indexeddb.repository";
 
@@ -15,33 +15,17 @@ import { BaseIndexeddbRepository } from "./base.indexeddb.repository";
   providedIn: 'root'
 })
 export class SystemConfigIndexeddbRepository
-  extends BaseIndexeddbRepository<SystemConfig>
+  extends BaseIndexeddbRepository<SystemConfigEntity>
   implements ISystemConfigRepository {
 
   protected readonly SERVICE_CODE = SERVICE_CODES.SC_GET_SYSTEM_CONFIG;
-  protected readonly DEFAULT_VALUE: SystemConfig = createDefaultSystemConfig();
+  protected readonly DEFAULT_VALUE: SystemConfigEntity = createDefaultSystemConfig();
 
-  protected getDefaultValue(): SystemConfig {
+  protected getDefaultValue(): SystemConfigEntity {
     return createDefaultSystemConfig();
   }
 
-  async exists(): Promise<boolean> {
-    try {
-      const entities = await this.httpMockService!.findByServiceCode(this.SERVICE_CODE);
-
-      if (!entities || entities.length === 0) {
-        return false;
-      }
-
-      const configSignal = this.toSignal(entities, 'GET');
-      return !!configSignal()?.id;
-    } catch (error) {
-      console.error('[SystemConfigRepository] Error en exists():', error);
-      return false;
-    }
-  }
-
-  async create(config: SystemConfig): Promise<boolean> {
+  async create(config: SystemConfigEntity): Promise<boolean> {
     try {
       const entityToSave = { ...config };
 
@@ -63,15 +47,15 @@ export class SystemConfigIndexeddbRepository
       const entity = await this.httpMockService!.createMock(newEntity);
       this.entity.set(config);
       console.log('[SystemConfigRepository] Config creada en IndexedDB con ID:', entity.id);
-      return true;
+      return Promise.resolve(true);
 
     } catch (err) {
       console.error('[SystemConfigRepository] Error al crear config:', err);
-      return false;
+      return Promise.reject(false);
     }
   }
 
-  async update(config: SystemConfig): Promise<boolean> {
+  async update(config: SystemConfigEntity): Promise<boolean> {
     try {
       debugger;
       const entities = await this.httpMockService!.findByServiceCode(this.SERVICE_CODE);
@@ -82,7 +66,7 @@ export class SystemConfigIndexeddbRepository
       }
 
       const existingEntity = entities[0];
-      const updatedConfig: SystemConfig = {
+      const updatedConfig: SystemConfigEntity = {
         ...config,
         updatedAt: new Date(),
         updateTimestamp: function () { this.updatedAt = new Date(); }
@@ -96,11 +80,11 @@ export class SystemConfigIndexeddbRepository
       await this.httpMockService!.updateMock(updatedEntity);
       this.entity.set(updatedConfig);
       console.log('[SystemConfigRepository] Config actualizada correctamente');
-      return true;
+      return Promise.resolve(true);
 
     } catch (error) {
       console.error('[SystemConfigRepository] Error al actualizar config:', error);
-      return await this.create(config);
+      return Promise.reject(false);
     }
   }
 
@@ -108,7 +92,6 @@ export class SystemConfigIndexeddbRepository
     const config = this.entity();
     return config.groups?.find(g => g.key === keyGroup);
   }
-
 
   getField(keyGroup: string, keyConfigField: string): ConfigField | undefined {
     const group = this.getGroup(keyGroup);
@@ -124,7 +107,7 @@ export class SystemConfigIndexeddbRepository
   ): Promise<boolean> {
     try {
       const currentEntity = this.entity();
-      const config: SystemConfig = {
+      const config: SystemConfigEntity = {
         ...currentEntity,
         groups: structuredClone(currentEntity.groups),
         updateTimestamp: function () { this.updatedAt = new Date(); }
@@ -170,7 +153,7 @@ export class SystemConfigIndexeddbRepository
       const httpMocks = await this.httpMockService?.findByServiceCode(this.SERVICE_CODE);
 
       if (httpMocks && httpMocks.length > 0) {
-        const entity: SystemConfig = JSON.parse(httpMocks[0].responseBody);
+        const entity: SystemConfigEntity = JSON.parse(httpMocks[0].responseBody);
         this.entity.set(entity);
         console.log('[SystemConfigRepository] Config cargada desde IndexedDB');
       } else {

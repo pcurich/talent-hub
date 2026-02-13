@@ -1,188 +1,136 @@
-import { Injectable, Signal, signal } from '@angular/core';
-import { createIndexedDbServices, FeedbackEntity, FeedbackService } from '@pcurich/client-storage-indexeddb'
-import { FEEDBACK_DB_CONFIG } from '@pcurich/client-storage-indexeddb'
+import { Injectable } from '@angular/core';
+import { FeedbackEntity, HttpMockEntity } from '@pcurich/client-storage-indexeddb'
 import { IFeedbackRepository } from '../interfaces/feedback.repository.interface';
+import { BaseIndexeddbRepository } from './base.indexeddb.repository';
+import { APP_CONFIG, SERVICE_CODES } from '../constants/general.constants';
+import { HttpStatusCode } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
-export class FeedbackRepository implements IFeedbackRepository {
-  private feedbackService!: FeedbackService;
-  private entities = signal<FeedbackEntity[]>([]);
-  private selectedEntity = signal<FeedbackEntity | undefined>(undefined);
-  private initPromise: Promise<void>;
-  private isInitialized = false;
+export class FeedbackRepository
+  extends BaseIndexeddbRepository<FeedbackEntity[]>
+  implements IFeedbackRepository {
 
-  constructor() {
-    this.initPromise = this.initialize();
+  protected readonly SERVICE_CODE = SERVICE_CODES.SC_GET_FEEDBACKS;
+  protected override DEFAULT_VALUE: FeedbackEntity[] = [];
+
+  protected override getDefaultValue(): FeedbackEntity[] {
+    return [];
   }
 
-  private async initialize() {
+  async create(feedBack: FeedbackEntity): Promise<boolean> {
     try {
-      await this.initService();
-      this.isInitialized = true;
-      await this.refreshEntities();
-    } catch (error) {
-      console.error('Error inicializando FeedbackRepository:', error);
+      // Crear una copia de la entidad sin el id para que IndexedDB lo auto-genere
+      const entityToSave = { ...feedBack };
+
+      if (!entityToSave.createdAt) {
+        entityToSave.createdAt = new Date();
+      }
+      entityToSave.updatedAt = new Date();
+
+      // Asegurar que las fechas estén correctamente establecidas
+      if (!entityToSave.createdAt) {
+        entityToSave.createdAt = new Date();
+      }
+      entityToSave.updatedAt = new Date();
+
+      // Crear en IndexedDB
+      const newEntity: Partial<HttpMockEntity> = {
+        serviceCode: this.SERVICE_CODE,
+        method: 'GET',
+        url: `/feedback/${feedBack.id}`,
+        responseBody: JSON.stringify(entityToSave),
+        httpCodeResponseValue: HttpStatusCode.Ok,
+        name: APP_CONFIG.APP_MOCK_NAME,
+        delayMs: 0,
+      };
+
+      const entity = await this.httpMockService!.createMock(newEntity);
+      this.entity.update(list => [...list, feedBack]);
+      console.log('[FeedbackRepository] Feedback creada en IndexedDB con ID:', entity.id);
+      return Promise.resolve(true);
+    } catch (err) {
+      console.error('[FeedbackRepository] Error al crear feedback:', err);
+      return Promise.reject(false);
     }
   }
 
-  private async initService() {
-    const cfg = FEEDBACK_DB_CONFIG;
-    const dataTableName = cfg.stores[0].name;
-    const keyPath = cfg.stores[0].keyPath;
-    const { dbContext } = await createIndexedDbServices(cfg);
-    this.feedbackService = new FeedbackService(dbContext, dataTableName, keyPath);
-    console.log('FeedbackService inicializado correctamente');
-  }
-
-  private async ensureInitialized() {
-    if (!this.isInitialized) {
-      await this.initPromise;
-    }
-  }
-
-  // Método para refrescar el caché desde IndexedDB
-  private async refreshEntities() {
+  async update(entity: FeedbackEntity): Promise<boolean> {
     try {
-      // debugger;
-      const feedbacks = await this.feedbackService.getAllFeedbacks();
-      this.entities.set(feedbacks || []);
-      console.log(`${feedbacks?.length || 0} feedbacks cargados desde IndexedDB`);
+      debugger;
+      const entities = await this.httpMockService!.findByServiceCode(this.SERVICE_CODE);
+
+      if (!entities || entities.length === 0) {
+        console.warn('[FeedbackRepository] No existe Feedback, creando nueva...');
+        return await this.create(entity);
+      }
+
+      const existingEntity = entities[0];
+      const updatedConfig: FeedbackEntity = {
+        ...entity,
+        updatedAt: new Date(),
+        updateTimestamp: function () { this.updatedAt = new Date(); }
+      };
+
+      const updatedEntity = {
+        ...existingEntity,
+        responseBody: JSON.stringify(updatedConfig)
+      } as HttpMockEntity;
+
+      await this.httpMockService!.updateMock(updatedEntity);
+      this.entity.update(list => list.map(item => item.id === updatedConfig.id ? updatedConfig : item));
+      console.log('[FeedbackRepository] Feedback actualizada correctamente');
+      return Promise.resolve(true);
+
     } catch (error) {
-      console.error('Error al refrescar entidades:', error);
-      this.entities.set([]);
-    }
-  }
-
-  getEntities(): Signal<FeedbackEntity[]> {
-    return this.entities.asReadonly();
-  }
-
-  getAll(): FeedbackEntity[] {
-    debugger;
-    return this.entities();
-  }
-
-  getById(id: number): FeedbackEntity | undefined {
-    return this.entities().find(entity => entity.id === id);
-  }
-
-  getSelectedEntity(): Signal<FeedbackEntity | undefined> {
-    return this.selectedEntity.asReadonly();
-  }
-
-  setSelectedEntity(entity: FeedbackEntity | undefined): void {
-    this.selectedEntity.set(entity);
-  }
-
-  create(entity: FeedbackEntity): FeedbackEntity {
-    this.ensureInitialized().then(async () => {
-      try {
-        // Crear una copia de la entidad sin el id para que IndexedDB lo auto-genere
-        const entityToSave = { ...entity };
-
-        // Eliminar el id para que autoIncrement funcione
-        delete (entityToSave as any).id;
-
-        // Asegurar que las fechas estén correctamente establecidas
-        if (!entityToSave.createdAt) {
-          entityToSave.createdAt = new Date();
-        }
-        entityToSave.updatedAt = new Date();
-
-        // Crear en IndexedDB
-        const id = await this.feedbackService.createFeedback(entityToSave);
-
-        // Recargar desde IndexedDB para tener el estado real
-        await this.refreshEntities();
-
-        console.log('Feedback creado en IndexedDB con ID:', id);
-      } catch (err) {
-        console.error('Error al crear feedback:', err);
-      }
-    });
-
-    return entity;
-  }
-
-  update(entity: FeedbackEntity): void {
-    this.ensureInitialized().then(async () => {
-      try {
-        entity.updateTimestamp();
-
-        // Actualizar en IndexedDB
-        await this.feedbackService.updateFeedback(entity);
-
-        // Recargar desde IndexedDB para tener el estado real
-        await this.refreshEntities();
-
-        console.log('Feedback actualizado en IndexedDB:', entity.id);
-      } catch (err) {
-        console.error('Error al actualizar feedback:', err);
-      }
-    });
-  }
-
-  delete(id: number): void {
-    this.ensureInitialized().then(async () => {
-      try {
-        // Eliminar de IndexedDB
-        await this.feedbackService.deleteFeedback(id.toString());
-
-        // Recargar desde IndexedDB para reflejar la eliminación
-        await this.refreshEntities();
-
-        console.log('Feedback eliminado de IndexedDB:', id);
-      } catch (err) {
-        console.error('Error al eliminar feedback:', err);
-      }
-    });
-  }
-
-  searchEntities(searchTerm: string): FeedbackEntity[] {
-    if (!searchTerm.trim()) {
-      return this.entities();
+      console.error('[FeedbackRepository] Error al actualizar feedback:', error);
+      return Promise.reject(false);
     }
 
-    const term = searchTerm.toLowerCase();
-    return this.entities().filter(entity =>
-      entity.teamMember?.toLowerCase().includes(term) ||
-      entity.squad?.toLowerCase().includes(term) ||
-      entity.registration?.toLowerCase().includes(term) ||
-      entity.productOwner?.toLowerCase().includes(term) ||
-      entity.focalPoint?.toLowerCase().includes(term)
-    );
   }
 
-  downloadAllFeedbacks(): void {
-    this.ensureInitialized().then(() => {
-      try {
-        const feedbacks = this.entities();
+  //   searchEntities(searchTerm: string): FeedbackEntity[] {
+  //     if (!searchTerm.trim()) {
+  //       return this.entities();
+  //     }
 
-        const jsonData = JSON.stringify(feedbacks, null, 2);
-        const blob = new Blob([jsonData], { type: 'application/json' });
-        const url = window.URL.createObjectURL(blob);
+  //     const term = searchTerm.toLowerCase();
+  //     return this.entities().filter(entity =>
+  //       entity.teamMember?.toLowerCase().includes(term) ||
+  //       entity.squad?.toLowerCase().includes(term) ||
+  //       entity.registration?.toLowerCase().includes(term) ||
+  //       entity.productOwner?.toLowerCase().includes(term) ||
+  //       entity.focalPoint?.toLowerCase().includes(term)
+  // );
+  //     }
+  //   }
+  //   }
 
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `feedbacks-${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+  // downloadAllFeedbacks(): void {
+  //   this.ensureInitialized().then(() => {
+  //     try {
+  //       const feedbacks = this.entities();
 
-        window.URL.revokeObjectURL(url);
+  //       const jsonData = JSON.stringify(feedbacks, null, 2);
+  //       const blob = new Blob([jsonData], { type: 'application/json' });
+  //       const url = window.URL.createObjectURL(blob);
 
-        console.log('Feedbacks descargados exitosamente');
-      } catch (err) {
-        console.error('Error al descargar feedbacks:', err);
-      }
-    });
-  }
+  //       const link = document.createElement('a');
+  //       link.href = url;
+  //       link.download = `feedbacks-${new Date().toISOString().split('T')[0]}.json`;
+  //       document.body.appendChild(link);
+  //       link.click();
+  //       document.body.removeChild(link);
 
-  // Método público para refrescar manualmente si es necesario
-  async refresh(): Promise<void> {
-    await this.ensureInitialized();
-    await this.refreshEntities();
-  }
+  //       window.URL.revokeObjectURL(url);
+
+  //       console.log('Feedbacks descargados exitosamente');
+  //     } catch (err) {
+  //       console.error('Error al descargar feedbacks:', err);
+  //     }
+  //   });
+  // }
+
+
 }

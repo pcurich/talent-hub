@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { ConfigField, FieldOption } from '../../../model/system-config.model';
+import { ConfigField, FieldOption } from '../../../model/system-config-entity.model';
 import {
   FieldEditorModalState,
   OptionFormData,

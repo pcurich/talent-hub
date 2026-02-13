@@ -1,13 +1,13 @@
 import { Signal } from "@angular/core";
-import { ConfigField, ConfigGroup, SystemConfig } from "../model/system-config.model";
+import { ConfigField, ConfigGroup, SystemConfigEntity } from "../model/system-config-entity.model";
 import { IInitializable } from "./initializable.interface";
 
 export interface ISystemConfigRepository extends IInitializable {
   exists(): Promise<boolean>;
-  get(): Signal<SystemConfig>;
+  get(): Signal<SystemConfigEntity>;
 
-  create(config: SystemConfig): Promise<boolean>;
-  update(config: SystemConfig): Promise<boolean>;
+  create(config: SystemConfigEntity): Promise<boolean>;
+  update(config: SystemConfigEntity): Promise<boolean>;
 
   getGroup(keyGroup: string): ConfigGroup | undefined;
   getField(keyGroup: string, keyConfigField: string): ConfigField | undefined;
