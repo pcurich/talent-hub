@@ -82,6 +82,13 @@ export const FEEDBACK_STATUS_OPTIONS: FieldOption[] = [
   { value: 'cancelled', label: 'Cancelado', description: 'Feedback cancelado', color: '#dc3545', order: 6 }
 ];
 
+export const FEEDBACK_ACTIONABLE_STATUS_OPTIONS: FieldOption[] = [
+  { value: 'Pendiente', label: 'Pendiente', description: 'Acción planificada pero aún no iniciada', color: '#ffc107', order: 1 },
+  { value: 'En Progreso', label: 'En Progreso', description: 'Acción actualmente en ejecución', color: '#17a2b8', order: 2 },
+  { value: 'Completado', label: 'Completado', description: 'Acción finalizada exitosamente', color: '#28a745', order: 3 },
+  { value: 'Cancelado', label: 'Cancelado', description: 'Acción que ha sido cancelada y no se realizará', color: '#dc3545', order: 4 }
+];
+
 export const FEEDBACK_TYPE_OPTIONS: FieldOption[] = [
   { value: 'appreciative', label: 'Apreciativo', description: 'Reconocer logros y buen desempeño', icon: 'star', color: '#ffc107', order: 1 },
   { value: 'constructive', label: 'Constructivo', description: 'Identificar oportunidades de crecimiento', icon: 'trending_up', color: '#17a2b8', order: 2 },
@@ -179,7 +186,7 @@ export const FEEDBACK_CONFIG_GROUP: ConfigGroup = {
   order: 1,
   fields: [
     {
-      key: 'performance_level',
+      key: 'feedback_performance_level',
       label: 'Nivel de Desempeño',
       description: 'Configuración de los niveles de evaluación de desempeño',
       type: 'select',
@@ -221,6 +228,17 @@ export const FEEDBACK_CONFIG_GROUP: ConfigGroup = {
       required: true,
       group: 'feedback',
       order: 4
+    },
+    {
+      key: 'feedback_action_plan',
+      label: 'Plan de acción',
+      description: 'Configuración del plan de acción asociado a los feedbacks',
+      type: 'select',
+      defaultValue: 'draft',
+      options: FEEDBACK_ACTIONABLE_STATUS_OPTIONS,
+      required: true,
+      group: 'feedback',
+      order: 5
     },
     {
       key: 'feedback_default_type',
