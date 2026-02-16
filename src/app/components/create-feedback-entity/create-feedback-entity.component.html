@@ -5,104 +5,60 @@
   </div>
 
   <form (ngSubmit)="onSubmit()" #feedbackForm="ngForm">
-    <!-- Información General -->
+    <!-- Información del Contexto (Solo lectura) -->
     <section class="form-section">
-      <h3>Información General</h3>
+      <h3>Información del Contexto</h3>
       <div class="form-grid">
         <div class="form-group">
-          <label for="registration">Registro <span class="required">*</span></label>
-          <input
-            type="text"
-            id="registration"
-            name="registration"
-            [(ngModel)]="entity.registration"
-            required
-            placeholder="Ej: REG001"
-          />
+          <label>Squad</label>
+          <input type="text" [value]="entity.squad.name" disabled readonly />
         </div>
 
         <div class="form-group">
-          <label for="teamMember">Team Member <span class="required">*</span></label>
-          <input
-            type="text"
-            id="teamMember"
-            name="teamMember"
-            [(ngModel)]="entity.teamMember"
-            required
-            placeholder="Nombre completo"
-          />
+          <label>Product Owner</label>
+          <input type="text" [value]="entity.squad.productOwner.name" disabled readonly />
         </div>
 
         <div class="form-group">
-          <label for="company">Empresa</label>
-          <select id="company" name="company" [(ngModel)]="entity.company">
-            <option *ngFor="let company of companies" [value]="company">{{ company }}</option>
-          </select>
+          <label>Team Member</label>
+          <input type="text" [value]="entity.teamMember.name" disabled readonly />
         </div>
 
+        <div class="form-group">
+          <label>Registro</label>
+          <input type="text" [value]="entity.teamMember.registration" disabled readonly />
+        </div>
+
+        <div class="form-group">
+          <label>Fecha POCLAC</label>
+          <input type="text" [value]="entity.poclacDate | date:'dd/MM/yyyy'" disabled readonly />
+        </div>
+      </div>
+    </section>
+
+    <!-- Información del Feedback -->
+    <section class="form-section">
+      <h3>Información del Feedback</h3>
+      <div class="form-grid">
         <div class="form-group">
           <label for="seniority">Seniority</label>
-          <select id="seniority" name="seniority" [(ngModel)]="entity.seniority">
-            <option *ngFor="let seniority of seniorities" [value]="seniority">{{ seniority }}</option>
+          <select id="seniority" name="seniority" [(ngModel)]="entity.seniority" [compareWith]="compareFieldOption">
+            <option *ngFor="let option of seniorityOptions" [ngValue]="option">{{ option.label }}</option>
           </select>
-        </div>
-
-        <div class="form-group">
-          <label for="squad">Squad <span class="required">*</span></label>
-          <input
-            type="text"
-            id="squad"
-            name="squad"
-            [(ngModel)]="entity.squad"
-            required
-            placeholder="Nombre del squad"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="productOwner">Product Owner <span class="required">*</span></label>
-          <input
-            type="text"
-            id="productOwner"
-            name="productOwner"
-            [(ngModel)]="entity.productOwner"
-            required
-            placeholder="Nombre del PO"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="focalPoint">Focal Point <span class="required">*</span></label>
-          <input
-            type="text"
-            id="focalPoint"
-            name="focalPoint"
-            [(ngModel)]="entity.focalPoint"
-            required
-            placeholder="Nombre del FP"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="poclacDate">Fecha POCLAC</label>
-          <input
-            type="date"
-            id="poclacDate"
-            name="poclacDate"
-            [(ngModel)]="entity.poclacDate"
-          />
         </div>
 
         <div class="form-group">
           <label for="feedbackProvider">Proveedor de Feedback <span class="required">*</span></label>
-          <input
-            type="text"
-            id="feedbackProvider"
-            name="feedbackProvider"
-            [(ngModel)]="entity.feedbackProvider"
-            required
-            placeholder="Nombre completo"
-          />
+          <select id="feedbackProvider" name="feedbackProvider" [(ngModel)]="entity.feedbackProvider" [compareWith]="compareFieldOption" required>
+            <option *ngFor="let option of feedbackProviderOptions" [ngValue]="option">{{ option.label }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="feedbackType">Tipo de Feedback <span class="required">*</span></label>
+          <select id="feedbackType" name="feedbackType" [(ngModel)]="entity.feedbackType" [compareWith]="compareFieldOption" required>
+            <option *ngFor="let option of feedbackTypeOptions" [ngValue]="option">{{ option.label }}</option>
+          </select>
         </div>
       </div>
     </section>
@@ -112,8 +68,8 @@
       <h3>Calificación General</h3>
       <div class="form-group">
         <label for="generalRating">Calificación</label>
-        <select id="generalRating" name="generalRating" [(ngModel)]="entity.generalRating">
-          <option *ngFor="let rating of generalRatings" [value]="rating">{{ rating }}</option>
+        <select id="generalRating" name="generalRating" [(ngModel)]="entity.generalRating" [compareWith]="compareFieldOption">
+          <option *ngFor="let option of generalRatingOptions" [ngValue]="option">{{ option.label }}</option>
         </select>
       </div>
     </section>
@@ -124,27 +80,23 @@
       <div class="form-grid">
         <div class="form-group">
           <label for="performanceWhat">¿Cumple con la entrega del backlog?</label>
-          <select id="performanceWhat" name="performanceWhat" [(ngModel)]="entity.performanceWhat">
-            <option *ngFor="let level of performanceLevels" [value]="level">{{ level }}</option>
+          <select id="performanceWhat" name="performanceWhat" [(ngModel)]="entity.performance.what" [compareWith]="compareFieldOption">
+            <option *ngFor="let option of performanceWhatOptions" [ngValue]="option">{{ option.label }}</option>
           </select>
         </div>
 
         <div class="form-group">
           <label for="performanceHow">¿Vive los principios Samay?</label>
-          <select id="performanceHow" name="performanceHow" [(ngModel)]="entity.performanceHow">
-            <option *ngFor="let level of performanceLevels" [value]="level">{{ level }}</option>
+          <select id="performanceHow" name="performanceHow" [(ngModel)]="entity.performance.how" [compareWith]="compareFieldOption">
+            <option *ngFor="let option of performanceHowOptions" [ngValue]="option">{{ option.label }}</option>
           </select>
         </div>
 
-        <div class="form-group full-width">
+        <div class="form-group">
           <label for="performanceAchievements">Logros y resultados</label>
-          <input
-            type="text"
-            id="performanceAchievements"
-            name="performanceAchievements"
-            [(ngModel)]="entity.performanceAchievements"
-            placeholder="Describa los logros principales"
-          />
+          <select id="performanceAchievements" name="performanceAchievements" [(ngModel)]="entity.performance.achievements" [compareWith]="compareFieldOption">
+            <option *ngFor="let option of performanceAchievementsOptions" [ngValue]="option">{{ option.label }}</option>
+          </select>
         </div>
 
         <div class="form-group full-width">
@@ -152,7 +104,7 @@
           <textarea
             id="performanceDetails"
             name="performanceDetails"
-            [(ngModel)]="entity.performanceDetails"
+            [(ngModel)]="entity.performance.details"
             rows="3"
             placeholder="Detalles adicionales del desempeño"
           ></textarea>
@@ -163,12 +115,6 @@
     <!-- Feedback SBI -->
     <section class="form-section">
       <h3>Feedback - Método SBI</h3>
-      <div class="form-group">
-        <label for="feedbackType">Tipo de Feedback</label>
-        <select id="feedbackType" name="feedbackType" [(ngModel)]="entity.feedbackType">
-          <option *ngFor="let type of feedbackTypes" [value]="type">{{ type }}</option>
-        </select>
-      </div>
 
       <div class="form-group">
         <label for="situation">Situación</label>
@@ -241,8 +187,8 @@
 
             <div class="form-group">
               <label [for]="'responsible-' + i">Responsable</label>
-              <select [id]="'responsible-' + i" [name]="'responsible-' + i" [(ngModel)]="action.responsible">
-                <option *ngFor="let resp of actionResponsibles" [value]="resp">{{ resp }}</option>
+              <select [id]="'responsible-' + i" [name]="'responsible-' + i" [(ngModel)]="action.responsible" [compareWith]="compareFieldOption">
+                <option *ngFor="let option of actionResponsibleOptions" [ngValue]="option">{{ option.label }}</option>
               </select>
             </div>
 
@@ -253,8 +199,8 @@
 
             <div class="form-group">
               <label [for]="'status-' + i">Estado</label>
-              <select [id]="'status-' + i" [name]="'status-' + i" [(ngModel)]="action.status">
-                <option *ngFor="let status of actionStatuses" [value]="status">{{ status }}</option>
+              <select [id]="'status-' + i" [name]="'status-' + i" [(ngModel)]="action.status" [compareWith]="compareFieldOption">
+                <option *ngFor="let option of actionStatusOptions" [ngValue]="option">{{ option.label }}</option>
               </select>
             </div>
 

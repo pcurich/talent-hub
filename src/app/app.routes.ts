@@ -13,6 +13,7 @@ import { WizardLayoutComponent } from './layouts/wizard-layout/wizard-layout';
 import { CurrentUserComponent } from './components/current-user/current-user.component';
 import { NotificationsComponent } from './components/notifications/notifications.component';
 import { SystemConfigComponent } from './components/system-config/system-config.component';
+import { SquadTeamGridComponent } from './components/squad-team-grid/squad-team-grid.component';
 
 export const routes: Routes = [
 
@@ -46,6 +47,7 @@ export const routes: Routes = [
       { path: '', component: HomeComponent },
       { path: 'profile', component: CurrentUserComponent },
       { path: 'notifications', component: NotificationsComponent },
+      { path: 'squad-team-grid', component: SquadTeamGridComponent },
       { path: 'create-feedback', component: CreateFeedbackEntityComponent },
       { path: 'update-feedback/:id', component: UpdateFeedbackEntityComponent },
       { path: 'excel-settings', component: ExcelSettingsComponent },

@@ -1,0 +1,116 @@
+<div class="squad-team-grid-container">
+  <div class="header">
+    <h2>Mis Squads y Team Members</h2>
+  </div>
+
+  <!-- Filters Section -->
+  <section class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="squadFilter">Filtrar por Squad</label>
+        <select
+          id="squadFilter"
+          [ngModel]="selectedSquadName()"
+          (ngModelChange)="onSquadFilterChange($event)"
+        >
+          <option value="">Todos los Squads</option>
+          <option *ngFor="let squad of squads()" [value]="squad.name">
+            {{ squad.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="poFilter">Filtrar por Product Owner</label>
+        <select
+          id="poFilter"
+          [ngModel]="selectedProductOwnerName()"
+          (ngModelChange)="onProductOwnerFilterChange($event)"
+          [disabled]="productOwners().length === 0"
+        >
+          <option value="">Todos los Product Owners</option>
+          <option *ngFor="let po of productOwners()" [value]="po">
+            {{ po }}
+          </option>
+        </select>
+      </div>
+
+      <button
+        type="button"
+        class="btn-clear"
+        (click)="clearFilters()"
+        [disabled]="!selectedSquadName() && !selectedProductOwnerName()"
+      >
+        Limpiar Filtros
+      </button>
+    </div>
+
+    <div class="filter-info">
+      <span class="result-count">
+        {{ filteredTeamMembers().length }} team member(s) encontrado(s)
+      </span>
+    </div>
+  </section>
+
+  <!-- Grid Section -->
+  <section class="grid-section">
+    <div class="table-container" *ngIf="filteredTeamMembers().length > 0; else noResults">
+      <table class="team-grid">
+        <thead>
+          <tr>
+            <th>Squad</th>
+            <th>Product Owner</th>
+            <th>Team Member</th>
+            <th>Registro</th>
+            <th>Email</th>
+            <th>Empresa</th>
+            <th class="actions-col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of filteredTeamMembers(); trackBy: trackByRegistration">
+            <td class="squad-cell">
+              <span class="squad-badge"><strong>{{ row.squad.name }}</strong></span>
+            </td>
+            <td>{{ row.squad.productOwner.name || '-' }}</td>
+            <td class="name-cell">
+              <strong>{{ row.teamMember.name }}</strong>
+            </td>
+            <td>{{ row.teamMember.registration }}</td>
+            <td>{{ row.teamMember.email || '-' }}</td>
+            <td>{{ row.teamMember.companyValue || '-' }}</td>
+            <td class="actions-cell">
+              <button
+                type="button"
+                class="btn-action btn-feedback"
+                (click)="goToCreateFeedback(row)"
+                title="Crear Feedback para {{ row.teamMember.name }}"
+              >
+                <span class="icon">📝</span>
+                Crear Feedback
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #noResults>
+      <div class="no-results">
+        <div class="no-results-icon">👥</div>
+        <p *ngIf="squads().length === 0">No tienes squads asignados.</p>
+        <p *ngIf="squads().length > 0 && filteredTeamMembers().length === 0">
+          No se encontraron team members con los filtros seleccionados.
+        </p>
+        <button
+          *ngIf="selectedSquadName() || selectedProductOwnerName()"
+          type="button"
+          class="btn-clear"
+          (click)="clearFilters()"
+        >
+          Limpiar Filtros
+        </button>
+      </div>
+    </ng-template>
+  </section>
+</div>
