@@ -14,7 +14,6 @@ export class InitAppIndexeddbRepository implements IInitAppRepository {
 
   async initializeDatabase(registration: string): Promise<void> {
     this.cfg = getIndexedDbConfigWithRegistration(registration);
-    debugger;
     const isInit = await this.isInitialized();
 
     if (!isInit) {

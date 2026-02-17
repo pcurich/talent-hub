@@ -374,7 +374,6 @@ export class SystemConfigComponent implements OnInit {
       alert('Error: No se pudo identificar el campo a actualizar');
       return;
     }
-    debugger
     // Actualizar en ALL_CONFIG_GROUPS (en memoria)
     const group = this.configGroups.find(g => g.key === groupKey);
     if (group) {

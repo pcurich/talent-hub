@@ -74,41 +74,68 @@ export class CreateFeedbackEntityComponent implements OnInit {
   }
 
   validateForm(): boolean {
-    // if (!this.entity.teamMember.trim()) {
-    //   alert('El nombre del Team Member es requerido');
-    //   return false;
-    // }
-    // if (!this.entity.registration.trim()) {
-    //   alert('El registro es requerido');
-    //   return false;
-    // }
-    // if (!this.entity.squad.trim()) {
-    //   alert('El squad es requerido');
-    //   return false;
-    // }
-    // if (!this.entity.productOwner.trim()) {
-    //   alert('El Product Owner es requerido');
-    //   return false;
-    // }
-    // if (!this.entity.focalPoint.trim()) {
-    //   alert('El Focal Point es requerido');
-    //   return false;
-    // }
-    // if (!this.entity.feedbackProvider.trim()) {
-    //   alert('El Proveedor de Feedback es requerido');
-    //   return false;
-    // }
+    // Validación de campos obligatorios
+
+    if (!this.entity.seniority?.value || this.entity.seniority?.value === 'blank') {
+      alert('El nivel de seniority es requerido');
+      return false;
+    }
+    if (!this.entity.feedbackProvider?.value || this.entity.feedbackProvider?.value === 'blank') {
+      alert('El Proveedor de Feedback es requerido');
+      return false;
+    }
+    if (!this.entity.feedbackType?.value || this.entity.feedbackType?.value === 'blank') {
+      alert('El Tipo de Feedback es requerido');
+      return false;
+    }
+    if (!this.entity.generalRating?.value || this.entity.generalRating?.value === 'blank') {
+      alert('La calificación general es requerida');
+      return false;
+    }
+    if (!this.entity.performance?.what?.value || this.entity.performance?.what?.value === '0') {
+      alert('La evaluación "¿Cumple con la entrega del backlog?" es requerida');
+      return false;
+    }
+    if (!this.entity.performance?.how?.value || this.entity.performance?.how?.value === '0') {
+      alert('La evaluación "¿Vive los principios Samay?" es requerida');
+      return false;
+    }
+    if (!this.entity.performance?.achievements?.value || this.entity.performance?.achievements?.value === '0') {
+      alert('La evaluación "Logros y resultados" es requerida');
+      return false;
+    }
+    // Validar plan de acción si existe
+    for (const [i, action] of this.entity.actionPlan.entries()) {
+      if (!action.actionable?.trim()) {
+        alert(`La acción ${i + 1} debe tener un nombre.`);
+        return false;
+      }
+      if (!action.responsible?.value || action.responsible?.value === 'blank') {
+        alert(`La acción ${i + 1} debe tener un responsable.`);
+        return false;
+      }
+      if (!action.commitmentDate) {
+        alert(`La acción ${i + 1} debe tener una fecha de compromiso.`);
+        return false;
+      }
+      if (!action.status?.value) {
+        alert(`La acción ${i + 1} debe tener un estado.`);
+        return false;
+      }
+    }
     return true;
   }
 
   addActionPlan() {
     this.entity.actionPlan.push({
-      actionable: '',
-      responsible: this.actionResponsibleOptions[0] || { value: '', label: '---', description: '', color: '', order: 0 },
+      actionable: '11111',
+      responsible: this.actionResponsibleOptions[0],
       commitmentDate: new Date(),
-      status: this.actionStatusOptions[0] || { value: '', label: '---', description: '', color: '', order: 0 },
-      details: ''
+      status: this.actionStatusOptions[0],
+      details: '1111'
     });
+    // Forzar actualización visual
+    this.entity.actionPlan = [...this.entity.actionPlan];
   }
 
   removeActionPlan(index: number) {

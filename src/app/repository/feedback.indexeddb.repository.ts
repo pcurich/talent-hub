@@ -58,7 +58,6 @@ export class FeedbackRepository
 
   async update(entity: FeedbackEntity): Promise<boolean> {
     try {
-      debugger;
       const entities = await this.httpMockService!.findByServiceCode(this.SERVICE_CODE);
 
       if (!entities || entities.length === 0) {
