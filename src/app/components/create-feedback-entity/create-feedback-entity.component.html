@@ -45,32 +45,32 @@
           <select id="seniority" name="seniority" [(ngModel)]="entity.seniority" [compareWith]="compareFieldOption">
             <option *ngFor="let option of seniorityOptions" [ngValue]="option">{{ option.label }}</option>
           </select>
+          <small class="field-hint" *ngIf="entity.seniority.description">
+            <span class="hint-icon">💡</span> {{ entity.seniority.description }}
+          </small>
         </div>
 
         <div class="form-group">
           <label for="feedbackProvider">Proveedor de Feedback <span class="required">*</span></label>
-          <select id="feedbackProvider" name="feedbackProvider" [(ngModel)]="entity.feedbackProvider" [compareWith]="compareFieldOption" required>
+          <select id="feedbackProvider" name="feedbackProvider" [(ngModel)]="entity.feedbackProvider"
+            [compareWith]="compareFieldOption" required>
             <option *ngFor="let option of feedbackProviderOptions" [ngValue]="option">{{ option.label }}</option>
           </select>
+          <small class="field-hint" *ngIf="entity.feedbackProvider.description">
+            <span class="hint-icon">💡</span> {{ entity.feedbackProvider.description }}
+          </small>
         </div>
 
         <div class="form-group">
           <label for="feedbackType">Tipo de Feedback <span class="required">*</span></label>
-          <select id="feedbackType" name="feedbackType" [(ngModel)]="entity.feedbackType" [compareWith]="compareFieldOption" required>
+          <select id="feedbackType" name="feedbackType" [(ngModel)]="entity.feedbackType"
+            [compareWith]="compareFieldOption" required>
             <option *ngFor="let option of feedbackTypeOptions" [ngValue]="option">{{ option.label }}</option>
           </select>
+          <small class="field-hint" *ngIf="entity.feedbackType.description">
+            <span class="hint-icon">💡</span> {{ entity.feedbackType.description }}
+          </small>
         </div>
-      </div>
-    </section>
-
-    <!-- Calificación General -->
-    <section class="form-section">
-      <h3>Calificación General</h3>
-      <div class="form-group">
-        <label for="generalRating">Calificación</label>
-        <select id="generalRating" name="generalRating" [(ngModel)]="entity.generalRating" [compareWith]="compareFieldOption">
-          <option *ngFor="let option of generalRatingOptions" [ngValue]="option">{{ option.label }}</option>
-        </select>
       </div>
     </section>
 
@@ -80,34 +80,43 @@
       <div class="form-grid">
         <div class="form-group">
           <label for="performanceWhat">¿Cumple con la entrega del backlog?</label>
-          <select id="performanceWhat" name="performanceWhat" [(ngModel)]="entity.performance.what" [compareWith]="compareFieldOption">
+          <select id="performanceWhat" name="performanceWhat" [(ngModel)]="entity.performance.what"
+            [compareWith]="compareFieldOption">
             <option *ngFor="let option of performanceWhatOptions" [ngValue]="option">{{ option.label }}</option>
           </select>
+          <small class="field-hint" *ngIf="entity.performance.what.description">
+            <span class="hint-icon">💡</span> {{ entity.performance.what.description }}
+          </small>
         </div>
 
         <div class="form-group">
           <label for="performanceHow">¿Vive los principios Samay?</label>
-          <select id="performanceHow" name="performanceHow" [(ngModel)]="entity.performance.how" [compareWith]="compareFieldOption">
+          <select id="performanceHow" name="performanceHow" [(ngModel)]="entity.performance.how"
+            [compareWith]="compareFieldOption">
             <option *ngFor="let option of performanceHowOptions" [ngValue]="option">{{ option.label }}</option>
           </select>
+          <small class="field-hint" *ngIf="entity.performance.how.description">
+            <span class="hint-icon">💡</span> {{ entity.performance.how.description }}
+          </small>
         </div>
 
         <div class="form-group">
           <label for="performanceAchievements">Logros y resultados</label>
-          <select id="performanceAchievements" name="performanceAchievements" [(ngModel)]="entity.performance.achievements" [compareWith]="compareFieldOption">
+          <select id="performanceAchievements" name="performanceAchievements"
+            [(ngModel)]="entity.performance.achievements" [compareWith]="compareFieldOption">
             <option *ngFor="let option of performanceAchievementsOptions" [ngValue]="option">{{ option.label }}</option>
           </select>
+          <small class="field-hint" *ngIf="entity.performance.achievements.description">
+            <span class="hint-icon">💡</span> {{ entity.performance.achievements.description }}
+          </small>
         </div>
+      </div>
 
+      <div class="form-grid">
         <div class="form-group full-width">
           <label for="performanceDetails">Detalles de desempeño</label>
-          <textarea
-            id="performanceDetails"
-            name="performanceDetails"
-            [(ngModel)]="entity.performance.details"
-            rows="3"
-            placeholder="Detalles adicionales del desempeño"
-          ></textarea>
+          <textarea id="performanceDetails" name="performanceDetails" [(ngModel)]="entity.performance.details" rows="3"
+            placeholder="Detalles adicionales del desempeño"></textarea>
         </div>
       </div>
     </section>
@@ -118,35 +127,20 @@
 
       <div class="form-group">
         <label for="situation">Situación</label>
-        <textarea
-          id="situation"
-          name="situation"
-          [(ngModel)]="entity.feedbackDetails.situation"
-          rows="3"
-          placeholder="Describa la situación específica"
-        ></textarea>
+        <textarea id="situation" name="situation" [(ngModel)]="entity.feedbackDetails.situation" rows="3"
+          placeholder="Describa la situación específica"></textarea>
       </div>
 
       <div class="form-group">
         <label for="behavior">Comportamiento</label>
-        <textarea
-          id="behavior"
-          name="behavior"
-          [(ngModel)]="entity.feedbackDetails.behavior"
-          rows="3"
-          placeholder="Describa el comportamiento observado"
-        ></textarea>
+        <textarea id="behavior" name="behavior" [(ngModel)]="entity.feedbackDetails.behavior" rows="3"
+          placeholder="Describa el comportamiento observado"></textarea>
       </div>
 
       <div class="form-group">
         <label for="impact">Impacto</label>
-        <textarea
-          id="impact"
-          name="impact"
-          [(ngModel)]="entity.feedbackDetails.impact"
-          rows="3"
-          placeholder="Describa el impacto del comportamiento"
-        ></textarea>
+        <textarea id="impact" name="impact" [(ngModel)]="entity.feedbackDetails.impact" rows="3"
+          placeholder="Describa el impacto del comportamiento"></textarea>
       </div>
     </section>
 
@@ -155,13 +149,23 @@
       <h3>Expectativas del Usuario</h3>
       <div class="form-group">
         <label for="userExpectations">Expectativas</label>
-        <textarea
-          id="userExpectations"
-          name="userExpectations"
-          [(ngModel)]="entity.userExpectations"
-          rows="3"
-          placeholder="Describa las expectativas"
-        ></textarea>
+        <textarea id="userExpectations" name="userExpectations" [(ngModel)]="entity.userExpectations" rows="3"
+          placeholder="Describa las expectativas"></textarea>
+      </div>
+    </section>
+
+    <!-- Calificación General -->
+    <section class="form-section">
+      <h3>Calificación General</h3>
+      <div class="form-group">
+        <label for="generalRating">Calificación</label>
+        <select id="generalRating" name="generalRating" [(ngModel)]="entity.generalRating"
+          [compareWith]="compareFieldOption">
+          <option *ngFor="let option of generalRatingOptions" [ngValue]="option">{{ option.label }}</option>
+        </select>
+        <small class="field-hint" *ngIf="entity.generalRating.description">
+          <span class="hint-icon">💡</span> {{ entity.generalRating.description }}
+        </small>
       </div>
     </section>
 
@@ -187,21 +191,31 @@
 
             <div class="form-group">
               <label [for]="'responsible-' + i">Responsable</label>
-              <select [id]="'responsible-' + i" [name]="'responsible-' + i" [(ngModel)]="action.responsible" [compareWith]="compareFieldOption">
+              <select [id]="'responsible-' + i" [name]="'responsible-' + i" [(ngModel)]="action.responsible"
+                [compareWith]="compareFieldOption">
                 <option *ngFor="let option of actionResponsibleOptions" [ngValue]="option">{{ option.label }}</option>
               </select>
+              <small class="field-hint"
+                *ngIf="action.responsible.description">
+                <span class="hint-icon">💡</span> {{ action.responsible.description }}
+              </small>
             </div>
 
             <div class="form-group">
               <label [for]="'commitmentDate-' + i">Fecha de Compromiso</label>
-              <input type="date" [id]="'commitmentDate-' + i" [name]="'commitmentDate-' + i" [(ngModel)]="action.commitmentDate">
+              <input type="date" [id]="'commitmentDate-' + i" [name]="'commitmentDate-' + i"
+                [(ngModel)]="action.commitmentDate">
             </div>
 
             <div class="form-group">
               <label [for]="'status-' + i">Estado</label>
-              <select [id]="'status-' + i" [name]="'status-' + i" [(ngModel)]="action.status" [compareWith]="compareFieldOption">
+              <select [id]="'status-' + i" [name]="'status-' + i" [(ngModel)]="action.status"
+                [compareWith]="compareFieldOption">
                 <option *ngFor="let option of actionStatusOptions" [ngValue]="option">{{ option.label }}</option>
               </select>
+              <small class="field-hint" *ngIf="action.status.description">
+                <span class="hint-icon">💡</span> {{ action.status.description }}
+              </small>
             </div>
 
             <div class="form-group full-width">
@@ -219,4 +233,8 @@
       <button type="submit" class="btn-primary" [disabled]="!feedbackForm.form.valid">Crear Feedback</button>
     </div>
   </form>
+
+  <!-- <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div> -->
 </div>

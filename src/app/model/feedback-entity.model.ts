@@ -78,7 +78,7 @@ export class FeedbackEntity extends BaseEntity {
     this.seniority = init.seniority ?? { value: '0', label: '---------------', description: 'No se ha especificado un nivel de seniority', color: '#ffffff', order: 6 };
     this.squad = init.squad ?? ({} as Squad);
     this.poclacDate = init.poclacDate ?? new Date();
-    this.feedbackProvider = init.feedbackProvider ?? { value: '0', label: '---------------', description: 'No se ha especificado un proveedor de feedback', color: '#ffffff', order: 6 };
+    this.feedbackProvider = init.feedbackProvider ?? { value: 'blank', label: '---------------', description: 'No se ha especificado un proveedor de feedback', color: '#ffffff', order: 6 };
 
     this.generalRating = init.generalRating ?? { value: 'blank', label: '---------------', description: 'No se ha especificado una calificación general', color: '#ffffff', order: 4 };
 

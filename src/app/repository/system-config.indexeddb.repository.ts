@@ -57,7 +57,6 @@ export class SystemConfigIndexeddbRepository
 
   async update(config: SystemConfigEntity): Promise<boolean> {
     try {
-      debugger;
       const entities = await this.httpMockService!.findByServiceCode(this.SERVICE_CODE);
 
       if (!entities || entities.length === 0) {

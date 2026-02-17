@@ -64,7 +64,6 @@ export const REPOSITORY_INITIALIZER: ApplicationConfig = {
 
       if (registration.length > 0) {
         // Inicializar todos los repositorios en paralelo con el registration
-        debugger;
         await Promise.all(
           repositories.map(repo => repo.initService(registration))
         );
