@@ -14,6 +14,7 @@ import { CurrentUserComponent } from './components/current-user/current-user.com
 import { NotificationsComponent } from './components/notifications/notifications.component';
 import { SystemConfigComponent } from './components/system-config/system-config.component';
 import { SquadTeamGridComponent } from './components/squad-team-grid/squad-team-grid.component';
+import { CreateFeedbackEntity2Component } from './components/create-feedback-entity-2/create-feedback-entity-2.component';
 
 export const routes: Routes = [
 
@@ -48,7 +49,7 @@ export const routes: Routes = [
       { path: 'profile', component: CurrentUserComponent },
       { path: 'notifications', component: NotificationsComponent },
       { path: 'squad-team-grid', component: SquadTeamGridComponent },
-      { path: 'create-feedback', component: CreateFeedbackEntityComponent },
+      { path: 'create-feedback', component: CreateFeedbackEntity2Component },
       { path: 'update-feedback/:id', component: UpdateFeedbackEntityComponent },
       { path: 'excel-settings', component: ExcelSettingsComponent },
       { path: 'field-options', component: FieldOptionsManagerComponent },

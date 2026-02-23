@@ -82,11 +82,20 @@ export const FEEDBACK_STATUS_OPTIONS: FieldOption[] = [
   { value: 'cancelled', label: 'Cancelado', description: 'Feedback cancelado', color: '#dc3545', order: 6 }
 ];
 
+export const FEEDBACK_ACTIONABLE_PROVIDER_OPTIONS: FieldOption[] = [
+  { value: 'blank', label: '---------------', description: 'No se ha especificado quién brinda el feedback', color: '#ffffff', order: 1 },
+  { value: 'CL', label: 'Chapter Lead', description: 'Líder técnico responsable del desarrollo profesional del equipo', icon: 'school', color: '#007bff', order: 2 },
+  { value: 'PO', label: 'Product Owner', description: 'Responsable de maximizar el valor del producto y gestionar el backlog', icon: 'inventory', color: '#28a745', order: 3 },
+  { value: 'FP', label: 'Focal Point', description: 'Punto de contacto principal entre el equipo y stakeholders', icon: 'support_agent', color: '#17a2b8', order: 4 },
+  { value: 'AC', label: 'Agile Coach', description: 'Facilitador de prácticas ágiles y mejora continua del equipo', icon: 'psychology', color: '#ffc107', order: 5 },
+];
+
 export const FEEDBACK_ACTIONABLE_STATUS_OPTIONS: FieldOption[] = [
-  { value: 'Pendiente', label: 'Pendiente', description: 'Acción planificada pero aún no iniciada', color: '#ffc107', order: 1 },
-  { value: 'En Progreso', label: 'En Progreso', description: 'Acción actualmente en ejecución', color: '#17a2b8', order: 2 },
-  { value: 'Completado', label: 'Completado', description: 'Acción finalizada exitosamente', color: '#28a745', order: 3 },
-  { value: 'Cancelado', label: 'Cancelado', description: 'Acción que ha sido cancelada y no se realizará', color: '#dc3545', order: 4 }
+  { value: 'blank', label: '---------------', description: 'No se ha especificado quién brinda el feedback', color: '#ffffff', order: 1 },
+  { value: 'Pendiente', label: 'Pendiente', description: 'Acción planificada pero aún no iniciada', color: '#ffc107', order: 2 },
+  { value: 'En Progreso', label: 'En Progreso', description: 'Acción actualmente en ejecución', color: '#17a2b8', order: 3 },
+  { value: 'Completado', label: 'Completado', description: 'Acción finalizada exitosamente', color: '#28a745', order: 4 },
+  { value: 'Cancelado', label: 'Cancelado', description: 'Acción que ha sido cancelada y no se realizará', color: '#dc3545', order: 5 }
 ];
 
 export const FEEDBACK_TYPE_OPTIONS: FieldOption[] = [
@@ -230,15 +239,26 @@ export const FEEDBACK_CONFIG_GROUP: ConfigGroup = {
       order: 4
     },
     {
-      key: 'feedback_action_plan',
-      label: 'Plan de acción',
-      description: 'Configuración del plan de acción asociado a los feedbacks',
+      key: 'feedback_action_status',
+      label: 'Estado del plan de acción',
+      description: 'Configuración del estado del plan de acción asociado a los feedbacks',
       type: 'select',
       defaultValue: 'draft',
       options: FEEDBACK_ACTIONABLE_STATUS_OPTIONS,
       required: true,
       group: 'feedback',
       order: 5
+    },
+    {
+      key: 'feedback_action_responsible',
+      label: 'Responsable del plan de acción',
+      description: 'Configuración del responsable del plan de acción asociado a los feedbacks',
+      type: 'select',
+      defaultValue: 'draft',
+      options: FEEDBACK_ACTIONABLE_PROVIDER_OPTIONS,
+      required: true,
+      group: 'feedback',
+      order: 6
     },
     {
       key: 'feedback_default_type',
