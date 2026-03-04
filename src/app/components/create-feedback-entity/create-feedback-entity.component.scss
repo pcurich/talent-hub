@@ -1,19 +1,107 @@
-.error-message {
-  margin-bottom: var(--spacing-md);
-  padding: var(--spacing-md);
-  background: var(--color-error, #dc3545);
-  color: #fff;
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-base);
-  font-weight: 600;
-  box-shadow: var(--shadow-xs);
-  letter-spacing: 0.02em;
+// Estilo para el botón Guardar Acción deshabilitado
+.btn-save[disabled], .btn-save:disabled {
+  background: #cccccc;
+  color: #888888;
+  border: 1px solid #bbbbbb;
+  cursor: not-allowed;
+  opacity: 0.7;
+  box-shadow: none;
+  transition: background 0.2s, color 0.2s;
 }
-.create-container, .update-container {
+.plan-action-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+
+  h3 {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+  .btn-add {
+    background-color: var(--color-secondary);
+    color: #fff;
+    border: none;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+
+    &:hover {
+      background-color: var(--color-secondary-dark);
+      box-shadow: var(--shadow-md);
+    }
+
+    &:disabled,
+    &[disabled] {
+      background-color: #ccc;
+      color: #888;
+      cursor: not-allowed;
+      box-shadow: none;
+      opacity: 0.7;
+    }
+  }
+}
+.btn-cancel {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: var(--transition-base);
+
+  &:hover {
+    background: var(--color-bg-light);
+  }
+}
+
+.btn-save {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition-base);
+
+  &:hover {
+    background: var(--color-primary-dark);
+  }
+}
+
+.create-container,
+.update-container {
   margin: 0 auto;
   padding: var(--spacing-xl);
   background: var(--color-bg-light);
   min-height: calc(100vh - 100px);
+}
+
+.btn-remove {
+  background-color: var(--color-error);
+  color: white;
+  border: none;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  transition: all var(--transition-fast);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: var(--color-error-dark);
+  }
 }
 
 .form-header {
@@ -169,27 +257,6 @@
   }
 }
 
-.btn-add {
-  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-light) 100%);
-  color: white;
-  border: none;
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  transition: all var(--transition-base);
-  box-shadow: var(--shadow-sm);
-
-  &:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-  }
-}
-
 .action-plans {
   display: flex;
   flex-direction: column;
@@ -216,22 +283,6 @@
       color: var(--color-primary);
       font-size: var(--font-size-base);
       font-weight: 600;
-    }
-
-    .btn-remove {
-      background-color: var(--color-error);
-      color: white;
-      border: none;
-      padding: var(--spacing-xs) var(--spacing-md);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      font-size: var(--font-size-sm);
-      font-weight: 600;
-      transition: all var(--transition-fast);
-
-      &:hover {
-        background-color: var(--color-error-dark);
-      }
     }
   }
 }
@@ -265,7 +316,11 @@
     }
 
     &.btn-primary {
-      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+      background: linear-gradient(
+        135deg,
+        var(--color-primary) 0%,
+        var(--color-primary-dark) 100%
+      );
       color: white;
 
       &:hover {
@@ -283,7 +338,8 @@
 }
 
 @media (max-width: 768px) {
-  .create-container, .update-container {
+  .create-container,
+  .update-container {
     padding: var(--spacing-md);
   }
 

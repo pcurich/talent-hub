@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FeedbackEntity } from '@pcurich/client-storage-indexeddb';
+import { FeedbackEntity } from '../../model/feedback-entity.model';
 
 @Component({
   selector: 'app-modal-entity',
@@ -24,13 +24,14 @@ export class ModalEntityComponent {
     return d.toLocaleDateString('es-PE');
   }
 
-  getActionPlanStatusClass(status: string): string {
+  getActionPlanStatusClass(status: any): string {
+    if (!status?.value) return 'status-default';
     const statusMap: { [key: string]: string } = {
-      'Completado': 'status-completed',
-      'En Progreso': 'status-progress',
-      'Pendiente': 'status-pending',
-      'Cancelado': 'status-cancelled'
+      'completed': 'status-completed',
+      'in_progress': 'status-progress',
+      'pending': 'status-pending',
+      'cancelled': 'status-cancelled'
     };
-    return statusMap[status] || 'status-default';
+    return statusMap[status.value] || 'status-default';
   }
 }

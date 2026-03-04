@@ -3,7 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FeedbackRepository } from '../../repository/feedback.indexeddb.repository';
+import { FeedbackIndexeddbRepository } from '../../repository/feedback.indexeddb.repository';
 import { FeedbackEntity, FeedbackType, Seniority, FeedbackProvider, GeneralRating, PerformanceWhat, PerformanceHow, PerformanceAchievements, ActionResponsible, ActionPlanStatus } from '../../model/feedback-entity.model';
 import { SystemConfigIndexeddbRepository } from '../../repository/system-config.indexeddb.repository';
 import { Squad, TeamMember } from '../../model/current-user.model';
@@ -18,7 +18,8 @@ import { Squad, TeamMember } from '../../model/current-user.model';
 })
 export class CreateFeedbackEntity2Component implements OnInit {
   addActionDisabled = false;
-  private feedbackRepository = inject(FeedbackRepository);
+  showSaveActionButton = true;
+  private feedbackRepository = inject(FeedbackIndexeddbRepository);
   private router = inject(Router);
   private systemConfig = inject(SystemConfigIndexeddbRepository);
 
@@ -38,6 +39,7 @@ export class CreateFeedbackEntity2Component implements OnInit {
   feedbackTypeOptions: FeedbackType[] = this.systemConfig.getField('feedback', 'feedback_default_type')?.options || [];
   actionResponsibleOptions: ActionResponsible[] = this.systemConfig.getField('feedback', 'feedback_action_responsible')?.options || [];
   actionStatusOptions: ActionPlanStatus[] = this.systemConfig.getField('feedback', 'feedback_action_status')?.options || [];
+
 
   constructor(private fb: FormBuilder) { }
 
@@ -101,45 +103,29 @@ export class CreateFeedbackEntity2Component implements OnInit {
     }
   }
 
-  // addNewActionPlan() {
-  //   // Crear un nuevo plan de acción vacío
-  //   const newPlan = {
-  //     actionable: '',
-  //     responsible: null,
-  //     commitmentDate: '',
-  //     status: null,
-  //     details: ''
-  //   };
-  //   // Agregar al modelo entity
-  //   if (!Array.isArray(this.entity.actionPlan)) {
-  //     this.entity.actionPlan = [];
-  //   }
-  //   this.entity.actionPlan.push(newPlan);
-  //   // Agregar al FormArray
-  //   this.actionPlan.push(this.fb.group({
-  //     actionable: [newPlan.actionable, Validators.required],
-  //     responsible: [newPlan.responsible, Validators.required],
-  //     commitmentDate: [newPlan.commitmentDate, Validators.required],
-  //     status: [newPlan.status, Validators.required],
-  //     details: [newPlan.details, []],
-  //   }));
-  //   this.addActionDisabled = true;
-  // }
+  addNewActionPlan() {
+    // Actualizar this.entity.actionPlan con los valores actuales del FormArray
+    this.entity.actionPlan = this.actionPlan.getRawValue();
+    console.log('Current Action Plans:', this.entity.actionPlan);
+    this.addActionDisabled = false;
+    this.showSaveActionButton = false;
+  }
 
   addActionPlan(plan?: any) {
-
     this.actionPlan.push(this.fb.group({
       actionable: [plan?.actionable || '', Validators.required],
       responsible: [plan?.responsible || null, Validators.required],
       commitmentDate: [plan?.commitmentDate || '', Validators.required],
       status: [plan?.status || null, Validators.required],
-      details: [plan?.details || '', []],
+      details: [plan?.details || ''],
     }));
     this.addActionDisabled = true;
+    this.showSaveActionButton = true;
   }
 
   removeActionPlan(index: number) {
     this.actionPlan.removeAt(index);
+    this.entity.actionPlan = this.actionPlan.getRawValue();
     this.addActionDisabled = false;
   }
 

@@ -1,16 +1,15 @@
 import { Injectable } from '@angular/core';
-import { FeedbackEntity, HttpMockEntity } from '@pcurich/client-storage-indexeddb'
 import { IFeedbackRepository } from '../interfaces/feedback.repository.interface';
 import { BaseIndexeddbRepository } from './base.indexeddb.repository';
 import { APP_CONFIG, SERVICE_CODES } from '../constants/general.constants';
 import { HttpStatusCode } from '@angular/common/http';
+import { FeedbackEntity } from '../model/feedback-entity.model';
+import { HttpMockEntity } from '@pcurich/client-storage-indexeddb';
 
 @Injectable({
   providedIn: 'root'
 })
-export class FeedbackRepository
-  extends BaseIndexeddbRepository<FeedbackEntity[]>
-  implements IFeedbackRepository {
+export class FeedbackIndexeddbRepository extends BaseIndexeddbRepository<FeedbackEntity[]> implements IFeedbackRepository {
 
   protected readonly SERVICE_CODE = SERVICE_CODES.SC_GET_FEEDBACKS;
   protected override DEFAULT_VALUE: FeedbackEntity[] = [];
@@ -29,17 +28,11 @@ export class FeedbackRepository
       }
       entityToSave.updatedAt = new Date();
 
-      // Asegurar que las fechas estén correctamente establecidas
-      if (!entityToSave.createdAt) {
-        entityToSave.createdAt = new Date();
-      }
-      entityToSave.updatedAt = new Date();
-
       // Crear en IndexedDB
       const newEntity: Partial<HttpMockEntity> = {
         serviceCode: this.SERVICE_CODE,
         method: 'GET',
-        url: `/feedback/${feedBack.id}`,
+        url: `/feedback`,
         responseBody: JSON.stringify(entityToSave),
         httpCodeResponseValue: HttpStatusCode.Ok,
         name: APP_CONFIG.APP_MOCK_NAME,

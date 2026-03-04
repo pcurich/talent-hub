@@ -10,11 +10,11 @@
           <th>N°</th>
           <th>Registro</th>
           <th>Team Member</th>
-          <th>Empresa</th>
           <th>Seniority</th>
           <th>Squad</th>
           <th>Product Owner</th>
           <th>Fecha POCLAC</th>
+          <th>Tipo Feedback</th>
           <th>Calificación</th>
           <th>Acciones</th>
         </tr>
@@ -23,25 +23,22 @@
         @for (entity of entities(); track entity.id) {
           <tr>
             <td>{{ entity.number }}</td>
-            <td>{{ entity.registration }}</td>
-            <td>{{ entity.teamMember }}</td>
+            <td>{{ entity.teamMember.registration }}</td>
+            <td>{{ entity.teamMember.name }}</td>
             <td>
-              <span class="badge" [class.badge-bcp]="entity.company === 'BCP'"
-                                   [class.badge-proveedor]="entity.company === 'Proveedor'">
-                {{ entity.company }}
-              </span>
+              <span [style.color]="entity.seniority.color">{{ entity.seniority.label }}</span>
             </td>
-            <td>{{ entity.seniority }}</td>
-            <td>{{ entity.squad }}</td>
-            <td>{{ entity.productOwner }}</td>
+            <td>{{ entity.squad.name }}</td>
+            <td>{{ entity.squad.productOwner.name }}</td>
             <td>{{ formatDate(entity.poclacDate) }}</td>
             <td>
-              <span class="rating"
-                    [class.rating-excellent]="entity.generalRating === 'Excelente'"
-                    [class.rating-good]="entity.generalRating === 'Muy Bueno' || entity.generalRating === 'Bueno'"
-                    [class.rating-regular]="entity.generalRating === 'Regular'"
-                    [class.rating-poor]="entity.generalRating === 'Necesita Mejorar'">
-                {{ entity.generalRating }}
+              <span class="badge" [style.background-color]="entity.feedbackType.color">
+                {{ entity.feedbackType.label }}
+              </span>
+            </td>
+            <td>
+              <span class="rating" [style.background-color]="entity.generalRating.color">
+                {{ entity.generalRating.label }}
               </span>
             </td>
             <td class="actions">
@@ -67,7 +64,7 @@
   <div class="modal-overlay" (click)="closeDeleteModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <h2>Confirmar Eliminación</h2>
-      <p>¿Está seguro que desea eliminar el registro de <strong>{{ entityToDelete?.teamMember }}</strong>?</p>
+      <p>¿Está seguro que desea eliminar el registro de <strong>{{ entityToDelete?.teamMember?.name }}</strong>?</p>
       <p class="warning">Esta acción no se puede deshacer.</p>
       <div class="modal-actions">
         <button class="btn btn-cancel" (click)="closeDeleteModal()">Cancelar</button>

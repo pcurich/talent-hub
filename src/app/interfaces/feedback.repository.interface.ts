@@ -1,7 +1,8 @@
 import { Signal } from "@angular/core";
-import { FeedbackEntity } from "@pcurich/client-storage-indexeddb";
+import { FeedbackEntity } from "../model/feedback-entity.model";
+import { IInitializable } from "./initializable.interface";
 
-export interface IFeedbackRepository {
+export interface IFeedbackRepository extends IInitializable {
   exists(): Promise<boolean>;
   get(): Signal<FeedbackEntity[]>;
 
