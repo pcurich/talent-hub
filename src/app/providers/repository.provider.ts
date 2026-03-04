@@ -1,9 +1,10 @@
 import { ApplicationConfig, inject, provideAppInitializer } from '@angular/core';
-import { CURRENT_USER_REPOSITORY, INIT_APP_REPOSITORY, INITIALIZABLE_REPOSITORIES, SYSTEM_CONFIG_REPOSITORY } from '../tokens/repository.tokens';
+import { CURRENT_USER_REPOSITORY, FEEDBACK_REPOSITORY, INIT_APP_REPOSITORY, INITIALIZABLE_REPOSITORIES, SYSTEM_CONFIG_REPOSITORY } from '../tokens/repository.tokens';
 import { InitAppIndexeddbRepository } from '../repository/init.indexeddb.repository';
 import { CurrentUserIndexeddbRepository } from '../repository/current-user.indexeddb.repository';
 import { SystemConfigIndexeddbRepository } from '../repository/system-config.indexeddb.repository';
 import { STORAGE_KEYS } from '../constants/general.constants';
+import { FeedbackIndexeddbRepository } from '../repository/feedback.indexeddb.repository';
 
 export const INIT_APP_PROVIDER: ApplicationConfig = {
   providers: [
@@ -52,6 +53,20 @@ export const SYSTEM_CONFIG_PROVIDER: ApplicationConfig = {
   ]
 };
 
+export const FEEDBACK_PROVIDER: ApplicationConfig = {
+  providers: [
+    FeedbackIndexeddbRepository,
+    {
+      provide: FEEDBACK_REPOSITORY,
+      useClass: FeedbackIndexeddbRepository
+    },
+    {
+      provide: INITIALIZABLE_REPOSITORIES,
+      useExisting: FeedbackIndexeddbRepository,
+      multi: true
+    }]
+}
+
 /**
  * Provider global que inicializa todos los repositorios registrados.
  * Implementa el Open/Closed Principle: agregar repos no requiere modificar este código.
@@ -61,7 +76,7 @@ export const REPOSITORY_INITIALIZER: ApplicationConfig = {
     provideAppInitializer(async () => {
       const repositories = inject(INITIALIZABLE_REPOSITORIES, { optional: true }) || [];
       const registration = localStorage.getItem(STORAGE_KEYS.CURRENT_REGISTRATION) || '';
-
+      debugger
       if (registration.length > 0) {
         // Inicializar todos los repositorios en paralelo con el registration
         await Promise.all(

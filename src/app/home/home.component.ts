@@ -1,13 +1,13 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { FeedbackEntity } from '@pcurich/client-storage-indexeddb';
+import { FeedbackEntity } from '../model/feedback-entity.model';
 
 import { SearchEntityComponent } from '../components/search-entity/search-entity.component';
 import { DataTableEntityComponent } from '../components/data-table-entity/data-table-entity.component';
 import { ModalEntityComponent } from '../components/modal-entity/modal-entity.component';
 
-import { FeedbackRepository } from '../repository/feedback.indexeddb.repository';
+import { FeedbackIndexeddbRepository } from '../repository/feedback.indexeddb.repository';
 
 @Component({
   selector: 'app-home',
@@ -22,7 +22,7 @@ import { FeedbackRepository } from '../repository/feedback.indexeddb.repository'
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
-  private feedbackService = inject(FeedbackRepository);
+  private feedbackService = inject(FeedbackIndexeddbRepository);
   private router = inject(Router);
 
   // Signals
@@ -40,12 +40,14 @@ export class HomeComponent {
     }
 
     return entities.filter(entity =>
-      entity.teamMember?.toLowerCase().includes(term) ||
-      entity.registration?.toLowerCase().includes(term) ||
-      entity.squad?.toLowerCase().includes(term) ||
-      entity.productOwner?.toLowerCase().includes(term) ||
-      entity.focalPoint?.toLowerCase().includes(term) ||
-      entity.company?.toLowerCase().includes(term)
+      entity.teamMember?.name?.toLowerCase().includes(term) ||
+      entity.teamMember?.registration?.toLowerCase().includes(term) ||
+      entity.squad?.name?.toLowerCase().includes(term) ||
+      entity.squad?.productOwner?.name?.toLowerCase().includes(term) ||
+      entity.feedbackProvider?.label?.toLowerCase().includes(term) ||
+      entity.seniority?.label?.toLowerCase().includes(term) ||
+      entity.feedbackType?.label?.toLowerCase().includes(term) ||
+      entity.generalRating?.label?.toLowerCase().includes(term)
     );
   });
 

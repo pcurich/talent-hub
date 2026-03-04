@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FeedbackEntity } from '@pcurich/client-storage-indexeddb';
+import { FeedbackEntity } from '../../model/feedback-entity.model';
 
 @Component({
   selector: 'app-data-table-entity',

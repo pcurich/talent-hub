@@ -3,11 +3,12 @@ import { IInitAppRepository } from '../interfaces/init.repository.interface';
 import { ICurrentUserRepository } from '../interfaces/current-user.repository.interface';
 import { ISystemConfigRepository } from '../interfaces/system-config.repository.interface';
 import { IInitializable } from '../interfaces/initializable.interface';
+import { IFeedbackRepository } from '../interfaces/feedback.repository.interface';
 
 export const INIT_APP_REPOSITORY = new InjectionToken<IInitAppRepository>('INIT_APP_REPOSITORY');
 export const CURRENT_USER_REPOSITORY = new InjectionToken<ICurrentUserRepository>('CURRENT_USER_REPOSITORY');
 export const SYSTEM_CONFIG_REPOSITORY = new InjectionToken<ISystemConfigRepository>('SYSTEM_CONFIG_REPOSITORY');
-
+export const FEEDBACK_REPOSITORY = new InjectionToken<IFeedbackRepository>('FEEDBACK_REPOSITORY');
 /**
  * Token multi-provider para registrar todos los repositorios inicializables.
  * Permite agregar nuevos repositorios sin modificar código existente (Open/Closed Principle).

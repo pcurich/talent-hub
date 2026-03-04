@@ -1,22 +1,25 @@
+
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FeedbackRepository } from '../../repository/feedback.indexeddb.repository';
+import { FeedbackIndexeddbRepository } from '../../repository/feedback.indexeddb.repository';
 import { FeedbackEntity, FeedbackType, Seniority, FeedbackProvider, GeneralRating, PerformanceWhat, PerformanceHow, PerformanceAchievements, ActionResponsible, ActionPlanStatus } from '../../model/feedback-entity.model';
 import { SystemConfigIndexeddbRepository } from '../../repository/system-config.indexeddb.repository';
 import { Squad, TeamMember } from '../../model/current-user.model';
-import { FieldOption } from '../../model/system-config-entity.model';
 
 @Component({
   selector: 'app-create-feedback-entity',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+
   templateUrl: './create-feedback-entity.component.html',
   styleUrl: './create-feedback-entity.component.scss'
 })
 export class CreateFeedbackEntityComponent implements OnInit {
-  private feedbackRepository = inject(FeedbackRepository);
+  addActionDisabled = false;
+  showSaveActionButton = true;
+  private feedbackRepository = inject(FeedbackIndexeddbRepository);
   private router = inject(Router);
   private systemConfig = inject(SystemConfigIndexeddbRepository);
 
@@ -25,7 +28,7 @@ export class CreateFeedbackEntityComponent implements OnInit {
   teamMember: TeamMember = {} as TeamMember;
 
   entity: FeedbackEntity = new FeedbackEntity();
-
+  feedbackForm!: FormGroup;
   // Opciones para los dropdowns
   seniorityOptions: Seniority[] = this.systemConfig.getField('team_members', 'team_members_seniority')?.options || [];
   feedbackProviderOptions: FeedbackProvider[] = this.systemConfig.getField('feedback', 'feedback_provider')?.options || [];
@@ -36,6 +39,9 @@ export class CreateFeedbackEntityComponent implements OnInit {
   feedbackTypeOptions: FeedbackType[] = this.systemConfig.getField('feedback', 'feedback_default_type')?.options || [];
   actionResponsibleOptions: ActionResponsible[] = this.systemConfig.getField('feedback', 'feedback_action_responsible')?.options || [];
   actionStatusOptions: ActionPlanStatus[] = this.systemConfig.getField('feedback', 'feedback_action_status')?.options || [];
+
+
+  constructor(private fb: FormBuilder) { }
 
   ngOnInit(): void {
     // Get data from navigation state using history.state
@@ -58,97 +64,112 @@ export class CreateFeedbackEntityComponent implements OnInit {
     this.entity.squad = this.squad;
     this.entity.teamMember = this.teamMember;
     this.entity.poclacDate = new Date();
+
+    this.initForm();
   }
 
-  compareFieldOption(o1: FieldOption, o2: FieldOption): boolean {
-    return o1 && o2 ? o1.value === o2.value : o1 === o2;
+  get actionPlan(): FormArray {
+    return this.feedbackForm.get('actionPlan') as FormArray;
   }
 
-  onSubmit() {
-    debugger
-    if (this.validateForm()) {
-      // this.feedbackRepository.create(this.entity);
-      alert('Feedback creado exitosamente');
-      this.router.navigate(['/']);
-    }
-  }
-
-  validateForm(): boolean {
-    // Validación de campos obligatorios
-
-    if (!this.entity.seniority?.value || this.entity.seniority?.value === 'blank') {
-      alert('El nivel de seniority es requerido');
-      return false;
-    }
-    if (!this.entity.feedbackProvider?.value || this.entity.feedbackProvider?.value === 'blank') {
-      alert('El Proveedor de Feedback es requerido');
-      return false;
-    }
-    if (!this.entity.feedbackType?.value || this.entity.feedbackType?.value === 'blank') {
-      alert('El Tipo de Feedback es requerido');
-      return false;
-    }
-    if (!this.entity.generalRating?.value || this.entity.generalRating?.value === 'blank') {
-      alert('La calificación general es requerida');
-      return false;
-    }
-    if (!this.entity.performance?.what?.value || this.entity.performance?.what?.value === '0') {
-      alert('La evaluación "¿Cumple con la entrega del backlog?" es requerida');
-      return false;
-    }
-    if (!this.entity.performance?.how?.value || this.entity.performance?.how?.value === '0') {
-      alert('La evaluación "¿Vive los principios Samay?" es requerida');
-      return false;
-    }
-    if (!this.entity.performance?.achievements?.value || this.entity.performance?.achievements?.value === '0') {
-      alert('La evaluación "Logros y resultados" es requerida');
-      return false;
-    }
-    // Validar plan de acción si existe
-    for (const [i, action] of this.entity.actionPlan.entries()) {
-      if (!action.actionable?.trim()) {
-        alert(`La acción ${i + 1} debe tener un nombre.`);
-        return false;
-      }
-      if (!action.responsible?.value || action.responsible?.value === 'blank') {
-        alert(`La acción ${i + 1} debe tener un responsable.`);
-        return false;
-      }
-      if (!action.commitmentDate) {
-        alert(`La acción ${i + 1} debe tener una fecha de compromiso.`);
-        return false;
-      }
-      if (!action.status?.value) {
-        alert(`La acción ${i + 1} debe tener un estado.`);
-        return false;
-      }
-    }
-    return true;
-  }
-
-  addActionPlan() {
-    this.entity.actionPlan.push({
-      actionable: '11111',
-      responsible: this.actionResponsibleOptions[0],
-      commitmentDate: new Date(),
-      status: this.actionStatusOptions[0],
-      details: '1111'
+  private initForm() {
+    this.feedbackForm = this.fb.group({
+      number: [this.entity.number || '', []],
+      squad: [this.entity.squad, Validators.required],
+      teamMember: [this.entity.teamMember, Validators.required],
+      seniority: [this.entity.seniority, Validators.required],
+      poclacDate: [this.entity.poclacDate, Validators.required],
+      feedbackProvider: [this.entity.feedbackProvider, Validators.required],
+      generalRating: [this.entity.generalRating, Validators.required],
+      performance: this.fb.group({
+        what: [this.entity.performance?.what, Validators.required],
+        how: [this.entity.performance?.how, Validators.required],
+        achievements: [this.entity.performance?.achievements, Validators.required],
+        details: [this.entity.performance?.details || '', []],
+      }),
+      feedbackType: [this.entity.feedbackType, Validators.required],
+      feedbackDetails: this.fb.group({
+        situation: [this.entity.feedbackDetails?.situation || '', Validators.required],
+        behavior: [this.entity.feedbackDetails?.behavior || '', Validators.required],
+        impact: [this.entity.feedbackDetails?.impact || '', Validators.required],
+      }),
+      userExpectations: [this.entity.userExpectations || '', Validators.required],
+      actionPlan: this.fb.array([])
     });
-    // Forzar actualización visual
-    this.entity.actionPlan = [...this.entity.actionPlan];
+
+    // Inicializar actionPlan si ya hay datos
+    if (this.entity.actionPlan && this.entity.actionPlan.length > 0) {
+      this.entity.actionPlan.forEach(plan => this.addActionPlan(plan));
+    }
+  }
+
+  addNewActionPlan() {
+    // Actualizar this.entity.actionPlan con los valores actuales del FormArray
+    this.entity.actionPlan = this.actionPlan.getRawValue();
+    console.log('Current Action Plans:', this.entity.actionPlan);
+    this.addActionDisabled = false;
+    this.showSaveActionButton = false;
+  }
+
+  addActionPlan(plan?: any) {
+    this.actionPlan.push(this.fb.group({
+      actionable: [plan?.actionable || '', Validators.required],
+      responsible: [plan?.responsible || null, Validators.required],
+      commitmentDate: [plan?.commitmentDate || '', Validators.required],
+      status: [plan?.status || null, Validators.required],
+      details: [plan?.details || ''],
+    }));
+    this.addActionDisabled = true;
+    this.showSaveActionButton = true;
   }
 
   removeActionPlan(index: number) {
-    this.entity.actionPlan.splice(index, 1);
+    this.actionPlan.removeAt(index);
+    this.entity.actionPlan = this.actionPlan.getRawValue();
+    this.addActionDisabled = false;
   }
 
-  cancel() {
-    if (confirm('¿Está seguro de cancelar? Se perderán los cambios no guardados.')) {
-      this.router.navigate(['/']);
+  compareFieldOption = (a: any, b: any) => {
+    if (!a || !b) return false;
+    return a.value === b.value;
+  };
+
+  async saveFeedback() {
+    if (this.feedbackForm.invalid) {
+      return;
+    }
+
+    const formValue = this.feedbackForm.getRawValue();
+
+    // Mapear los valores del formulario al modelo
+    this.entity.number = formValue.number;
+    this.entity.squad = formValue.squad;
+    this.entity.teamMember = formValue.teamMember;
+
+    this.entity.seniority = formValue.seniority;
+    this.entity.poclacDate = formValue.poclacDate;
+    this.entity.feedbackProvider = formValue.feedbackProvider;
+
+    this.entity.generalRating = formValue.generalRating;
+
+    this.entity.performance = formValue.performance;
+
+    this.entity.feedbackType = formValue.feedbackType;
+    this.entity.feedbackDetails = formValue.feedbackDetails;
+
+    this.entity.userExpectations = formValue.userExpectations;
+    this.entity.actionPlan = formValue.actionPlan;
+
+    try {
+      const saved = await this.feedbackRepository.create(this.entity);
+      if (saved) {
+        console.log('[CreateFeedback] Feedback guardado exitosamente:', this.entity);
+        this.router.navigate(['/squad-team-grid']);
+      }
+    } catch (error) {
+      console.error('[CreateFeedback] Error al guardar feedback:', error);
+      alert('Error al guardar el feedback. Intente nuevamente.');
     }
   }
-
-  trackByIndex(index: number): number {
-    return index;
-  }
 }
+

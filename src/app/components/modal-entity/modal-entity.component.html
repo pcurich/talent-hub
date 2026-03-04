@@ -17,34 +17,23 @@
             </div>
             <div class="info-item">
               <label>Registro:</label>
-              <span>{{ entity()!.registration }}</span>
+              <span>{{ entity()!.teamMember.registration }}</span>
             </div>
             <div class="info-item">
               <label>Team Member:</label>
-              <span>{{ entity()!.teamMember }}</span>
-            </div>
-            <div class="info-item">
-              <label>Empresa:</label>
-              <span class="badge" [class.badge-bcp]="entity()!.company === 'BCP'"
-                                   [class.badge-proveedor]="entity()!.company === 'Proveedor'">
-                {{ entity()!.company }}
-              </span>
+              <span>{{ entity()!.teamMember.name }}</span>
             </div>
             <div class="info-item">
               <label>Seniority:</label>
-              <span>{{ entity()!.seniority }}</span>
+              <span [style.color]="entity()!.seniority.color">{{ entity()!.seniority.label }}</span>
             </div>
             <div class="info-item">
               <label>Squad:</label>
-              <span>{{ entity()!.squad }}</span>
+              <span>{{ entity()!.squad.name }}</span>
             </div>
             <div class="info-item">
               <label>Product Owner:</label>
-              <span>{{ entity()!.productOwner }}</span>
-            </div>
-            <div class="info-item">
-              <label>Focal Point:</label>
-              <span>{{ entity()!.focalPoint }}</span>
+              <span>{{ entity()!.squad.productOwner.name }}</span>
             </div>
             <div class="info-item">
               <label>Fecha POCLAC:</label>
@@ -52,7 +41,7 @@
             </div>
             <div class="info-item">
               <label>Proveedor de Feedback:</label>
-              <span>{{ entity()!.feedbackProvider }}</span>
+              <span [style.color]="entity()!.feedbackProvider.color">{{ entity()!.feedbackProvider.label }}</span>
             </div>
           </div>
         </section>
@@ -61,12 +50,8 @@
         <section class="info-section">
           <h3>Calificación General</h3>
           <div class="rating-display">
-            <span class="rating-badge"
-                  [class.rating-excellent]="entity()!.generalRating === 'Excelente'"
-                  [class.rating-good]="entity()!.generalRating === 'Muy Bueno' || entity()!.generalRating === 'Bueno'"
-                  [class.rating-regular]="entity()!.generalRating === 'Regular'"
-                  [class.rating-poor]="entity()!.generalRating === 'Necesita Mejorar'">
-              {{ entity()!.generalRating }}
+            <span class="rating-badge" [style.background-color]="entity()!.generalRating.color">
+              {{ entity()!.generalRating.label }}
             </span>
           </div>
         </section>
@@ -77,21 +62,21 @@
           <div class="info-grid">
             <div class="info-item">
               <label>¿Cumple con la entrega del backlog?</label>
-              <span class="performance-level">{{ entity()!.performanceWhat }}</span>
+              <span class="performance-level" [style.color]="entity()!.performance.what.color">{{ entity()!.performance.what.label }}</span>
             </div>
             <div class="info-item">
               <label>¿Vive los principios Samay?</label>
-              <span class="performance-level">{{ entity()!.performanceHow }}</span>
+              <span class="performance-level" [style.color]="entity()!.performance.how.color">{{ entity()!.performance.how.label }}</span>
             </div>
             <div class="info-item">
               <label>Logros y resultados:</label>
-              <span class="performance-level">{{ entity()!.performanceAchievements }}</span>
+              <span class="performance-level" [style.color]="entity()!.performance.achievements.color">{{ entity()!.performance.achievements.label }}</span>
             </div>
           </div>
-          @if (entity()!.performanceDetails) {
+          @if (entity()!.performance.details) {
             <div class="info-item full-width">
               <label>Detalles de desempeño:</label>
-              <p class="details-text">{{ entity()!.performanceDetails }}</p>
+              <p class="details-text">{{ entity()!.performance.details }}</p>
             </div>
           }
         </section>
@@ -101,11 +86,8 @@
           <h3>Feedback - Método SBI</h3>
           <div class="feedback-type">
             <label>Tipo de Feedback:</label>
-            <span class="badge badge-feedback"
-                  [class.badge-positive]="entity()!.feedbackType === 'Positivo'"
-                  [class.badge-constructive]="entity()!.feedbackType === 'Constructivo'"
-                  [class.badge-negative]="entity()!.feedbackType === 'Negativo'">
-              {{ entity()!.feedbackType }}
+            <span class="badge badge-feedback" [style.background-color]="entity()!.feedbackType.color">
+              {{ entity()!.feedbackType.label }}
             </span>
           </div>
           <div class="sbi-container">
@@ -141,14 +123,14 @@
                 <div class="action-item">
                   <div class="action-header">
                     <h4>{{ action.actionable }}</h4>
-                    <span class="status-badge" [ngClass]="getActionPlanStatusClass(action.status)">
-                      {{ action.status }}
+                    <span class="status-badge" [style.background-color]="action.status.color">
+                      {{ action.status.label }}
                     </span>
                   </div>
                   <div class="action-details">
                     <div class="action-info">
                       <label>Responsable:</label>
-                      <span>{{ action.responsible }}</span>
+                      <span>{{ action.responsible.label }}</span>
                     </div>
                     <div class="action-info">
                       <label>Fecha de Compromiso:</label>

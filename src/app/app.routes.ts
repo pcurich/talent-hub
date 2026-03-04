@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
-import { CreateFeedbackEntityComponent } from './components/create-feedback-entity/create-feedback-entity.component';
 import { UpdateFeedbackEntityComponent } from './components/update-feedback-entity/update-feedback-entity.component';
 import { ExcelSettingsComponent } from './components/excel-settings/excel-settings.component';
 import { FieldOptionsManagerComponent } from './components/field-options-manager/field-options-manager.component';
@@ -14,7 +13,8 @@ import { CurrentUserComponent } from './components/current-user/current-user.com
 import { NotificationsComponent } from './components/notifications/notifications.component';
 import { SystemConfigComponent } from './components/system-config/system-config.component';
 import { SquadTeamGridComponent } from './components/squad-team-grid/squad-team-grid.component';
-import { CreateFeedbackEntity2Component } from './components/create-feedback-entity-2/create-feedback-entity-2.component';
+import { CreateFeedbackEntityComponent } from './components/create-feedback-entity/create-feedback-entity.component';
+
 
 export const routes: Routes = [
 
@@ -49,7 +49,7 @@ export const routes: Routes = [
       { path: 'profile', component: CurrentUserComponent },
       { path: 'notifications', component: NotificationsComponent },
       { path: 'squad-team-grid', component: SquadTeamGridComponent },
-      { path: 'create-feedback', component: CreateFeedbackEntity2Component },
+      { path: 'create-feedback', component: CreateFeedbackEntityComponent },
       { path: 'update-feedback/:id', component: UpdateFeedbackEntityComponent },
       { path: 'excel-settings', component: ExcelSettingsComponent },
       { path: 'field-options', component: FieldOptionsManagerComponent },
