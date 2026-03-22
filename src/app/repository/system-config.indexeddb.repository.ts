@@ -5,6 +5,7 @@ import { ISystemConfigRepository } from "../interfaces/system-config.repository.
 import {
   ConfigField,
   ConfigGroup,
+  FieldOption,
   SystemConfigEntity,
   createDefaultSystemConfig
 } from "../model/system-config-entity.model";
@@ -102,7 +103,7 @@ export class SystemConfigIndexeddbRepository
 
   async updateFieldValue(
     fieldKey: string,
-    value: string | number | boolean | string[] | null
+    value: FieldOption
   ): Promise<boolean> {
     try {
       const currentEntity = this.entity();

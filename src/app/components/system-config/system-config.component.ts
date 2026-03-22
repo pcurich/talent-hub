@@ -81,7 +81,7 @@ export class SystemConfigComponent implements OnInit {
     if (config?.groups) {
       for (const group of config.groups) {
         for (const field of group.fields || []) {
-          values.set(field.key, field.defaultValue);
+          values.set(field.key, field.defaultValue.value);
         }
       }
     } else {
@@ -100,7 +100,7 @@ export class SystemConfigComponent implements OnInit {
     const values = new Map<string, any>();
     for (const group of defaultConfig.groups) {
       for (const field of group.fields || []) {
-        values.set(field.key, field.defaultValue);
+        values.set(field.key, field.defaultValue.value);
       }
     }
     this.configValues.set(values);
@@ -131,7 +131,11 @@ export class SystemConfigComponent implements OnInit {
 
   onSelectChange(field: ConfigField, event: Event): void {
     const target = event.target as HTMLSelectElement;
+    const selectedOption = field.options?.find(o => o.value === target.value);
     this.setValue(field.key, target.value);
+    if (selectedOption) {
+      this.setFieldOption(field.key, selectedOption);
+    }
   }
 
   onMultiSelectChange(field: ConfigField, option: FieldOption, event: Event): void {
@@ -147,7 +151,12 @@ export class SystemConfigComponent implements OnInit {
 
   onBooleanChange(field: ConfigField, event: Event): void {
     const target = event.target as HTMLInputElement;
-    this.setValue(field.key, target.checked);
+    const boolValue = String(target.checked);
+    this.setValue(field.key, boolValue);
+    const option = field.options?.find(o => o.value === boolValue);
+    if (option) {
+      this.setFieldOption(field.key, option);
+    }
   }
 
   onTextChange(field: ConfigField, event: Event): void {
@@ -157,7 +166,7 @@ export class SystemConfigComponent implements OnInit {
 
   onNumberChange(field: ConfigField, event: Event): void {
     const target = event.target as HTMLInputElement;
-    this.setValue(field.key, Number(target.value));
+    this.setValue(field.key, target.value);
   }
 
   onColorChange(field: ConfigField, event: Event): void {
@@ -181,6 +190,12 @@ export class SystemConfigComponent implements OnInit {
     this.activeTooltip.set(null);
   }
 
+  private fieldOptionMap = new Map<string, FieldOption>();
+
+  private setFieldOption(fieldKey: string, option: FieldOption): void {
+    this.fieldOptionMap.set(fieldKey, option);
+  }
+
   async saveConfig(): Promise<void> {
     this.isSaving.set(true);
 
@@ -193,7 +208,10 @@ export class SystemConfigComponent implements OnInit {
         for (const field of group.fields || []) {
           const newValue = this.configValues().get(field.key);
           if (newValue !== undefined) {
-            field.defaultValue = newValue;
+            const option = this.fieldOptionMap.get(field.key)
+              ?? field.options?.find(o => o.value === String(newValue))
+              ?? { value: String(newValue), label: String(newValue) };
+            field.defaultValue = option;
           }
         }
       }

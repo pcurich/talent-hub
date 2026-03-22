@@ -1,5 +1,14 @@
 import { BaseEntity } from "@pcurich/client-storage-indexeddb";
-import { FieldOption } from "./system-config-entity.model";
+import {
+  FieldOption,
+  getDefaultFieldOption,
+  PERFORMANCE_LEVEL_OPTIONS,
+  FEEDBACK_PROVIDER_OPTIONS,
+  FEEDBACK_GENERAL_RATING_OPTIONS,
+  FEEDBACK_TYPE_OPTIONS,
+  TEAM_MEMBERS_SENIORITY_OPTIONS,
+  BLANK
+} from "./system-config-entity.model";
 import { Squad, TeamMember } from "./current-user.model";
 
 export type ActionPlanStatus = FieldOption;
@@ -75,21 +84,22 @@ export class FeedbackEntity extends BaseEntity {
 
     this.number = init.number ?? 0;
     this.teamMember = init.teamMember ?? ({} as TeamMember);
-    this.seniority = init.seniority ?? { value: '0', label: '---------------', description: 'No se ha especificado un nivel de seniority', color: '#ffffff', order: 6 };
+    this.seniority = init.seniority ?? getDefaultFieldOption('team_members_seniority') ?? TEAM_MEMBERS_SENIORITY_OPTIONS.find(o => o.value === BLANK)!;
     this.squad = init.squad ?? ({} as Squad);
     this.poclacDate = init.poclacDate ?? new Date();
-    this.feedbackProvider = init.feedbackProvider ?? { value: 'blank', label: '---------------', description: 'No se ha especificado un proveedor de feedback', color: '#ffffff', order: 6 };
+    this.feedbackProvider = init.feedbackProvider ?? getDefaultFieldOption('feedback_provider') ?? FEEDBACK_PROVIDER_OPTIONS.find(o => o.value === BLANK)!;
 
-    this.generalRating = init.generalRating ?? { value: 'blank', label: '---------------', description: 'No se ha especificado una calificación general', color: '#ffffff', order: 4 };
+    this.generalRating = init.generalRating ?? getDefaultFieldOption('feedback_general_rating') ?? FEEDBACK_GENERAL_RATING_OPTIONS.find(o => o.value === BLANK)!;
 
+    const defaultPerformance = getDefaultFieldOption('feedback_performance_level') ?? PERFORMANCE_LEVEL_OPTIONS.find(o => o.value === BLANK)!;
     this.performance = init.performance ?? {
-      what: { value: '0', label: '---------------', description: 'No se ha especificado un nivel de desempeño', color: '#ffffff', order: 6 },
-      how: { value: '0', label: '---------------', description: 'No se ha especificado un nivel de desempeño', color: '#ffffff', order: 6 },
-      achievements: { value: '0', label: '---------------', description: 'No se ha especificado un nivel de desempeño', color: '#ffffff', order: 6 },
+      what: defaultPerformance,
+      how: defaultPerformance,
+      achievements: defaultPerformance,
       details: ''
     };
 
-    this.feedbackType = init.feedbackType ?? { value: 'blank', label: '----------------', description: 'Seleccione un tipo de feedback', color: '#ffffff', order: 1 };
+    this.feedbackType = init.feedbackType ?? getDefaultFieldOption('feedback_default_type') ?? FEEDBACK_TYPE_OPTIONS.find(o => o.value === BLANK)!;
     this.feedbackDetails = init.feedbackDetails ?? {
       situation: '',
       behavior: '',
