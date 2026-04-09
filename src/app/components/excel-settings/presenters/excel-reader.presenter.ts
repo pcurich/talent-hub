@@ -281,16 +281,16 @@ export class ExcelReaderPresenter {
             const cell = worksheet[cellAddress];
 
             if (cell) {
-              headers.set(column, cell.w || String(cell.v) || mapping.label);
+              headers.set(mapping.excelCell, cell.w || String(cell.v) || mapping.label);
             } else {
               // Si no hay valor en la celda, usar el label del mapping
-              headers.set(column, mapping.label);
+              headers.set(mapping.excelCell, mapping.label);
             }
           }
 
           // Iterar desde la fila de datos hasta el final
           debugger;
-          for (let rowNum = config.dataStartRow - 1; rowNum <= range.e.r; rowNum++) {
+          for (let rowNum = config.dataStartRow ; rowNum <= range.e.r; rowNum++) {
             const cells = new Map<string, { value: any; formatted: string; column: string; row: number; reference: string }>();
             let hasData = false;
 

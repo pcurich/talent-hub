@@ -1,7 +1,8 @@
 import { Signal, signal, WritableSignal } from "@angular/core";
-import { createIndexedDbServices, HttpMockEntity, HttpMockService } from "@pcurich/client-storage-indexeddb";
+import { createIndexedDbServices, databaseExists, deleteDatabase, HttpMockEntity, HttpMockService } from "@pcurich/client-storage-indexeddb";
 import { IInitializable } from "../interfaces/initializable.interface";
 import { getIndexedDbConfigWithRegistration } from "../util/indexeddb-config.util";
+import { STORAGE_KEYS } from "../constants/general.constants";
 
 /**
  * Clase base abstracta para repositorios IndexedDB.
@@ -32,6 +33,11 @@ export abstract class BaseIndexeddbRepository<T> implements IInitializable {
    * Indica si la base de datos global ya fue inicializada.
    */
   private static globalInitialized = false;
+
+  /**
+   * Registration con el que se inicializó la conexión compartida.
+   */
+  private static currentRegistration = localStorage.getItem(STORAGE_KEYS.CURRENT_REGISTRATION) ?? '';
 
   protected httpMockService: HttpMockService | null = null;
   protected entity: WritableSignal<T>;
@@ -77,6 +83,16 @@ export abstract class BaseIndexeddbRepository<T> implements IInitializable {
    * del sistema, compartiendo la conexión entre todos los repositorios.
    */
   protected async ensureDatabase(registration: string = ''): Promise<void> {
+    // Si el registration cambió, forzar re-inicialización
+    if (registration && BaseIndexeddbRepository.globalInitialized &&
+      BaseIndexeddbRepository.currentRegistration !== registration) {
+      console.log(`[${this.constructor.name}] Registration cambió de '${BaseIndexeddbRepository.currentRegistration}' a '${registration}', re-inicializando...`);
+      BaseIndexeddbRepository.globalInitialized = false;
+      BaseIndexeddbRepository.sharedHttpMockService = null;
+      this.httpMockService = null;
+      this.isInitialized = false;
+    }
+
     // Si esta instancia ya está inicializada, no hacer nada
     if (this.isInitialized && this.httpMockService) {
       return;
@@ -121,7 +137,16 @@ export abstract class BaseIndexeddbRepository<T> implements IInitializable {
     const dataTableName = cfg.stores[0].name;
     const keyPath = cfg.stores[0].keyPath;
 
-    // Esta línea solo se ejecuta UNA VEZ en todo el ciclo de vida del sistema
+    // Si la BD existe pero el object store no (corrupta), eliminarla para recrearla limpia
+    const dbExists = await this.rawDatabaseNameExists(cfg.dbName);
+    if (dbExists) {
+      const storeOk = await databaseExists(cfg);
+      if (!storeOk) {
+        console.warn(`[BaseIndexeddbRepository] BD '${cfg.dbName}' existe pero sin store '${dataTableName}', eliminando para recrear...`);
+        await deleteDatabase(cfg);
+      }
+    }
+
     const services = await createIndexedDbServices(cfg);
     console.log('[BaseIndexeddbRepository] createIndexedDbServices ejecutado (única vez)');
 
@@ -132,6 +157,19 @@ export abstract class BaseIndexeddbRepository<T> implements IInitializable {
     }
 
     BaseIndexeddbRepository.globalInitialized = true;
+    BaseIndexeddbRepository.currentRegistration = registration;
+  }
+
+  /**
+   * Verifica si existe una base de datos con el nombre dado (sin validar stores).
+   */
+  private async rawDatabaseNameExists(dbName: string): Promise<boolean> {
+    try {
+      const databases = await indexedDB.databases();
+      return databases.some(db => db.name === dbName);
+    } catch {
+      return false;
+    }
   }
 
   /**
@@ -142,8 +180,13 @@ export abstract class BaseIndexeddbRepository<T> implements IInitializable {
     try {
       const httpMocks = await this.httpMockService?.findByServiceCode(this.SERVICE_CODE);
       if (httpMocks && httpMocks.length > 0) {
-        const entity: T = JSON.parse(httpMocks[0].responseBody);
-        this.entity.set(entity);
+        if (Array.isArray(this.DEFAULT_VALUE)) {
+          const entities = httpMocks.map(mock => JSON.parse(mock.responseBody));
+          this.entity.set(entities as T);
+        } else {
+          const entity: T = JSON.parse(httpMocks[0].responseBody);
+          this.entity.set(entity);
+        }
       } else {
         this.entity.set(this.DEFAULT_VALUE);
       }
@@ -181,7 +224,11 @@ export abstract class BaseIndexeddbRepository<T> implements IInitializable {
    */
   async exists(): Promise<boolean> {
     try {
-      const entities = await this.httpMockService!.findByServiceCode(this.SERVICE_CODE);
+      if (!this.httpMockService) {
+        return false;
+      }
+
+      const entities = await this.httpMockService.findByServiceCode(this.SERVICE_CODE);
 
       if (!entities || entities.length === 0) {
         return false;

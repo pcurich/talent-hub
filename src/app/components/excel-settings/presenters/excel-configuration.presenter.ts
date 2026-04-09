@@ -8,36 +8,39 @@ export class ExcelConfigurationPresenter {
   // Definición de los campos disponibles en FeedbackEntity
   private readonly defaultFields: ExcelColumnMapping[] = [
     // Campos básicos
-    { entityField: 'number', excelCell: 'A1', fieldType: 'number', required: false, label: 'Número', description: 'Número secuencial del feedback' },
-    { entityField: 'registration', excelCell: 'B1', fieldType: 'string', required: true, label: 'Registro', description: 'Registro del colaborador' },
+    { entityField: 'number', excelCell: 'A1', fieldType: 'number', required: true, label: 'Nro.', description: 'Número secuencial del feedback' },
+    { entityField: 'registration', excelCell: 'B1', fieldType: 'string', required: true, label: 'Matricula', description: 'Matricula del colaborador' },
     { entityField: 'teamMember', excelCell: 'C1', fieldType: 'string', required: true, label: 'Team Member', description: 'Nombre del colaborador' },
-    { entityField: 'company', excelCell: 'D1', fieldType: 'select', required: true, label: 'Empresa', description: 'BCP o Proveedor' },
+    { entityField: 'company', excelCell: 'D1', fieldType: 'select', required: true, label: 'Empresa', description: 'Empresa asignada del team Member' },
     { entityField: 'seniority', excelCell: 'E1', fieldType: 'select', required: true, label: 'Seniority', description: 'Nivel de seniority' },
 
     // Datos del squad
     { entityField: 'squad', excelCell: 'F1', fieldType: 'string', required: true, label: 'Squad', description: 'Nombre del squad' },
-    { entityField: 'productOwner', excelCell: 'G1', fieldType: 'string', required: true, label: 'Product Owner', description: 'PO del squad' },
-    { entityField: 'focalPoint', excelCell: 'H1', fieldType: 'string', required: true, label: 'Focal Point', description: 'Focal point del squad' },
+    { entityField: 'productOwner', excelCell: 'G1', fieldType: 'string', required: true, label: 'PO', description: 'PO del squad' },
     { entityField: 'poclacDate', excelCell: 'H1', fieldType: 'date', required: false, label: 'Fecha POCLAC', description: 'Fecha de POCLAC' },
 
     // Feedback
-    { entityField: 'feedbackProvider', excelCell: 'J1', fieldType: 'string', required: true, label: 'Proveedor de Feedback', description: 'Quien provee el feedback' },
-    { entityField: 'feedbackType', excelCell: 'N2', fieldType: 'select', required: false, label: 'Tipo de Feedback', description: 'Positivo, Constructivo, Negativo' },
+    { entityField: 'feedbackProvider', excelCell: 'I1', fieldType: 'select', required: true, label: 'Proveedor de Feedback', description: 'Quien provee el feedback' },
+    { entityField: 'feedbackType', excelCell: 'N1', fieldType: 'select', required: true, label: 'Tipo de Feedback', description: 'Excede, Cumple, Por debajo' },
 
     // Ratings y Performance
-    { entityField: 'generalRating', excelCell: 'J1', fieldType: 'select', required: false, label: 'Calificación General', description: 'Rating general del colaborador' },
-    { entityField: 'performanceWhat', excelCell: 'K1', fieldType: 'select', required: false, label: 'Performance What', description: 'Evaluación del QUÉ' },
-    { entityField: 'performanceHow', excelCell: 'L1', fieldType: 'select', required: false, label: 'Performance How', description: 'Evaluación del CÓMO' },
-    { entityField: 'performanceAchievements', excelCell: 'N1', fieldType: 'select', required: false, label: 'Performance Achievements', description: 'Evaluación de logros' },
-    { entityField: 'performanceDetails', excelCell: 'P1', fieldType: 'string', required: false, label: 'Detalles de Performance', description: 'Detalles adicionales de performance' },
+    { entityField: 'performanceWhat', excelCell: 'K1', fieldType: 'select', required: true, label: 'Desempeño Que', description: 'QUÉ - ¿Cumple con la entrega de tu backlog con las habilidades y conocimientos técnicos que actualmente tiene?' },
+    { entityField: 'performanceHow', excelCell: 'L1', fieldType: 'select', required: true, label: 'Desempeño Cómo', description: 'CÓMO - ¿En qué nivel vive los principios y comportamientos Samay?' },
+    { entityField: 'performanceAchievements', excelCell: 'M1', fieldType: 'select', required: true, label: 'Desempeño Logros', description: 'Evaluación de logros (Excede, Cumple, Por debajo)' },
+    { entityField: 'performanceDetails', excelCell: 'P1', fieldType: 'string', required: true, label: 'Detalles de Desempeño', description: 'Detalles adicionales de performance' },
+    { entityField: 'generalRating', excelCell: 'J1', fieldType: 'select', required: true, label: 'Calificación General', description: 'Rating general del colaborador' },
+
 
     // Feedback Details (SBI)
-    { entityField: 'feedbackDetails.situation', excelCell: 'O1', fieldType: 'nested', required: false, label: 'Situación (SBI)', description: 'Contexto de la situación' },
-    { entityField: 'feedbackDetails.behavior', excelCell: 'O1', fieldType: 'nested', required: false, label: 'Comportamiento (SBI)', description: 'Comportamiento observado' },
-    { entityField: 'feedbackDetails.impact', excelCell: 'O1', fieldType: 'nested', required: false, label: 'Impacto (SBI)', description: 'Impacto del comportamiento' },
+    { entityField: 'feedbackDetails.situation', excelCell: 'O1', fieldType: 'nested', required: true, label: 'Situación (SBI)', description: 'Contexto de la situación' },
+    { entityField: 'feedbackDetails.behavior', excelCell: 'O1', fieldType: 'nested', required: true, label: 'Comportamiento (SBI)', description: 'Comportamiento observado' },
+    { entityField: 'feedbackDetails.impact', excelCell: 'O1', fieldType: 'nested', required: true, label: 'Impacto (SBI)', description: 'Impacto del comportamiento' },
 
     // Otros
-    { entityField: 'userExpectations', excelCell: 'Q1', fieldType: 'string', required: false, label: 'Expectativas del Usuario', description: 'Expectativas y comentarios adicionales' }
+    { entityField: 'actionplan.actionable', excelCell: 'Q1', fieldType: 'string', required: false, label: 'Accionable', description: 'Accionable del plan de acción' },
+    { entityField: 'actionplan.responsible', excelCell: 'R1', fieldType: 'select', required: false, label: 'Responsable del Plan de Acción', description: 'Responsable (si es TM BCP -> CL si es TM Proveedor -> FP)' },
+    { entityField: 'actionplan.commitmentDate', excelCell: 'S1', fieldType: 'date', required: false, label: 'Fecha de Compromiso del Plan de Acción', description: 'Fecha de compromiso para el plan de acción' },
+    { entityField: 'actionplan.status', excelCell: 'T1', fieldType: 'select', required: false, label: 'Estado del Plan de Acción', description: 'Estado actual del plan de acción' },
   ];
 
   getDefaultFields(): ExcelColumnMapping[] {

@@ -187,6 +187,10 @@
 
 .actions-cell {
   text-align: center;
+  display: flex;
+  gap: var(--spacing-xs);
+  justify-content: center;
+  align-items: center;
 }
 
 .btn-action {
@@ -212,6 +216,17 @@
 
   &:hover {
     background-color: var(--color-success-dark);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+}
+
+.btn-view {
+  background-color: var(--color-primary);
+  color: white;
+
+  &:hover {
+    background-color: var(--color-primary-dark);
     box-shadow: var(--shadow-md);
     transform: translateY(-1px);
   }
