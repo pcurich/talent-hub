@@ -20,6 +20,8 @@ export class FeedbackIndexeddbRepository extends BaseIndexeddbRepository<Feedbac
 
   async create(feedBack: FeedbackEntity): Promise<boolean> {
     try {
+      await this.ensureDatabase();
+
       // Crear una copia de la entidad sin el id para que IndexedDB lo auto-genere
       const entityToSave = { ...feedBack };
 
@@ -32,7 +34,7 @@ export class FeedbackIndexeddbRepository extends BaseIndexeddbRepository<Feedbac
       const newEntity: Partial<HttpMockEntity> = {
         serviceCode: this.SERVICE_CODE,
         method: 'GET',
-        url: `/feedback`,
+        url: `/${this.SERVICE_CODE.toLowerCase()}]/${feedBack.teamMember.registration}  `,
         responseBody: JSON.stringify(entityToSave),
         httpCodeResponseValue: HttpStatusCode.Ok,
         name: APP_CONFIG.APP_MOCK_NAME,
@@ -51,7 +53,9 @@ export class FeedbackIndexeddbRepository extends BaseIndexeddbRepository<Feedbac
 
   async update(entity: FeedbackEntity): Promise<boolean> {
     try {
-      const entities = await this.httpMockService!.findByServiceCode(this.SERVICE_CODE);
+      await this.ensureDatabase();
+
+      const entities = await this.httpMockService!.findByServiceCode(this.SERVICE_CODE + '_' + entity.teamMember.registration);
 
       if (!entities || entities.length === 0) {
         console.warn('[FeedbackRepository] No existe Feedback, creando nueva...');
@@ -82,6 +86,9 @@ export class FeedbackIndexeddbRepository extends BaseIndexeddbRepository<Feedbac
 
   }
 
+  async findByRegistration(registration: string): Promise<FeedbackEntity[]> {
+    return []
+  }
   //   searchEntities(searchTerm: string): FeedbackEntity[] {
   //     if (!searchTerm.trim()) {
   //       return this.entities();

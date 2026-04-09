@@ -212,6 +212,24 @@
                   <tr>
                     <th *ngFor="let column of getTableColumns()">{{ column.label }}</th>
                   </tr>
+                  <tr class="bulk-edit-row">
+                    <th *ngFor="let column of getTableColumns()">
+                      <ng-container *ngIf="column.key !== 'rowNumber' && column.key !== 'status' && column.key !== 'actions'; else emptyHeader">
+                        <div class="bulk-edit-container">
+                          <select
+                            class="bulk-select"
+                            (change)="applyBulkValue(column, $any($event.target).value)"
+                            [title]="'Aplicar a toda la columna: ' + column.label">
+                            <option value="">— Aplicar a todos —</option>
+                            <option *ngFor="let option of getColumnUniqueValues(column)" [value]="option">
+                              {{ option }}
+                            </option>
+                          </select>
+                        </div>
+                      </ng-container>
+                      <ng-template #emptyHeader></ng-template>
+                    </th>
+                  </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let row of getFilteredLoadedEntities(); let i = index; trackBy: trackByEntity"
@@ -282,7 +300,7 @@
           </select>
         </div>
 
-        <input #fileInput type="file" [accept]="importType === 'excel' ? '.xlsx,.xls' : '.json'"
+        <input #fileInput type="file" [accept]="importType === 'json' ? '.json' : '.xlsx,.xls'"
           (change)="handleImport($event)" style="display: none">
 
         <button class="btn btn-danger" (click)="resetConfiguration()">
@@ -290,5 +308,76 @@
         </button>
       </div>
     </section>
+  </div>
+</div>
+
+<!-- Modal: Selección de Squad para carga de Excel -->
+<div class="squad-modal-overlay" *ngIf="showSquadModal" (click)="closeSquadModal()">
+  <div class="squad-modal" (click)="$event.stopPropagation()">
+    <div class="squad-modal-header">
+      <h2>📊 Cargar Excel</h2>
+      <button class="squad-modal-close" (click)="closeSquadModal()">✕</button>
+    </div>
+
+    <!-- PASO 1: Selección de squad -->
+    <div class="squad-modal-body" *ngIf="modalStep === 1">
+      <div class="form-group">
+        <label for="squadSelect">Seleccione el squad a cargar</label>
+        <select id="squadSelect" class="squad-select" [(ngModel)]="selectedSquadIndex">
+          <option [ngValue]="null" disabled>— Seleccione un squad —</option>
+          <option *ngFor="let squad of availableSquads; let i = index" [ngValue]="i">
+            {{ squad.name }}
+          </option>
+        </select>
+      </div>
+
+      <ng-container *ngIf="selectedSquad">
+        <div class="filename-notice">
+          <span class="filename-notice-icon">📁</span>
+          <div>
+            <strong>Nomenclatura del archivo a subir:</strong>
+            <code class="filename-code">{{ expectedFileName }}</code>
+          </div>
+        </div>
+
+        <div class="team-members-section">
+          <p class="team-members-title">
+            ℹ️ La información cargada corresponderá únicamente a los siguientes team members:
+          </p>
+          <ul class="team-members-list">
+            <li *ngFor="let member of selectedSquad.teamMembers" class="team-member-item">
+              <span class="member-company">{{ member.companyValue || '—' }}</span>
+              <span class="member-separator">·</span>
+              <span class="member-registration">{{ member.registration }}</span>
+              <span class="member-separator">·</span>
+              <span class="member-name">{{ member.name }}</span>
+            </li>
+          </ul>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- PASO 2: Selección de archivo -->
+    <div class="squad-modal-body" *ngIf="modalStep === 2">
+      <div class="upload-step">
+        <p class="upload-instruction">Seleccione el archivo con el siguiente nombre exacto:</p>
+        <code class="filename-code filename-code--large">{{ fileName }}</code>
+
+        <label class="file-upload-label">
+          <input type="file" accept=".xlsx,.xls" (change)="handleModalFileChange($event)" class="file-upload-input">
+          <span class="file-upload-btn">📂 Buscar archivo...</span>
+        </label>
+
+        <p class="file-error" *ngIf="modalFileError">⚠️ {{ modalFileError }}</p>
+      </div>
+    </div>
+
+    <div class="squad-modal-footer">
+      <button class="btn btn-secondary" (click)="closeSquadModal()">Cancelar</button>
+      <button class="btn btn-primary" *ngIf="modalStep === 1"
+        [disabled]="selectedSquadIndex === null" (click)="confirmSquadSelection()">
+        Continuar →
+      </button>
+    </div>
   </div>
 </div>

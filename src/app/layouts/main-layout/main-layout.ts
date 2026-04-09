@@ -88,7 +88,8 @@ export class MainLayoutComponent {
       console.log('[MainLayout] localStorage limpiado');
 
       // Redireccionar al root
-      this.router.navigate(['/auth/login']);
+      // this.router.navigate(['/auth/login']);
+      window.location.reload();
     } catch (error) {
       console.error('[MainLayout] Error al restaurar sistema:', error);
       alert('Error al restaurar el sistema. Por favor, inténtalo de nuevo.');

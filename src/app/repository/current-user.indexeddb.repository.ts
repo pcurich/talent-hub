@@ -17,7 +17,14 @@ export class CurrentUserIndexeddbRepository
   protected readonly DEFAULT_VALUE = {} as CurrentUser;
 
   protected getDefaultValue(): CurrentUser {
-    return {} as CurrentUser;
+    return this.DEFAULT_VALUE;
+  }
+
+  override async exists(registration?: string): Promise<boolean> {
+    if (registration) {
+      await this.ensureDatabase(registration);
+    }
+    return super.exists();
   }
 
   async create(currentUser: CurrentUser): Promise<boolean> {
@@ -52,7 +59,7 @@ export class CurrentUserIndexeddbRepository
     }
   }
 
-  findByRegistration(registration: string): PersonMatch {
+  async findByRegistration(registration: string): Promise<PersonMatch> {
     const currentUser = this.entity();
 
     if (currentUser.user?.registration === registration) {

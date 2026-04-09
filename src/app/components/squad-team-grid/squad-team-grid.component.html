@@ -87,8 +87,19 @@
                 title="Crear Feedback para {{ row.teamMember.name }}"
               >
                 <span class="icon">📝</span>
-                Crear Feedback
+                Crear
               </button>
+
+              <button
+                type="button"
+                class="btn-action btn-view"
+                (click)="goToShowFeedback(row)"
+                title="Ver Feedback para {{ row.teamMember.name }}"
+              >
+                <span class="icon">👁️</span>
+                Ver
+              </button>
+
             </td>
           </tr>
         </tbody>

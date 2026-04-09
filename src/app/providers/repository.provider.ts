@@ -76,7 +76,7 @@ export const REPOSITORY_INITIALIZER: ApplicationConfig = {
     provideAppInitializer(async () => {
       const repositories = inject(INITIALIZABLE_REPOSITORIES, { optional: true }) || [];
       const registration = localStorage.getItem(STORAGE_KEYS.CURRENT_REGISTRATION) || '';
-      debugger
+
       if (registration.length > 0) {
         // Inicializar todos los repositorios en paralelo con el registration
         await Promise.all(

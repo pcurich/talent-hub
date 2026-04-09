@@ -1,6 +1,6 @@
 import { BaseEntity } from "@pcurich/client-storage-indexeddb";
 
-export type PersonRole = 'user' | 'directManager' | 'teamMember' | null;
+export type PersonRole = 'cl' | 'po' | 'user' | 'teamMember' | 'directManager' | 'tm' | null;
 
 export interface PersonMatch {
   person: Person | null;

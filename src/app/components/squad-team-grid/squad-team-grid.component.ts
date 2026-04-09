@@ -104,6 +104,16 @@ export class SquadTeamGridComponent implements OnInit {
     });
   }
 
+  goToShowFeedback(row: TeamMemberRow): void {
+    console.log('Navigating to show feedback for:', row);
+    this.router.navigate(['/show-feedback'], {
+      state: {
+        squad: row.squad,
+        teamMember: row.teamMember
+      }
+    });
+  }
+
   trackByIndex(index: number): number {
     return index;
   }

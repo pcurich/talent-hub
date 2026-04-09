@@ -6,7 +6,8 @@ import { ExcelConfigurationPresenter } from './presenters/excel-configuration.pr
 import { ExcelFilePresenter } from './presenters/excel-file.presenter';
 import { ExcelColumnMapping, ExcelRowError, ExcelRowResult, ExcelSettingsConfig, FilterCriteria, ImportOptions, ImportState } from './models/excel-settings.models';
 import { ExcelReaderPresenter } from './presenters/excel-reader.presenter';
-import { FeedbackEntity } from '@pcurich/client-storage-indexeddb';
+import { CURRENT_USER_REPOSITORY, SYSTEM_CONFIG_REPOSITORY } from '../../tokens/repository.tokens';
+import { Squad } from '../../model/current-user.model';
 
 @Component({
   selector: 'app-excel-settings',
@@ -24,8 +25,12 @@ export class ExcelSettingsComponent implements OnInit {
   private filePresenter = inject(ExcelFilePresenter);
   private readerPresenter = inject(ExcelReaderPresenter);
 
+  private systemConfigRepo = inject(SYSTEM_CONFIG_REPOSITORY);
+  private currentUserRepo = inject(CURRENT_USER_REPOSITORY);
+
   activeTab: 'general' | 'mapping' | 'example' | 'loaded-data' = 'general';
   importType: 'excel' | 'json' | '' = '';
+  fileName: string = '';
 
   config: ExcelSettingsConfig;
   availableFields: ExcelColumnMapping[] = [];
@@ -49,6 +54,30 @@ export class ExcelSettingsComponent implements OnInit {
   // Filtro para datos cargados
   dataSearchTerm: string = '';
   showOnlyValidRows: boolean = true;
+
+  // Modal de selección de squad
+  showSquadModal = false;
+  modalStep: 1 | 2 = 1;
+  selectedSquadIndex: number | null = null;
+  modalFileError: string = '';
+  private currentUser = this.currentUserRepo.get();
+
+  get availableSquads(): Squad[] {
+    return this.currentUser()?.squads ?? [];
+  }
+
+  get selectedSquad(): Squad | null {
+    if (this.selectedSquadIndex === null) return null;
+    return this.availableSquads[this.selectedSquadIndex] ?? null;
+  }
+
+  get expectedFileName(): string {
+    const squad = this.selectedSquad;
+    const user = this.currentUser();
+    if (!squad || !user) return '';
+    this.fileName = `${squad.name.replaceAll(' ', '_')}_${user.directManager.registration}.xlsx`;
+    return this.fileName;
+  }
 
   constructor() {
     this.config = this.configPresenter.getDefaultConfig();
@@ -101,11 +130,49 @@ export class ExcelSettingsComponent implements OnInit {
   }
 
   triggerFileInput(): void {
-    if (this.importType) {
+    if (this.importType === 'excel') {
+      this.selectedSquadIndex = null;
+      this.showSquadModal = true;
+    } else if (this.importType) {
       setTimeout(() => {
         this.fileInput.nativeElement.click();
       }, 100);
     }
+  }
+
+  confirmSquadSelection(): void {
+    if (this.selectedSquadIndex === null) return;
+    this.modalStep = 2;
+    this.modalFileError = '';
+  }
+
+  handleModalFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (file.name !== this.fileName) {
+      this.modalFileError = `Se esperaba "${this.fileName}" pero se seleccionó "${file.name}".`;
+      input.value = '';
+      return;
+    }
+
+    this.modalFileError = '';
+    this.showSquadModal = false;
+    this.modalStep = 1;
+    // Re-emit via the hidden file input so handleImport flow is preserved
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    this.fileInput.nativeElement.files = dt.files;
+    this.fileInput.nativeElement.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  closeSquadModal(): void {
+    this.showSquadModal = false;
+    this.modalStep = 1;
+    this.importType = '';
+    this.selectedSquadIndex = null;
+    this.modalFileError = '';
   }
 
   async handleImport(event: Event): Promise<void> {
@@ -145,10 +212,6 @@ export class ExcelSettingsComponent implements OnInit {
 
     if (!file) return;
 
-    if (this.getMappedRequiredCount() < this.getRequiredCount()) {
-      alert('Debe completar el mapeo de todos los campos requeridos antes de importar datos');
-      return;
-    }
 
     const options: ImportOptions = {
       skipInvalidRows: true,
@@ -200,14 +263,36 @@ export class ExcelSettingsComponent implements OnInit {
     this.importType = '';
   }
 
+  /**
+ * Obtiene los valores únicos de una columna para el select del bulk edit
+ */
+  getColumnUniqueValues(column: any): string[] {
+    const values = new Set<string>();
+    this.getFilteredLoadedEntities().forEach(row => {
+      const val = this.getNestedValue(row.data, column.field);
+      if (val !== null && val !== undefined && val !== '') {
+        values.add(String(val));
+      }
+    });
+    return Array.from(values).sort();
+  }
+
+  /**
+   * Aplica un valor a todas las filas de una columna
+   */
+  applyBulkValue(column: any, value: string): void {
+    if (!value) return;
+    this.getFilteredLoadedEntities().forEach(row => {
+      this.setNestedValue(row.data, column.field, value);
+    });
+  }
+
   // Obtener las columnas dinámicas basadas en los headers
   getTableColumns(): { key: string; label: string; field: string }[] {
     if (this.loadedRowResults.length === 0) {
       return [];
     }
 
-    // Obtener headers del primer resultado
-    const firstRow = this.loadedRowResults[0];
     const columns: { key: string; label: string; field: string }[] = [];
 
     // Agregar columnas fijas
@@ -229,9 +314,10 @@ export class ExcelSettingsComponent implements OnInit {
     }
 
     columns.push({ key: 'actions', label: 'Acciones', field: '_actions' });
-
+    debugger;
     return columns;
   }
+
 
   // Obtener valor de una propiedad anidada
   getNestedValue(obj: any, path: string): any {

@@ -5,7 +5,7 @@ import { IInitializable } from "./initializable.interface";
 export interface ICurrentUserRepository extends IInitializable {
   exists(registration: string): Promise<boolean>;
   get(): Signal<CurrentUser>;
-  findByRegistration(registration: string): PersonMatch;
+  findByRegistration(registration: string): Promise<PersonMatch>;
   create(currentUser: CurrentUser): Promise<boolean>;
   update(currentUser: CurrentUser): Promise<boolean>;
 }

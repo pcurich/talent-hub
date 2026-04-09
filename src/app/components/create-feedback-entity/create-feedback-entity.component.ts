@@ -28,7 +28,7 @@ export class CreateFeedbackEntityComponent implements OnInit {
   teamMember: TeamMember = {} as TeamMember;
 
   entity: FeedbackEntity = new FeedbackEntity();
-  feedbackForm!: FormGroup;
+  feedbackForm: FormGroup = new FormGroup({});
   // Opciones para los dropdowns
   seniorityOptions: Seniority[] = this.systemConfig.getField('team_members', 'team_members_seniority')?.options || [];
   feedbackProviderOptions: FeedbackProvider[] = this.systemConfig.getField('feedback', 'feedback_provider')?.options || [];
