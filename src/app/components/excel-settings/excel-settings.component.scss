@@ -1141,3 +1141,59 @@
     text-align: left;
   }
 }
+
+// Modal step 3 – download template
+.download-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  text-align: center;
+
+  .download-success-icon {
+    font-size: 2.5rem;
+  }
+
+  .download-title {
+    margin: 0;
+    font-size: 1rem;
+    color: #2d3748;
+  }
+
+  .download-subtitle {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #718096;
+  }
+
+  .download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.6rem;
+    background: #38a169;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+
+    &:hover {
+      background: #2f855a;
+      transform: translateY(-1px);
+    }
+  }
+
+  .download-preview {
+    width: 100%;
+    text-align: left;
+
+    .download-preview-title {
+      font-size: 0.85rem;
+      color: #4a5568;
+      margin: 0 0 0.5rem 0;
+    }
+  }
+}

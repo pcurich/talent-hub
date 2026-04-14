@@ -1,5 +1,15 @@
 import { Injectable } from '@angular/core';
-import { ExcelColumnMapping, ExcelSettingsConfig, FilterCriteria, ConfigurationStats } from '../models/excel-settings.models';
+import { ExcelColumnMapping, ExcelSettingsConfig, ConfigurationStats } from '../models/excel-settings.models';
+import {
+  TEAM_MEMBERS_COMPANY_OPTIONS,
+  TEAM_MEMBERS_SENIORITY_OPTIONS,
+  FEEDBACK_PROVIDER_OPTIONS,
+  FEEDBACK_TYPE_OPTIONS,
+  PERFORMANCE_LEVEL_OPTIONS,
+  FEEDBACK_GENERAL_RATING_OPTIONS,
+  FEEDBACK_ACTIONABLE_PROVIDER_OPTIONS,
+  FEEDBACK_ACTIONABLE_STATUS_OPTIONS
+} from '../../../model/system-config-entity.model';
 
 @Injectable()
 export class ExcelConfigurationPresenter {
@@ -11,8 +21,8 @@ export class ExcelConfigurationPresenter {
     { entityField: 'number', excelCell: 'A1', fieldType: 'number', required: true, label: 'Nro.', description: 'Número secuencial del feedback' },
     { entityField: 'registration', excelCell: 'B1', fieldType: 'string', required: true, label: 'Matricula', description: 'Matricula del colaborador' },
     { entityField: 'teamMember', excelCell: 'C1', fieldType: 'string', required: true, label: 'Team Member', description: 'Nombre del colaborador' },
-    { entityField: 'company', excelCell: 'D1', fieldType: 'select', required: true, label: 'Empresa', description: 'Empresa asignada del team Member' },
-    { entityField: 'seniority', excelCell: 'E1', fieldType: 'select', required: true, label: 'Seniority', description: 'Nivel de seniority' },
+    { entityField: 'company', excelCell: 'D1', fieldType: 'select', required: true, label: 'Empresa', description: 'Empresa asignada del team Member', options: TEAM_MEMBERS_COMPANY_OPTIONS },
+    { entityField: 'seniority', excelCell: 'E1', fieldType: 'select', required: true, label: 'Seniority', description: 'Nivel de seniority', options: TEAM_MEMBERS_SENIORITY_OPTIONS },
 
     // Datos del squad
     { entityField: 'squad', excelCell: 'F1', fieldType: 'string', required: true, label: 'Squad', description: 'Nombre del squad' },
@@ -20,27 +30,27 @@ export class ExcelConfigurationPresenter {
     { entityField: 'poclacDate', excelCell: 'H1', fieldType: 'date', required: false, label: 'Fecha POCLAC', description: 'Fecha de POCLAC' },
 
     // Feedback
-    { entityField: 'feedbackProvider', excelCell: 'I1', fieldType: 'select', required: true, label: 'Proveedor de Feedback', description: 'Quien provee el feedback' },
-    { entityField: 'feedbackType', excelCell: 'N1', fieldType: 'select', required: true, label: 'Tipo de Feedback', description: 'Excede, Cumple, Por debajo' },
+    { entityField: 'feedbackProvider', excelCell: 'I1', fieldType: 'select', required: true, label: 'Proveedor de Feedback', description: 'Quien provee el feedback', options: FEEDBACK_PROVIDER_OPTIONS },
+    { entityField: 'feedbackType', excelCell: 'J1', fieldType: 'select', required: true, label: 'Tipo de Feedback', description: 'Excede, Cumple, Por debajo', options: FEEDBACK_TYPE_OPTIONS },
 
     // Ratings y Performance
-    { entityField: 'performanceWhat', excelCell: 'K1', fieldType: 'select', required: true, label: 'Desempeño Que', description: 'QUÉ - ¿Cumple con la entrega de tu backlog con las habilidades y conocimientos técnicos que actualmente tiene?' },
-    { entityField: 'performanceHow', excelCell: 'L1', fieldType: 'select', required: true, label: 'Desempeño Cómo', description: 'CÓMO - ¿En qué nivel vive los principios y comportamientos Samay?' },
-    { entityField: 'performanceAchievements', excelCell: 'M1', fieldType: 'select', required: true, label: 'Desempeño Logros', description: 'Evaluación de logros (Excede, Cumple, Por debajo)' },
-    { entityField: 'performanceDetails', excelCell: 'P1', fieldType: 'string', required: true, label: 'Detalles de Desempeño', description: 'Detalles adicionales de performance' },
-    { entityField: 'generalRating', excelCell: 'J1', fieldType: 'select', required: true, label: 'Calificación General', description: 'Rating general del colaborador' },
+    { entityField: 'performanceWhat', excelCell: 'K1', fieldType: 'select', required: true, label: 'Desempeño Que', description: 'QUÉ - ¿Cumple con la entrega de tu backlog con las habilidades y conocimientos técnicos que actualmente tiene?', options: PERFORMANCE_LEVEL_OPTIONS },
+    { entityField: 'performanceHow', excelCell: 'L1', fieldType: 'select', required: true, label: 'Desempeño Cómo', description: 'CÓMO - ¿En qué nivel vive los principios y comportamientos Samay?', options: PERFORMANCE_LEVEL_OPTIONS },
+    { entityField: 'performanceAchievements', excelCell: 'M1', fieldType: 'select', required: true, label: 'Desempeño Logros', description: 'Evaluación de logros (Excede, Cumple, Por debajo)', options: PERFORMANCE_LEVEL_OPTIONS },
+    { entityField: 'performanceDetails', excelCell: 'N1', fieldType: 'string', required: true, label: 'Detalles de Desempeño', description: 'Detalles adicionales de performance' },
+    { entityField: 'generalRating', excelCell: 'O1', fieldType: 'select', required: true, label: 'Calificación General', description: 'Rating general del colaborador', options: FEEDBACK_GENERAL_RATING_OPTIONS },
 
 
     // Feedback Details (SBI)
-    { entityField: 'feedbackDetails.situation', excelCell: 'O1', fieldType: 'nested', required: true, label: 'Situación (SBI)', description: 'Contexto de la situación' },
-    { entityField: 'feedbackDetails.behavior', excelCell: 'O1', fieldType: 'nested', required: true, label: 'Comportamiento (SBI)', description: 'Comportamiento observado' },
-    { entityField: 'feedbackDetails.impact', excelCell: 'O1', fieldType: 'nested', required: true, label: 'Impacto (SBI)', description: 'Impacto del comportamiento' },
+    { entityField: 'feedbackDetails.situation', excelCell: 'P1', fieldType: 'nested', required: true, label: 'Situación (SBI)', description: 'Contexto de la situación' },
+    { entityField: 'feedbackDetails.behavior', excelCell: 'Q1', fieldType: 'nested', required: true, label: 'Comportamiento (SBI)', description: 'Comportamiento observado' },
+    { entityField: 'feedbackDetails.impact', excelCell: 'R1', fieldType: 'nested', required: true, label: 'Impacto (SBI)', description: 'Impacto del comportamiento' },
 
     // Otros
-    { entityField: 'actionplan.actionable', excelCell: 'Q1', fieldType: 'string', required: false, label: 'Accionable', description: 'Accionable del plan de acción' },
-    { entityField: 'actionplan.responsible', excelCell: 'R1', fieldType: 'select', required: false, label: 'Responsable del Plan de Acción', description: 'Responsable (si es TM BCP -> CL si es TM Proveedor -> FP)' },
-    { entityField: 'actionplan.commitmentDate', excelCell: 'S1', fieldType: 'date', required: false, label: 'Fecha de Compromiso del Plan de Acción', description: 'Fecha de compromiso para el plan de acción' },
-    { entityField: 'actionplan.status', excelCell: 'T1', fieldType: 'select', required: false, label: 'Estado del Plan de Acción', description: 'Estado actual del plan de acción' },
+    { entityField: 'actionplan.actionable', excelCell: 'S1', fieldType: 'string', required: false, label: 'Accionable', description: 'Accionable del plan de acción' },
+    { entityField: 'actionplan.responsible', excelCell: 'T1', fieldType: 'select', required: false, label: 'Responsable del Plan de Acción', description: 'Responsable (si es TM BCP -> CL si es TM Proveedor -> FP)', options: FEEDBACK_ACTIONABLE_PROVIDER_OPTIONS },
+    { entityField: 'actionplan.commitmentDate', excelCell: 'U1', fieldType: 'date', required: false, label: 'Fecha de Compromiso del Plan de Acción', description: 'Fecha de compromiso para el plan de acción' },
+    { entityField: 'actionplan.status', excelCell: 'V1', fieldType: 'select', required: false, label: 'Estado del Plan de Acción', description: 'Estado actual del plan de acción', options: FEEDBACK_ACTIONABLE_STATUS_OPTIONS },
   ];
 
   getDefaultFields(): ExcelColumnMapping[] {
@@ -109,20 +119,6 @@ export class ExcelConfigurationPresenter {
       config: this.getDefaultConfig(),
       fields: this.getDefaultFields()
     };
-  }
-
-  applyFilters(fields: ExcelColumnMapping[], criteria: FilterCriteria): ExcelColumnMapping[] {
-    return fields.filter(field => {
-      const matchesSearch = !criteria.searchTerm ||
-        field.label.toLowerCase().includes(criteria.searchTerm.toLowerCase()) ||
-        field.entityField.toLowerCase().includes(criteria.searchTerm.toLowerCase()) ||
-        field.description?.toLowerCase().includes(criteria.searchTerm.toLowerCase());
-
-      const matchesRequired = !criteria.showOnlyRequired || field.required;
-      const matchesMapped = !criteria.showOnlyMapped || field.excelCell.trim() !== '';
-
-      return matchesSearch && matchesRequired && matchesMapped;
-    });
   }
 
   getStats(fields: ExcelColumnMapping[]): ConfigurationStats {

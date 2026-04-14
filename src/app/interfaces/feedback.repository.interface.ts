@@ -1,5 +1,5 @@
 import { Signal } from "@angular/core";
-import { FeedbackEntity } from "../model/feedback-entity.model";
+import { FeedbackEntity, TeamMemberProfile } from "../model/feedback-entity.model";
 import { IInitializable } from "./initializable.interface";
 
 export interface IFeedbackRepository extends IInitializable {
@@ -8,8 +8,6 @@ export interface IFeedbackRepository extends IInitializable {
 
   create(feedBack: FeedbackEntity): Promise<boolean>;
   update(feedBack: FeedbackEntity): Promise<boolean>;
-  // delete(id: number): Promise<boolean>;
+  findByRegistration(registration: string): Promise<TeamMemberProfile | null>;
 
-  // searchEntities(searchTerm: string): FeedbackEntity[];
-  // downloadAllFeedbacks(): void;
 }

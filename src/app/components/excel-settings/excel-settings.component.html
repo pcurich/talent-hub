@@ -21,7 +21,7 @@
         <div class="stat-card">
           <div class="stat-icon">✅</div>
           <div class="stat-content">
-            <div class="stat-value">{{ getMappedCount() }}</div>
+            <div class="stat-value">{{ stats.mappedFields }}</div>
             <div class="stat-label">Campos Mapeados</div>
           </div>
         </div>
@@ -29,7 +29,7 @@
         <div class="stat-card warning">
           <div class="stat-icon">⚠️</div>
           <div class="stat-content">
-            <div class="stat-value">{{ getMappedRequiredCount() }} / {{ getRequiredCount() }}</div>
+            <div class="stat-value">{{ stats.mappedRequiredFields }} / {{ stats.requiredFields }}</div>
             <div class="stat-label">Requeridos Mapeados</div>
           </div>
         </div>
@@ -47,60 +47,21 @@
     <!-- Tabs -->
     <section class="tabs-section">
       <div class="tabs-header">
-        <button class="tab-button" [class.active]="activeTab === 'general'" (click)="activeTab = 'general'">
-          📋 Configuración General
-        </button>
         <button class="tab-button" [class.active]="activeTab === 'mapping'" (click)="activeTab = 'mapping'">
           🔍 Mapeo de Celdas
         </button>
         <button class="tab-button" [class.active]="activeTab === 'example'" (click)="activeTab = 'example'">
           💡 Ejemplo de uso
         </button>
-        <button class="tab-button" *ngIf="importState.status === 'completed'"
+        <button class="tab-button" *ngIf="loadedData.importState.status === 'completed'"
           [class.active]="activeTab === 'loaded-data'" (click)="activeTab = 'loaded-data'">
-          📦 Datos Cargados ({{ loadedRowResults.length }})
+          📦 Datos Cargados ({{ loadedData.results.length }})
         </button>
       </div>
 
       <div class="tabs-content">
-        <!-- Tab: Configuración General -->
-        <div class="tab-panel" [class.active]="activeTab === 'general'">
-          <div class="general-settings">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="sheetName">Nombre de la Hoja</label>
-                <input type="text" id="sheetName" [(ngModel)]="config.sheetName" placeholder="ej: Feedbacks, Hoja1">
-                <small>Nombre de la hoja del Excel donde están los datos</small>
-              </div>
-
-              <div class="form-group">
-                <label for="dataStartRow">Fila de Inicio de Datos</label>
-                <input type="number" id="dataStartRow" [(ngModel)]="config.dataStartRow" min="1" max="100">
-                <small>Número de fila donde comienzan los datos</small>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Tab: Mapeo de Celdas -->
         <div class="tab-panel" [class.active]="activeTab === 'mapping'">
-          <div class="filters-header">
-            <div class="filter-controls">
-              <input type="text" class="search-input" [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()"
-                placeholder="🔍 Buscar campo...">
-
-              <label class="checkbox-filter">
-                <input type="checkbox" [(ngModel)]="showOnlyRequired" (ngModelChange)="applyFilters()">
-                Solo Requeridos
-              </label>
-
-              <label class="checkbox-filter">
-                <input type="checkbox" [(ngModel)]="showOnlyMapped" (ngModelChange)="applyFilters()">
-                Solo Mapeados
-              </label>
-            </div>
-          </div>
-
           <div class="mapping-table-container">
             <table class="mapping-table">
               <thead>
@@ -113,7 +74,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let field of filteredFields; trackBy: trackByField" [class.required-field]="field.required"
+                <tr *ngFor="let field of availableFields; trackBy: trackByIndex" [class.required-field]="field.required"
                   [class.mapped-field]="field.excelCell.trim() !== ''">
                   <td class="type-cell">
                     <span class="field-type-icon" [title]="field.fieldType">
@@ -140,7 +101,7 @@
               </tbody>
             </table>
 
-            <div *ngIf="filteredFields.length === 0" class="no-results">
+            <div *ngIf="availableFields.length === 0" class="no-results">
               <p>📭 No se encontraron campos que coincidan con los filtros</p>
             </div>
           </div>
@@ -195,13 +156,13 @@
               <p>Revise y edite los datos antes de guardarlos en la base de datos</p>
 
               <div class="data-filter-controls">
-                <input type="text" class="search-input" [(ngModel)]="dataSearchTerm"
+                <input type="text" class="search-input" [(ngModel)]="loadedData.searchTerm"
                   placeholder="🔍 Buscar en datos...">
 
                 <div class="data-stats">
-                  <span class="stat-badge valid">✅ {{ importState.result?.validRows || 0 }} válidos</span>
-                  <span class="stat-badge invalid">❌ {{ importState.result?.invalidRows || 0 }} inválidos</span>
-                  <span class="stat-badge total">📊 {{ loadedRowResults.length }} en vista</span>
+                  <span class="stat-badge valid">✅ {{ loadedData.importState.result?.validRows || 0 }} válidos</span>
+                  <span class="stat-badge invalid">❌ {{ loadedData.importState.result?.invalidRows || 0 }} inválidos</span>
+                  <span class="stat-badge total">📊 {{ loadedData.results.length }} en vista</span>
                 </div>
               </div>
             </div>
@@ -210,18 +171,18 @@
               <table class="loaded-data-table">
                 <thead>
                   <tr>
-                    <th *ngFor="let column of getTableColumns()">{{ column.label }}</th>
+                    <th *ngFor="let column of loadedData.getTableColumns(config.mappings)">{{ column.label }}</th>
                   </tr>
                   <tr class="bulk-edit-row">
-                    <th *ngFor="let column of getTableColumns()">
+                    <th *ngFor="let column of loadedData.getTableColumns(config.mappings)">
                       <ng-container *ngIf="column.key !== 'rowNumber' && column.key !== 'status' && column.key !== 'actions'; else emptyHeader">
                         <div class="bulk-edit-container">
                           <select
                             class="bulk-select"
-                            (change)="applyBulkValue(column, $any($event.target).value)"
+                            (change)="loadedData.applyBulkValue(column, $any($event.target).value)"
                             [title]="'Aplicar a toda la columna: ' + column.label">
                             <option value="">— Aplicar a todos —</option>
-                            <option *ngFor="let option of getColumnUniqueValues(column)" [value]="option">
+                            <option *ngFor="let option of loadedData.getColumnUniqueValues(column)" [value]="option">
                               {{ option }}
                             </option>
                           </select>
@@ -232,10 +193,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let row of getFilteredLoadedEntities(); let i = index; trackBy: trackByEntity"
+                  <tr *ngFor="let row of loadedData.getFilteredEntities(); let i = index; trackBy: trackByIndex"
                     [class.invalid-row]="!row.isValid" [class.valid-row]="row.isValid">
 
-                    <ng-container *ngFor="let column of getTableColumns()">
+                    <ng-container *ngFor="let column of loadedData.getTableColumns(config.mappings)">
                       <!-- Columna # -->
                       <td *ngIf="column.key === 'rowNumber'">{{ row.rowNumber }}</td>
 
@@ -243,13 +204,13 @@
                       <td *ngIf="column.key === 'status'" class="status-cell">
                         <span *ngIf="row.isValid" class="status-badge valid" title="Fila válida">✅</span>
                         <span *ngIf="!row.isValid && row.errors.length > 0" class="status-badge invalid"
-                          [title]="getErrorMessages(row.errors)">❌</span>
+                          [title]="loadedData.getErrorMessages(row.errors)">❌</span>
                       </td>
 
                       <!-- Columnas de datos dinámicas -->
                       <td *ngIf="column.key !== 'rowNumber' && column.key !== 'status' && column.key !== 'actions'">
-                        <input type="text" class="editable-cell" [value]="getNestedValue(row.data, column.field)" readonly
-                          (input)="setNestedValue(row.data, column.field, $any($event.target).value)">
+                        <input type="text" class="editable-cell" [value]="loadedData.getNestedValue(row.data, column.field)" readonly
+                          (input)="loadedData.setNestedValue(row.data, column.field, $any($event.target).value)">
                       </td>
 
                       <!-- Columna Acciones -->
@@ -263,14 +224,14 @@
                 </tbody>
               </table>
 
-              <div *ngIf="getFilteredLoadedEntities().length === 0" class="no-results">
+              <div *ngIf="loadedData.getFilteredEntities().length === 0" class="no-results">
                 <p>📭 No se encontraron datos</p>
               </div>
             </div>
 
             <div class="loaded-data-actions">
               <button class="btn btn-primary" (click)="saveLoadedData()">
-                💾 Guardar {{ getValidRowsCount() }} Registros Válidos
+                💾 Guardar {{ loadedData.getValidRowsCount() }} Registros Válidos
               </button>
               <button class="btn btn-danger" (click)="clearLoadedData()">
                 🗑️ Descartar Datos
@@ -290,6 +251,10 @@
 
         <button class="btn btn-secondary" (click)="exportConfiguration()">
           📥 Exportar Configuración
+        </button>
+
+        <button class="btn btn-secondary" (click)="exportTemplateExcel()">
+          📋 Exportar Plantilla Excel
         </button>
 
         <div class="import-select-wrapper">
@@ -312,31 +277,31 @@
 </div>
 
 <!-- Modal: Selección de Squad para carga de Excel -->
-<div class="squad-modal-overlay" *ngIf="showSquadModal" (click)="closeSquadModal()">
+<div class="squad-modal-overlay" *ngIf="squadModal.show" (click)="closeSquadModal()">
   <div class="squad-modal" (click)="$event.stopPropagation()">
     <div class="squad-modal-header">
-      <h2>📊 Cargar Excel</h2>
+      <h2>{{ squadModal.mode === 'export' ? '📋 Exportar Plantilla Excel' : '📊 Cargar Excel' }}</h2>
       <button class="squad-modal-close" (click)="closeSquadModal()">✕</button>
     </div>
 
     <!-- PASO 1: Selección de squad -->
-    <div class="squad-modal-body" *ngIf="modalStep === 1">
+    <div class="squad-modal-body" *ngIf="squadModal.step === 1">
       <div class="form-group">
-        <label for="squadSelect">Seleccione el squad a cargar</label>
-        <select id="squadSelect" class="squad-select" [(ngModel)]="selectedSquadIndex">
+        <label for="squadSelect">{{ squadModal.mode === 'export' ? 'Seleccione el squad para generar la plantilla' : 'Seleccione el squad a cargar' }}</label>
+        <select id="squadSelect" class="squad-select" [(ngModel)]="squadModal.selectedSquadIndex">
           <option [ngValue]="null" disabled>— Seleccione un squad —</option>
-          <option *ngFor="let squad of availableSquads; let i = index" [ngValue]="i">
+          <option *ngFor="let squad of squadModal.availableSquads; let i = index" [ngValue]="i">
             {{ squad.name }}
           </option>
         </select>
       </div>
 
-      <ng-container *ngIf="selectedSquad">
+      <ng-container *ngIf="squadModal.selectedSquad">
         <div class="filename-notice">
           <span class="filename-notice-icon">📁</span>
           <div>
             <strong>Nomenclatura del archivo a subir:</strong>
-            <code class="filename-code">{{ expectedFileName }}</code>
+            <code class="filename-code">{{ squadModal.expectedFileName }}</code>
           </div>
         </div>
 
@@ -345,7 +310,7 @@
             ℹ️ La información cargada corresponderá únicamente a los siguientes team members:
           </p>
           <ul class="team-members-list">
-            <li *ngFor="let member of selectedSquad.teamMembers" class="team-member-item">
+            <li *ngFor="let member of squadModal.selectedSquad.teamMembers" class="team-member-item">
               <span class="member-company">{{ member.companyValue || '—' }}</span>
               <span class="member-separator">·</span>
               <span class="member-registration">{{ member.registration }}</span>
@@ -358,24 +323,50 @@
     </div>
 
     <!-- PASO 2: Selección de archivo -->
-    <div class="squad-modal-body" *ngIf="modalStep === 2">
+    <div class="squad-modal-body" *ngIf="squadModal.step === 2">
       <div class="upload-step">
         <p class="upload-instruction">Seleccione el archivo con el siguiente nombre exacto:</p>
-        <code class="filename-code filename-code--large">{{ fileName }}</code>
+        <code class="filename-code filename-code--large">{{ squadModal.fileName }}</code>
 
         <label class="file-upload-label">
           <input type="file" accept=".xlsx,.xls" (change)="handleModalFileChange($event)" class="file-upload-input">
           <span class="file-upload-btn">📂 Buscar archivo...</span>
         </label>
 
-        <p class="file-error" *ngIf="modalFileError">⚠️ {{ modalFileError }}</p>
+        <p class="file-error" *ngIf="squadModal.fileError">⚠️ {{ squadModal.fileError }}</p>
+      </div>
+    </div>
+
+    <!-- PASO 3: Descarga de plantilla -->
+    <div class="squad-modal-body" *ngIf="squadModal.step === 3">
+      <div class="download-step">
+        <div class="download-success-icon">✅</div>
+        <p class="download-title">Plantilla generada para <strong>{{ squadModal.selectedSquad?.name }}</strong></p>
+        <p class="download-subtitle">
+          El archivo incluye {{ squadModal.selectedSquad?.teamMembers?.length }} team member(s) con los datos del squad y PO precargados.
+        </p>
+        <a class="download-btn" [href]="squadModal.templateDownloadUrl" [download]="squadModal.templateFileName">
+          📥 Descargar {{ squadModal.templateFileName }}
+        </a>
+        <div class="download-preview">
+          <p class="download-preview-title">Contenido pre-establecido:</p>
+          <ul class="team-members-list">
+            <li *ngFor="let member of squadModal.selectedSquad?.teamMembers" class="team-member-item">
+              <span class="member-company">{{ member.companyValue || '—' }}</span>
+              <span class="member-separator">·</span>
+              <span class="member-registration">{{ member.registration }}</span>
+              <span class="member-separator">·</span>
+              <span class="member-name">{{ member.name }}</span>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
 
     <div class="squad-modal-footer">
       <button class="btn btn-secondary" (click)="closeSquadModal()">Cancelar</button>
-      <button class="btn btn-primary" *ngIf="modalStep === 1"
-        [disabled]="selectedSquadIndex === null" (click)="confirmSquadSelection()">
+      <button class="btn btn-primary" *ngIf="squadModal.step === 1"
+        [disabled]="squadModal.selectedSquadIndex === null" (click)="confirmSquadSelection()">
         Continuar →
       </button>
     </div>
