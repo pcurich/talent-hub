@@ -11,6 +11,16 @@ import {
 } from "./system-config-entity.model";
 import { Squad, TeamMember } from "./current-user.model";
 
+/**
+ * TeamMember enriquecido con sus feedbacks asociados.
+ * Usar en lugar de PersonMatch cuando el objetivo es acceder
+ * directamente a los feedbacks desde el contexto del colaborador.
+ */
+export interface TeamMemberProfile extends TeamMember {
+  squad: Squad;
+  feedbacks: FeedbackEntity[];
+}
+
 export type ActionPlanStatus = FieldOption;
 export type PerformanceWhat = FieldOption;
 export type PerformanceHow = FieldOption;

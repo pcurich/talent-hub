@@ -3,7 +3,7 @@ import { IFeedbackRepository } from '../interfaces/feedback.repository.interface
 import { BaseIndexeddbRepository } from './base.indexeddb.repository';
 import { APP_CONFIG, SERVICE_CODES } from '../constants/general.constants';
 import { HttpStatusCode } from '@angular/common/http';
-import { FeedbackEntity } from '../model/feedback-entity.model';
+import { FeedbackEntity, TeamMemberProfile } from '../model/feedback-entity.model';
 import { HttpMockEntity } from '@pcurich/client-storage-indexeddb';
 
 @Injectable({
@@ -86,50 +86,16 @@ export class FeedbackIndexeddbRepository extends BaseIndexeddbRepository<Feedbac
 
   }
 
-  async findByRegistration(registration: string): Promise<FeedbackEntity[]> {
-    return []
+  async findByRegistration(registration: string): Promise<TeamMemberProfile | null> {
+    await this.ensureDatabase();
+
+    const feedbacks = (this.entity() as FeedbackEntity[])
+      .filter(f => f.teamMember?.registration === registration);
+
+    if (feedbacks.length === 0) return null;
+
+    const { teamMember, squad } = feedbacks[0];
+    return { ...teamMember, squad, feedbacks };
   }
-  //   searchEntities(searchTerm: string): FeedbackEntity[] {
-  //     if (!searchTerm.trim()) {
-  //       return this.entities();
-  //     }
-
-  //     const term = searchTerm.toLowerCase();
-  //     return this.entities().filter(entity =>
-  //       entity.teamMember?.toLowerCase().includes(term) ||
-  //       entity.squad?.toLowerCase().includes(term) ||
-  //       entity.registration?.toLowerCase().includes(term) ||
-  //       entity.productOwner?.toLowerCase().includes(term) ||
-  //       entity.focalPoint?.toLowerCase().includes(term)
-  // );
-  //     }
-  //   }
-  //   }
-
-  // downloadAllFeedbacks(): void {
-  //   this.ensureInitialized().then(() => {
-  //     try {
-  //       const feedbacks = this.entities();
-
-  //       const jsonData = JSON.stringify(feedbacks, null, 2);
-  //       const blob = new Blob([jsonData], { type: 'application/json' });
-  //       const url = window.URL.createObjectURL(blob);
-
-  //       const link = document.createElement('a');
-  //       link.href = url;
-  //       link.download = `feedbacks-${new Date().toISOString().split('T')[0]}.json`;
-  //       document.body.appendChild(link);
-  //       link.click();
-  //       document.body.removeChild(link);
-
-  //       window.URL.revokeObjectURL(url);
-
-  //       console.log('Feedbacks descargados exitosamente');
-  //     } catch (err) {
-  //       console.error('Error al descargar feedbacks:', err);
-  //     }
-  //   });
-  // }
-
 
 }

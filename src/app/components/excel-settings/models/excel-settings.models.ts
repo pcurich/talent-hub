@@ -87,15 +87,6 @@ export interface ImportOptions {
 }
 
 /**
- * Criterios de filtrado
- */
-export interface FilterCriteria {
-  searchTerm: string;
-  showOnlyRequired: boolean;
-  showOnlyMapped: boolean;
-}
-
-/**
  * Estadísticas de configuración
  */
 export interface ConfigurationStats {

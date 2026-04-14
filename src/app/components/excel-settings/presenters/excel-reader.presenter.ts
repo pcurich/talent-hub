@@ -6,8 +6,7 @@ import {
   ExcelRowResult,
   ExcelReadResult,
   ExcelRowError,
-  ExcelRowData,
-  ImportOptions
+  ExcelRowData
 } from '../models/excel-settings.models';
 
 @Injectable()
@@ -18,11 +17,9 @@ export class ExcelReaderPresenter {
    */
   async readExcelFile(
     file: File,
-    config: ExcelSettingsConfig,
-    options: ImportOptions
+    config: ExcelSettingsConfig
   ): Promise<ExcelReadResult> {
     const errors: string[] = [];
-    debugger;
     // Validar configuración
     if (!this.isConfigValid(config)) {
       return {
@@ -38,8 +35,6 @@ export class ExcelReaderPresenter {
     }
 
     try {
-      // Aquí iría la lógica de lectura del Excel usando una librería como xlsx
-      // Por ahora es un placeholder
       const excelData = await this.parseExcelFile(file, config);
 
       // Procesar cada fila
@@ -54,19 +49,14 @@ export class ExcelReaderPresenter {
 
         if (rowResult.isValid) {
           entities.push(new FeedbackEntity(rowResult.data));
-        } else {
-          entities.push(new FeedbackEntity(rowResult.data));
-          errors.push(`Fila ${rowResult.rowNumber}: Contiene errores y detiene la importación`);
         }
       }
-      // TODO CAMBIAR EL invalidRows
 
-      debugger
       return {
         success: true,
         totalRows: rows.length,
-        validRows: rows.length,
-        invalidRows: errors.length,
+        validRows: rows.filter(r => r.isValid).length,
+        invalidRows: rows.filter(r => !r.isValid).length,
         rows,
         entities,
         config,
@@ -102,7 +92,30 @@ export class ExcelReaderPresenter {
     for (const mapping of config.mappings) {
       try {
         const cellValue = this.getCellValue(rowData, mapping.excelCell);
-        const parsedValue = this.parseValue(cellValue, mapping);
+        let parsedValue = this.parseValue(cellValue, mapping);
+
+        // Validar campos de tipo select: resolver label del Excel → valor de la entidad
+        if (mapping.fieldType === 'select' && mapping.options?.length) {
+          const rawLabel = parsedValue as string | null;
+          if (rawLabel) {
+            const option = mapping.options.find(
+              o => o.label.toLowerCase() === rawLabel.trim().toLowerCase()
+            );
+            if (!option) {
+              const validLabels = mapping.options
+                .filter(o => o.value !== 'blank')
+                .map(o => o.label)
+                .join(', ');
+              errors.push({
+                field: mapping.entityField,
+                message: `'${rawLabel}' no es un valor válido para '${mapping.label}'. Opciones aceptadas: ${validLabels}`,
+                severity: 'error'
+              });
+              continue;
+            }
+            parsedValue = option.value === 'blank' ? null : option.value;
+          }
+        }
 
         // Validar campo requerido
         if (mapping.required && (parsedValue === null || parsedValue === undefined || parsedValue === '')) {
@@ -289,8 +302,7 @@ export class ExcelReaderPresenter {
           }
 
           // Iterar desde la fila de datos hasta el final
-          debugger;
-          for (let rowNum = config.dataStartRow ; rowNum <= range.e.r; rowNum++) {
+          for (let rowNum = config.dataStartRow; rowNum <= range.e.r; rowNum++) {
             const cells = new Map<string, { value: any; formatted: string; column: string; row: number; reference: string }>();
             let hasData = false;
 
@@ -338,31 +350,4 @@ export class ExcelReaderPresenter {
     });
   }
 
-  /**
-   * Valida una entidad antes de guardarla
-   */
-  validateEntity(entity: Partial<FeedbackEntity>): ExcelRowError[] {
-    const errors: ExcelRowError[] = [];
-
-    // Validaciones específicas
-    if (!entity.registration) {
-      errors.push({
-        field: 'registration',
-        message: 'El registro es obligatorio',
-        severity: 'error'
-      });
-    }
-
-    if (!entity.teamMember) {
-      errors.push({
-        field: 'teamMember',
-        message: 'El nombre del team member es obligatorio',
-        severity: 'error'
-      });
-    }
-
-    // Agregar más validaciones según necesites
-
-    return errors;
-  }
 }
