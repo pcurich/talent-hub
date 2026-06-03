@@ -1,9 +1,14 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CURRENT_USER_REPOSITORY } from '../../tokens/repository.tokens';
 import { CurrentUser, Squad, TeamMember } from '../../model/current-user.model';
+import { SquadExcelPresenter } from './squad-excel.presenter';
+import { ExcelConfigurationPresenter } from '../excel-settings/presenters/excel-configuration.presenter';
+import { ExcelReaderPresenter } from '../excel-settings/presenters/excel-reader.presenter';
+import { LoadedDataPresenter } from '../excel-settings/presenters/loaded-data.presenter';
+import { FeedbackIndexeddbRepository } from '../../repository/feedback.indexeddb.repository';
 
 interface TeamMemberRow {
   squad: Squad;
@@ -14,14 +19,23 @@ interface TeamMemberRow {
   selector: 'app-squad-team-grid',
   standalone: true,
   imports: [CommonModule, FormsModule],
+  providers: [SquadExcelPresenter, ExcelConfigurationPresenter, ExcelReaderPresenter, LoadedDataPresenter],
   templateUrl: './squad-team-grid.component.html',
   styleUrl: './squad-team-grid.component.scss'
 })
 export class SquadTeamGridComponent implements OnInit {
+  @ViewChild('uploadFileInput') uploadFileInput!: ElementRef<HTMLInputElement>;
+
   private currentUserRepo = inject(CURRENT_USER_REPOSITORY);
   private router = inject(Router);
+  private feedbackRepo = inject(FeedbackIndexeddbRepository);
+  readonly squadExcel = inject(SquadExcelPresenter);
 
   currentUser: CurrentUser = {} as CurrentUser;
+  rowActionMap: Record<string, string> = new Proxy({} as Record<string, string>, {
+    get: (target, prop: string) => target[prop] ?? '',
+    set: (target, prop: string, value: string) => { target[prop] = value; return true; }
+  });
 
   // Filters
   selectedSquadName = signal<string>('');
@@ -105,8 +119,7 @@ export class SquadTeamGridComponent implements OnInit {
   }
 
   goToShowFeedback(row: TeamMemberRow): void {
-    console.log('Navigating to show feedback for:', row);
-    this.router.navigate(['/show-feedback'], {
+    this.router.navigate(['/show-feedback', row.teamMember.registration], {
       state: {
         squad: row.squad,
         teamMember: row.teamMember
@@ -118,7 +131,67 @@ export class SquadTeamGridComponent implements OnInit {
     return index;
   }
 
+  downloadTemplate(row: TeamMemberRow): void {
+    this.squadExcel.downloadTemplateForTeamMember(row.squad, row.teamMember);
+  }
+
+  onRowAction(action: string, row: TeamMemberRow): void {
+    this.rowActionMap[row.teamMember.registration] = '';
+
+    switch (action) {
+      case 'create':   this.goToCreateFeedback(row); break;
+      case 'view':     this.goToShowFeedback(row); break;
+      case 'upload':   this.squadExcel.openUploadForSquad(row.squad); break;
+      case 'download': this.downloadTemplate(row); break;
+    }
+  }
+
+  downloadGridTemplate(): void {
+    this.squadExcel.downloadTemplateForRows(this.filteredTeamMembers());
+  }
+
+  uploadGridTemplate(): void {
+    this.squadExcel.openUploadForGrid();
+  }
+
+  onUploadGridFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.squadExcel.handleUploadGridFile(file).finally(() => {
+      input.value = '';
+    });
+  }
+
+  onUploadFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.squadExcel.handleUploadFile(file).finally(() => {
+      input.value = '';
+    });
+  }
+
+  triggerUploadInput(): void {
+    this.uploadFileInput?.nativeElement.click();
+  }
+
   trackByRegistration(index: number, row: TeamMemberRow): string {
     return row.teamMember.registration;
+  }
+
+  async saveLoadedFeedbacks(): Promise<void> {
+    const entities = this.squadExcel.loadedData.importState.result?.entities ?? [];
+    let saved = 0;
+    for (const entity of entities) {
+      const ok = await this.feedbackRepo.create(entity);
+      if (ok) saved++;
+    }
+    alert(`${saved} feedback(s) guardado(s) correctamente.`);
+    this.squadExcel.closeResultModal();
+  }
+
+  removeLoadedRow(index: number): void {
+    this.squadExcel.loadedData.removeRow(index);
   }
 }

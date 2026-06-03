@@ -5,16 +5,51 @@
     </div>
 
     <ul class="nav-menu">
+
+      <!-- Principal -->
       <li>
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
           🏠 Inicio
         </a>
       </li>
-      <li>
-        <a routerLink="/create-feedback" routerLinkActive="active">
-          ➕ Crear Feedback
-        </a>
+
+      <!-- Cuenta -->
+      <li class="menu-section">
+        <span class="section-title">👤 Cuenta</span>
+        <ul class="submenu">
+          <li>
+            <a routerLink="/profile" routerLinkActive="active">
+              🪪 Mi Perfil
+            </a>
+          </li>
+          <li>
+            <a routerLink="/notifications" routerLinkActive="active">
+              🔔 Notificaciones
+            </a>
+          </li>
+        </ul>
       </li>
+
+      <!-- Squads & Feedback -->
+      <li class="menu-section">
+        <span class="section-title">👥 Squads</span>
+        <ul class="submenu">
+          <li>
+            <a routerLink="/squad-team-grid" routerLinkActive="active">
+              🗂️ Squad Team Grid
+            </a>
+          </li>
+          <li>
+            <a routerLink="/create-feedback" routerLinkActive="active">
+              ➕ Crear Feedback
+            </a>
+          </li>
+        </ul>
+      </li>
+
+
+
+      <!-- Configuración -->
       <li class="menu-section">
         <span class="section-title">⚙️ Configuración</span>
         <ul class="submenu">
@@ -25,12 +60,17 @@
           </li>
           <li>
             <a routerLink="/field-options" routerLinkActive="active">
-              🎛️ Opciones
+              🎛️ Opciones de Campo
+            </a>
+          </li>
+          <li>
+            <a routerLink="/settings" routerLinkActive="active">
+              🛠️ Sistema
             </a>
           </li>
         </ul>
       </li>
+
     </ul>
   </div>
 </nav>
-

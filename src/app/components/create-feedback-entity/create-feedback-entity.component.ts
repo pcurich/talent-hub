@@ -5,8 +5,8 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, F
 import { Router } from '@angular/router';
 import { FeedbackIndexeddbRepository } from '../../repository/feedback.indexeddb.repository';
 import { FeedbackEntity, FeedbackType, Seniority, FeedbackProvider, GeneralRating, PerformanceWhat, PerformanceHow, PerformanceAchievements, ActionResponsible, ActionPlanStatus } from '../../model/feedback-entity.model';
-import { SystemConfigIndexeddbRepository } from '../../repository/system-config.indexeddb.repository';
 import { Squad, TeamMember } from '../../model/current-user.model';
+import { FeedbackOptionsUtil } from '../../util/feedback-options.util';
 
 @Component({
   selector: 'app-create-feedback-entity',
@@ -21,7 +21,7 @@ export class CreateFeedbackEntityComponent implements OnInit {
   showSaveActionButton = true;
   private feedbackRepository = inject(FeedbackIndexeddbRepository);
   private router = inject(Router);
-  private systemConfig = inject(SystemConfigIndexeddbRepository);
+  readonly feedbackOptions = inject(FeedbackOptionsUtil);
 
   // Data from navigation state
   squad: Squad = {} as Squad;
@@ -29,17 +29,16 @@ export class CreateFeedbackEntityComponent implements OnInit {
 
   entity: FeedbackEntity = new FeedbackEntity();
   feedbackForm: FormGroup = new FormGroup({});
-  // Opciones para los dropdowns
-  seniorityOptions: Seniority[] = this.systemConfig.getField('team_members', 'team_members_seniority')?.options || [];
-  feedbackProviderOptions: FeedbackProvider[] = this.systemConfig.getField('feedback', 'feedback_provider')?.options || [];
-  generalRatingOptions: GeneralRating[] = this.systemConfig.getField('feedback', 'feedback_general_rating')?.options || [];
-  performanceWhatOptions: PerformanceWhat[] = this.systemConfig.getField('feedback', 'feedback_performance_level')?.options || [];
-  performanceHowOptions: PerformanceHow[] = this.systemConfig.getField('feedback', 'feedback_performance_level')?.options || [];
-  performanceAchievementsOptions: PerformanceAchievements[] = this.systemConfig.getField('feedback', 'feedback_performance_level')?.options || [];
-  feedbackTypeOptions: FeedbackType[] = this.systemConfig.getField('feedback', 'feedback_default_type')?.options || [];
-  actionResponsibleOptions: ActionResponsible[] = this.systemConfig.getField('feedback', 'feedback_action_responsible')?.options || [];
-  actionStatusOptions: ActionPlanStatus[] = this.systemConfig.getField('feedback', 'feedback_action_status')?.options || [];
-
+  // Opciones para los dropdowns desde SystemConfig
+  get seniorityOptions(): Seniority[] { return this.feedbackOptions.seniorityOptions; }
+  get feedbackProviderOptions(): FeedbackProvider[] { return this.feedbackOptions.feedbackProviderOptions; }
+  get generalRatingOptions(): GeneralRating[] { return this.feedbackOptions.generalRatingOptions; }
+  get performanceWhatOptions(): PerformanceWhat[] { return this.feedbackOptions.performanceLevelOptions; }
+  get performanceHowOptions(): PerformanceHow[] { return this.feedbackOptions.performanceLevelOptions; }
+  get performanceAchievementsOptions(): PerformanceAchievements[] { return this.feedbackOptions.performanceLevelOptions; }
+  get feedbackTypeOptions(): FeedbackType[] { return this.feedbackOptions.feedbackTypeOptions; }
+  get actionResponsibleOptions(): ActionResponsible[] { return this.feedbackOptions.actionResponsibleOptions; }
+  get actionStatusOptions(): ActionPlanStatus[] { return this.feedbackOptions.actionStatusOptions; }
 
   constructor(private fb: FormBuilder) { }
 
@@ -134,6 +133,10 @@ export class CreateFeedbackEntityComponent implements OnInit {
     return a.value === b.value;
   };
 
+  cancel(): void {
+    this.router.navigate(['/squad-team-grid']);
+  }
+
   async saveFeedback() {
     if (this.feedbackForm.invalid) {
       return;
@@ -163,8 +166,7 @@ export class CreateFeedbackEntityComponent implements OnInit {
     try {
       const saved = await this.feedbackRepository.create(this.entity);
       if (saved) {
-        console.log('[CreateFeedback] Feedback guardado exitosamente:', this.entity);
-        this.router.navigate(['/squad-team-grid']);
+        await this.router.navigate(['/squad-team-grid']);
       }
     } catch (error) {
       console.error('[CreateFeedback] Error al guardar feedback:', error);

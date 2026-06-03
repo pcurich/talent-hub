@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Va
 import { ActivatedRoute, Router } from '@angular/router';
 import { FeedbackIndexeddbRepository } from '../../repository/feedback.indexeddb.repository';
 import { ActionPlan, ActionPlanStatus, ActionResponsible, FeedbackEntity, FeedbackType, GeneralRating, PerformanceAchievements, PerformanceHow, PerformanceWhat, Seniority, FeedbackProvider } from '../../model/feedback-entity.model';
-import { SystemConfigIndexeddbRepository } from '../../repository/system-config.indexeddb.repository';
+import { FeedbackOptionsUtil } from '../../util/feedback-options.util';
 
 @Component({
   selector: 'app-update-feedback-entity',
@@ -15,7 +15,7 @@ import { SystemConfigIndexeddbRepository } from '../../repository/system-config.
 })
 export class UpdateFeedbackEntityComponent implements OnInit {
   private feedbackService = inject(FeedbackIndexeddbRepository);
-  private systemConfig = inject(SystemConfigIndexeddbRepository);
+  private systemConfig = inject(FeedbackOptionsUtil);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private fb = inject(FormBuilder);
@@ -27,15 +27,15 @@ export class UpdateFeedbackEntityComponent implements OnInit {
   showSaveActionButton = true;
 
   // Opciones para los dropdowns desde SystemConfig
-  seniorityOptions: Seniority[] = this.systemConfig.getField('team_members', 'team_members_seniority')?.options || [];
-  feedbackProviderOptions: FeedbackProvider[] = this.systemConfig.getField('feedback', 'feedback_provider')?.options || [];
-  generalRatingOptions: GeneralRating[] = this.systemConfig.getField('feedback', 'feedback_general_rating')?.options || [];
-  performanceWhatOptions: PerformanceWhat[] = this.systemConfig.getField('feedback', 'feedback_performance_level')?.options || [];
-  performanceHowOptions: PerformanceHow[] = this.systemConfig.getField('feedback', 'feedback_performance_level')?.options || [];
-  performanceAchievementsOptions: PerformanceAchievements[] = this.systemConfig.getField('feedback', 'feedback_performance_level')?.options || [];
-  feedbackTypeOptions: FeedbackType[] = this.systemConfig.getField('feedback', 'feedback_default_type')?.options || [];
-  actionResponsibleOptions: ActionResponsible[] = this.systemConfig.getField('feedback', 'feedback_action_responsible')?.options || [];
-  actionStatusOptions: ActionPlanStatus[] = this.systemConfig.getField('feedback', 'feedback_action_status')?.options || [];
+  get seniorityOptions(): Seniority[] { return this.systemConfig.seniorityOptions; }
+  get feedbackProviderOptions(): FeedbackProvider[] { return this.systemConfig.feedbackProviderOptions; }
+  get generalRatingOptions(): GeneralRating[] { return this.systemConfig.generalRatingOptions; }
+  get performanceWhatOptions(): PerformanceWhat[] { return this.systemConfig.performanceLevelOptions; }
+  get performanceHowOptions(): PerformanceHow[] { return this.systemConfig.performanceLevelOptions; }
+  get performanceAchievementsOptions(): PerformanceAchievements[] { return this.systemConfig.performanceLevelOptions; }
+  get feedbackTypeOptions(): FeedbackType[] { return this.systemConfig.feedbackTypeOptions; }
+  get actionResponsibleOptions(): ActionResponsible[] { return this.systemConfig.actionResponsibleOptions; }
+  get actionStatusOptions(): ActionPlanStatus[] { return this.systemConfig.actionStatusOptions; }
 
   ngOnInit() {
     this.entityId = Number(this.route.snapshot.paramMap.get('id')) || 0;

@@ -1,7 +1,7 @@
 <form [formGroup]="feedbackForm" (ngSubmit)="saveFeedback()" class="create-container">
   <div class="form-header">
     <h2>Crear Nuevo Feedback</h2>
-    <button type="button" class="btn-cancel" (click)="'()=>{return console.log(cancel)}'">&#10005; Cancelar</button>
+    <button type="button" class="btn-cancel" (click)="cancel()">&#10005; Cancelar</button>
   </div>
 
   <!-- Información del Contexto (Solo lectura) -->
@@ -219,8 +219,4 @@
 </form>
 
 
-{{entity | json}}
 
-<br>
-
-{{feedbackForm.errors | json}}

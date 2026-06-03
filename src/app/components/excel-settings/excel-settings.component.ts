@@ -2,8 +2,8 @@ import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core'
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExcelConfigurationPresenter } from './presenters/excel-configuration.presenter';
-import { ExcelFilePresenter } from './presenters/excel-file.presenter';
-import { ExcelColumnMapping, ExcelSettingsConfig } from './models/excel-settings.models';
+import { ExcelFileService } from '../../services/excel-file.service';
+import { ExcelColumnMapping, ExcelSettingsConfig, ExcelReadResult } from './models/excel-settings.models';
 import { ExcelReaderPresenter } from './presenters/excel-reader.presenter';
 import { ExcelSquadModalPresenter } from './presenters/excel-squad-modal.presenter';
 import { LoadedDataPresenter } from './presenters/loaded-data.presenter';
@@ -14,7 +14,6 @@ import { LoadedDataPresenter } from './presenters/loaded-data.presenter';
   imports: [CommonModule, FormsModule],
   providers: [
     ExcelConfigurationPresenter,
-    ExcelFilePresenter,
     ExcelReaderPresenter,
     ExcelSquadModalPresenter,
     LoadedDataPresenter
@@ -26,7 +25,7 @@ export class ExcelSettingsComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   private readonly configPresenter = inject(ExcelConfigurationPresenter);
-  private readonly filePresenter = inject(ExcelFilePresenter);
+  private readonly filePresenter = inject(ExcelFileService);
   private readonly readerPresenter = inject(ExcelReaderPresenter);
 
   readonly squadModal = inject(ExcelSquadModalPresenter);
@@ -44,6 +43,15 @@ export class ExcelSettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadConfiguration();
+    this.checkRouterState();
+  }
+
+  private checkRouterState(): void {
+    const state = history.state as { importResult?: ExcelReadResult };
+    if (state?.importResult) {
+      this.loadedData.setImportResult(state.importResult);
+      this.activeTab = 'loaded-data';
+    }
   }
 
   loadConfiguration(): void {

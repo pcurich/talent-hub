@@ -151,7 +151,6 @@ export class SystemConfigIndexeddbRepository
   protected override async refreshEntities(): Promise<void> {
     try {
       const httpMocks = await this.httpMockService?.findByServiceCode(this.SERVICE_CODE);
-
       if (httpMocks && httpMocks.length > 0) {
         const entity: SystemConfigEntity = JSON.parse(httpMocks[0].responseBody);
         this.entity.set(entity);
