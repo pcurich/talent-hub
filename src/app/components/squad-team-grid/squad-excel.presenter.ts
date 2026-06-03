@@ -2,19 +2,20 @@ import { Injectable, inject } from '@angular/core';
 import * as XLSX from 'xlsx';
 import { Squad, TeamMember } from '../../model/current-user.model';
 import { CURRENT_USER_REPOSITORY } from '../../tokens/repository.tokens';
-import { ExcelConfigurationPresenter } from '../excel-settings/presenters/excel-configuration.presenter';
-import { ExcelReaderPresenter } from '../excel-settings/presenters/excel-reader.presenter';
-import { LoadedDataPresenter } from '../excel-settings/presenters/loaded-data.presenter';
-import { ExcelColumnMapping } from '../excel-settings/models/excel-settings.models';
-import { DataValidationEntry } from '../excel-settings/utils/excel-validation.util';
-import { buildStyledWorkbook, triggerDownload } from '../excel-settings/utils/excel-writer.util';
+import { ExcelConfigurationService } from '../../services/excel-configuration.service';
+
+import { ExcelImportResultService } from '../../services/excel-import-result.service';
+import { ExcelColumnMapping } from '../../model/excel-settings.models';
+import { DataValidationEntry } from '../../util/excel-validation.util';
+import { buildStyledWorkbook, triggerDownload } from '../../util/excel-writer.util';
+import { ExcelReaderService } from '../../services/excel-reader.service';
 
 @Injectable()
 export class SquadExcelPresenter {
   private readonly currentUserRepo = inject(CURRENT_USER_REPOSITORY);
-  private readonly configPresenter = inject(ExcelConfigurationPresenter);
-  private readonly readerPresenter = inject(ExcelReaderPresenter);
-  readonly loadedData = inject(LoadedDataPresenter);
+  private readonly configPresenter = inject(ExcelConfigurationService);
+  private readonly readerService = inject(ExcelReaderService);
+  readonly loadedData = inject(ExcelImportResultService);
 
   // Upload (file selector) modal state
   showUploadModal = false;
@@ -82,7 +83,7 @@ export class SquadExcelPresenter {
     try {
       const { config, fields } = this.configPresenter.loadConfiguration();
       this.uploadMappings = fields;
-      const result = await this.readerPresenter.readExcelFile(file, config);
+      const result = await this.readerService.readExcelFile(file, config);
       this.loadedData.setImportResult(result);
       this.showUploadGridModal = false;
       this.isGridProcessing = false;
@@ -108,7 +109,7 @@ export class SquadExcelPresenter {
     try {
       const { config, fields } = this.configPresenter.loadConfiguration();
       this.uploadMappings = fields;
-      const result = await this.readerPresenter.readExcelFile(file, config);
+      const result = await this.readerService.readExcelFile(file, config);
       this.loadedData.setImportResult(result);
       this.showUploadModal = false;
       this.isProcessing = false;
@@ -126,6 +127,7 @@ export class SquadExcelPresenter {
   }
 
   downloadTemplateForSquad(squad: Squad): void {
+    debugger;
     const currentUser = this.currentUserRepo.get()();
     if (!currentUser) return;
 

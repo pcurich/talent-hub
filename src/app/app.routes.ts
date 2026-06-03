@@ -1,8 +1,5 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
-import { UpdateFeedbackEntityComponent } from './components/update-feedback-entity/update-feedback-entity.component';
-import { ExcelSettingsComponent } from './components/excel-settings/excel-settings.component';
-import { FieldOptionsManagerComponent } from './components/field-options-manager/field-options-manager.component';
 import { InitAppComponent } from './components/init-app/init-app.component';
 import { LoginComponent } from './components/login/login';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout';
@@ -52,9 +49,6 @@ export const routes: Routes = [
       { path: 'squad-team-grid', component: SquadTeamGridComponent },
       { path: 'create-feedback', component: CreateFeedbackEntityComponent },
       { path: 'show-feedback/:registration', component: ShowFeedbackEntityComponent },
-      // { path: 'update-feedback/:id', component: UpdateFeedbackEntityComponent },
-      { path: 'excel-settings', component: ExcelSettingsComponent },
-      { path: 'field-options', component: FieldOptionsManagerComponent },
       { path: 'settings', component: SystemConfigComponent }
     ]
   },

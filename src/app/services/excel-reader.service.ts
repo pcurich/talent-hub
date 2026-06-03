@@ -1,16 +1,10 @@
-import { Injectable } from '@angular/core';
-import { FeedbackEntity } from '../../../model/feedback-entity.model';
+import { Injectable } from "@angular/core";
+import { FeedbackEntity } from "../model/feedback-entity.model";
+import { ExcelSettingsConfig, ExcelReadResult, ExcelRowResult, ExcelRowData, ExcelRowError } from "../model/excel-settings.models";
 import * as XLSX from 'xlsx';
-import {
-  ExcelSettingsConfig,
-  ExcelRowResult,
-  ExcelReadResult,
-  ExcelRowError,
-  ExcelRowData
-} from '../models/excel-settings.models';
 
-@Injectable()
-export class ExcelReaderPresenter {
+@Injectable({ providedIn: 'root' })
+export class ExcelReaderService {
 
   /**
    * Lee y procesa el archivo Excel completo

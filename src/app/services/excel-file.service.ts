@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ExcelSettingsConfig } from '../components/excel-settings/models/excel-settings.models';
+import { ExcelSettingsConfig } from '../model/excel-settings.models';
 
 export interface ExportResult {
   success: boolean;

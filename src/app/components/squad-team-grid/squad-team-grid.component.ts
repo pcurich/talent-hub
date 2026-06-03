@@ -5,10 +5,9 @@ import { Router } from '@angular/router';
 import { CURRENT_USER_REPOSITORY } from '../../tokens/repository.tokens';
 import { CurrentUser, Squad, TeamMember } from '../../model/current-user.model';
 import { SquadExcelPresenter } from './squad-excel.presenter';
-import { ExcelConfigurationPresenter } from '../excel-settings/presenters/excel-configuration.presenter';
-import { ExcelReaderPresenter } from '../excel-settings/presenters/excel-reader.presenter';
-import { LoadedDataPresenter } from '../excel-settings/presenters/loaded-data.presenter';
+import { ExcelImportResultService } from '../../services/excel-import-result.service';
 import { FeedbackIndexeddbRepository } from '../../repository/feedback.indexeddb.repository';
+import { ExcelReaderService } from '../../services/excel-reader.service';
 
 interface TeamMemberRow {
   squad: Squad;
@@ -19,7 +18,7 @@ interface TeamMemberRow {
   selector: 'app-squad-team-grid',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  providers: [SquadExcelPresenter, ExcelConfigurationPresenter, ExcelReaderPresenter, LoadedDataPresenter],
+  providers: [SquadExcelPresenter, ExcelReaderService, ExcelImportResultService],
   templateUrl: './squad-team-grid.component.html',
   styleUrl: './squad-team-grid.component.scss'
 })

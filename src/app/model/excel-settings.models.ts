@@ -1,4 +1,4 @@
-import { FeedbackEntity } from '../../../model/feedback-entity.model';
+import { FeedbackEntity } from './feedback-entity.model';
 
 /**
  * Opción para campos de tipo select

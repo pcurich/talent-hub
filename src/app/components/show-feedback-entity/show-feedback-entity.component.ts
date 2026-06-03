@@ -17,16 +17,11 @@ import {
   Seniority
 } from '../../model/feedback-entity.model';
 import { FeedbackOptionsUtil } from '../../util/feedback-options.util';
-import { ExcelConfigurationPresenter } from '../excel-settings/presenters/excel-configuration.presenter';
-import { ExcelReaderPresenter } from '../excel-settings/presenters/excel-reader.presenter';
-import { LoadedDataPresenter } from '../excel-settings/presenters/loaded-data.presenter';
-import { ExcelSettingsConfig, ExcelColumnMapping } from '../excel-settings/models/excel-settings.models';
 
 @Component({
   selector: 'app-show-feedback-entity',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
-  providers: [ExcelConfigurationPresenter, ExcelReaderPresenter, LoadedDataPresenter],
   templateUrl: './show-feedback-entity.component.html',
   styleUrl: './show-feedback-entity.component.scss'
 })
@@ -38,16 +33,6 @@ export class ShowFeedbackEntityComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
-  private readonly configPresenter = inject(ExcelConfigurationPresenter);
-  private readonly readerPresenter = inject(ExcelReaderPresenter);
-  readonly loadedData = inject(LoadedDataPresenter);
-
-  // Upload modal state
-  showUploadModal = false;
-  uploadFileError = '';
-  isProcessingUpload = false;
-  uploadConfig!: ExcelSettingsConfig;
-  uploadMappings: ExcelColumnMapping[] = [];
 
   squad: Squad = {} as Squad;
   teamMember: TeamMember = {} as TeamMember;
@@ -94,10 +79,6 @@ export class ShowFeedbackEntityComponent implements OnInit {
   selectFeedback(feedback: FeedbackEntity) {
     this.selectedFeedback.set(feedback);
     this.initForm(feedback);
-  }
-
-  get actionPlan(): FormArray {
-    return this.feedbackForm.get('actionPlan') as FormArray;
   }
 
   private initForm(entity: FeedbackEntity) {
@@ -163,6 +144,10 @@ export class ShowFeedbackEntityComponent implements OnInit {
     }
   }
 
+  get actionPlan(): FormArray {
+    return this.feedbackForm.get('actionPlan') as FormArray;
+  }
+
   addNewActionPlan() {
     const entity = this.selectedFeedback();
     if (entity) {
@@ -191,59 +176,6 @@ export class ShowFeedbackEntityComponent implements OnInit {
       entity.actionPlan = this.actionPlan.getRawValue();
     }
     this.addActionDisabled = false;
-  }
-
-  openUploadModal(): void {
-    const { config, fields } = this.configPresenter.loadConfiguration();
-    this.uploadConfig = config;
-    this.uploadMappings = fields;
-    this.loadedData.clear();
-    this.uploadFileError = '';
-    this.showUploadModal = true;
-  }
-
-  closeUploadModal(): void {
-    this.showUploadModal = false;
-    this.uploadFileError = '';
-    this.isProcessingUpload = false;
-  }
-
-  async onUploadFileChange(event: Event): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    input.value = '';
-    if (!file) return;
-
-    this.uploadFileError = '';
-    this.isProcessingUpload = true;
-    try {
-      const result = await this.readerPresenter.readExcelFile(file, this.uploadConfig);
-      this.loadedData.setImportResult(result);
-    } catch (error) {
-      this.uploadFileError = error instanceof Error ? error.message : 'Error al leer el archivo.';
-    } finally {
-      this.isProcessingUpload = false;
-    }
-  }
-
-  async saveLoadedFeedbacks(): Promise<void> {
-    const validEntities = this.loadedData.importState.result?.entities ?? [];
-    let saved = 0;
-    for (const entity of validEntities) {
-      const ok = await this.feedbackService.create(entity);
-      if (ok) saved++;
-    }
-    alert(`${saved} feedback(s) guardado(s) correctamente.`);
-    this.loadedData.clear();
-    this.closeUploadModal();
-    const registration = this.route.snapshot.params['registration'] ?? this.teamMember.registration;
-    if (registration) {
-      await this.feedbackService.findByRegistration(registration);
-    }
-  }
-
-  removeLoadedRow(index: number): void {
-    this.loadedData.removeRow(index);
   }
 
   goBack() {

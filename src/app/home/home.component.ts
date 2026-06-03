@@ -3,20 +3,13 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FeedbackEntity } from '../model/feedback-entity.model';
 
-import { SearchEntityComponent } from '../components/search-entity/search-entity.component';
-import { DataTableEntityComponent } from '../components/data-table-entity/data-table-entity.component';
-import { ModalEntityComponent } from '../components/modal-entity/modal-entity.component';
-
 import { FeedbackIndexeddbRepository } from '../repository/feedback.indexeddb.repository';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
-    CommonModule,
-    SearchEntityComponent,
-    DataTableEntityComponent,
-    ModalEntityComponent
+    CommonModule
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'

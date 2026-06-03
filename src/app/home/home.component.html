@@ -4,11 +4,6 @@
   <div class="content">
     <h1> Sistema de Gestión de Feedback y Evaluaciones </h1>
 
-    <!-- Componente de búsqueda -->
-    <div class="search-section">
-      <app-search-entity (search)="onSearch($event)"></app-search-entity>
-    </div>
-
     <!-- Estadísticas rápidas -->
     <div class="stats">
       <div class="stat-card">
@@ -21,15 +16,6 @@
       </div>
     </div>
 
-    <!-- Tabla de datos -->
-    <div class="table-section">
-      <app-data-table-entity [entities]="filteredEntities()" (view)="onView($event)" (edit)="onEdit($event)"
-        (delete)="onDelete($event)">
-      </app-data-table-entity>
-    </div>
   </div>
 
-  <!-- Modal para ver detalles -->
-  <app-modal-entity [entity]="selectedEntity" [isOpen]="isModalOpen" (close)="onCloseModal()">
-  </app-modal-entity>
 </div>
