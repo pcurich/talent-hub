@@ -49,6 +49,29 @@
       <span class="result-count">
         {{ filteredTeamMembers().length }} team member(s) encontrado(s)
       </span>
+      <div class="grid-action-buttons">
+        <button
+          type="button"
+          class="btn-action btn-download btn-grid-download"
+          (click)="downloadGridTemplate()"
+          [disabled]="filteredTeamMembers().length === 0"
+          title="Descargar plantilla con todos los team members visibles"
+        >
+          <span class="icon">📥</span>
+          Descargar Plantilla ({{ filteredTeamMembers().length }})
+        </button>
+
+        <button
+          type="button"
+          class="btn-action btn-upload btn-grid-upload"
+          (click)="uploadGridTemplate()"
+          [disabled]="filteredTeamMembers().length === 0"
+          title="Cargar Excel con todos los team members visibles"
+        >
+          <span class="icon">📤</span>
+          Cargar Excel ({{ filteredTeamMembers().length }})
+        </button>
+      </div>
     </div>
   </section>
 
@@ -80,26 +103,19 @@
             <td>{{ row.teamMember.email || '-' }}</td>
             <td>{{ row.teamMember.companyValue || '-' }}</td>
             <td class="actions-cell">
-              <button
-                type="button"
-                class="btn-action btn-feedback"
-                (click)="goToCreateFeedback(row)"
-                title="Crear Feedback para {{ row.teamMember.name }}"
+              <select
+                [id]="'row-action-' + row.teamMember.registration"
+                [name]="'row-action-' + row.teamMember.registration"
+                class="btn btn-secondary import-select-button"
+                [(ngModel)]="rowActionMap[row.teamMember.registration]"
+                (ngModelChange)="onRowAction($event, row)"
               >
-                <span class="icon">📝</span>
-                Crear
-              </button>
-
-              <button
-                type="button"
-                class="btn-action btn-view"
-                (click)="goToShowFeedback(row)"
-                title="Ver Feedback para {{ row.teamMember.name }}"
-              >
-                <span class="icon">👁️</span>
-                Ver
-              </button>
-
+                <option value="" disabled>------------</option>
+                <option value="create">📝 Crear Feedback</option>
+                <option value="view">👁️ Ver Feedback</option>
+                <option value="upload">📤 Cargar Excel</option>
+                <option value="download">📥 Descargar Plantilla</option>
+              </select>
             </td>
           </tr>
         </tbody>
@@ -124,4 +140,176 @@
       </div>
     </ng-template>
   </section>
+</div>
+
+<!-- Hidden file input for Excel upload -->
+<input
+  #uploadFileInput
+  type="file"
+  accept=".xlsx,.xls"
+  style="display: none"
+  (change)="onUploadFileChange($event)">
+
+<!-- Modal: Cargar Excel por Squad -->
+<div class="upload-modal-overlay" *ngIf="squadExcel.showUploadModal">
+  <div class="upload-modal" (click)="$event.stopPropagation()">
+    <div class="upload-modal-header">
+      <h2>📤 Cargar Excel</h2>
+      <button class="upload-modal-close" (click)="squadExcel.closeUploadModal()">✕</button>
+    </div>
+
+    <div class="upload-modal-body">
+      <p class="upload-squad-name">Squad: <strong>{{ squadExcel.uploadSquad?.name }}</strong></p>
+
+      <div class="filename-notice">
+        <span>📁</span>
+        <div>
+          <strong>Nombre de archivo requerido:</strong>
+          <code class="filename-code">{{ squadExcel.getExpectedFileName(squadExcel.uploadSquad!) }}</code>
+        </div>
+      </div>
+
+      <label class="file-upload-label" [class.disabled]="squadExcel.isProcessing">
+        <input
+          type="file"
+          accept=".xlsx,.xls"
+          class="file-upload-input"
+          [disabled]="squadExcel.isProcessing"
+          (change)="onUploadFileChange($event)">
+        <span class="file-upload-btn">
+          {{ squadExcel.isProcessing ? '⏳ Procesando...' : '📂 Buscar archivo...' }}
+        </span>
+      </label>
+
+      <p class="file-error" *ngIf="squadExcel.uploadFileError">⚠️ {{ squadExcel.uploadFileError }}</p>
+    </div>
+
+    <div class="upload-modal-footer">
+      <button class="btn btn-secondary" (click)="squadExcel.closeUploadModal()" [disabled]="squadExcel.isProcessing">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Resultado de carga Excel -->
+<div class="upload-modal-overlay" *ngIf="squadExcel.showResultModal">
+  <div class="result-modal" (click)="$event.stopPropagation()">
+
+    <div class="upload-modal-header">
+      <h2>📦 Datos Cargados del Excel</h2>
+      <button class="upload-modal-close" (click)="squadExcel.closeResultModal()">✕</button>
+    </div>
+
+    <div class="result-modal-body">
+
+      <div class="result-stats">
+        <span class="stat-badge valid">✅ {{ squadExcel.loadedData.importState.result?.validRows || 0 }} válidos</span>
+        <span class="stat-badge invalid">❌ {{ squadExcel.loadedData.importState.result?.invalidRows || 0 }} inválidos</span>
+        <span class="stat-badge total">📊 {{ squadExcel.loadedData.results.length }} en vista</span>
+        <input type="text" class="result-search" [(ngModel)]="squadExcel.loadedData.searchTerm" placeholder="🔍 Buscar...">
+      </div>
+
+      <div class="loaded-data-table-container">
+        <table class="loaded-data-table">
+          <thead>
+            <tr>
+              <th *ngFor="let column of squadExcel.loadedData.getTableColumns(squadExcel.uploadMappings)">{{ column.label }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of squadExcel.loadedData.getFilteredEntities(); let i = index"
+              [class.invalid-row]="!row.isValid" [class.valid-row]="row.isValid">
+
+              <ng-container *ngFor="let column of squadExcel.loadedData.getTableColumns(squadExcel.uploadMappings)">
+                <!-- Columna # -->
+                <td *ngIf="column.key === 'rowNumber'">{{ row.rowNumber }}</td>
+
+                <!-- Columna Estado -->
+                <td *ngIf="column.key === 'status'" class="status-cell">
+                  <span *ngIf="row.isValid" class="status-badge valid" title="Fila válida">✅</span>
+                  <span *ngIf="!row.isValid && row.errors.length > 0" class="status-badge invalid"
+                    [title]="squadExcel.loadedData.getErrorMessages(row.errors)">❌</span>
+                </td>
+
+                <!-- Columnas de datos dinámicas -->
+                <td *ngIf="column.key !== 'rowNumber' && column.key !== 'status' && column.key !== 'actions'">
+                  <input type="text" class="editable-cell"
+                    [value]="squadExcel.loadedData.getNestedValue(row.data, column.field)"
+                    readonly
+                    (input)="squadExcel.loadedData.setNestedValue(row.data, column.field, $any($event.target).value)">
+                </td>
+
+                <!-- Columna Acciones -->
+                <td *ngIf="column.key === 'actions'" class="actions-cell">
+                  <button class="btn-delete" (click)="removeLoadedRow(i)" title="Eliminar fila">🗑️</button>
+                </td>
+              </ng-container>
+            </tr>
+          </tbody>
+        </table>
+
+        <div *ngIf="squadExcel.loadedData.getFilteredEntities().length === 0" class="no-results">
+          <p>📭 No se encontraron datos</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="upload-modal-footer">
+      <button class="btn btn-secondary" (click)="squadExcel.closeResultModal()">Descartar</button>
+      <button class="btn btn-primary"
+        (click)="saveLoadedFeedbacks()"
+        [disabled]="squadExcel.loadedData.getValidRowsCount() === 0">
+        💾 Guardar {{ squadExcel.loadedData.getValidRowsCount() }} Registro(s) Válido(s)
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden file input for Grid Excel upload -->
+<input
+  #uploadGridFileInput
+  type="file"
+  accept=".xlsx,.xls"
+  style="display: none"
+  (change)="onUploadGridFileChange($event)">
+
+<!-- Modal: Cargar Excel todos los squads -->
+<div class="upload-modal-overlay" *ngIf="squadExcel.showUploadGridModal">
+  <div class="upload-modal" (click)="$event.stopPropagation()">
+    <div class="upload-modal-header">
+      <h2>📤 Cargar Excel — Todos los Squads</h2>
+      <button class="upload-modal-close" (click)="squadExcel.closeUploadGridModal()">✕</button>
+    </div>
+
+    <div class="upload-modal-body">
+      <div class="filename-notice">
+        <span>📁</span>
+        <div>
+          <strong>Nombre de archivo requerido:</strong>
+          <code class="filename-code">{{ squadExcel.getExpectedGridFileName() }}</code>
+        </div>
+      </div>
+
+      <label class="file-upload-label" [class.disabled]="squadExcel.isGridProcessing">
+        <input
+          type="file"
+          accept=".xlsx,.xls"
+          class="file-upload-input"
+          [disabled]="squadExcel.isGridProcessing"
+          (change)="onUploadGridFileChange($event)">
+        <span class="file-upload-btn">
+          {{ squadExcel.isGridProcessing ? '⏳ Procesando...' : '📂 Buscar archivo...' }}
+        </span>
+      </label>
+
+      <p class="file-error" *ngIf="squadExcel.uploadGridFileError">⚠️ {{ squadExcel.uploadGridFileError }}</p>
+    </div>
+
+    <div class="upload-modal-footer">
+      <button class="btn btn-secondary" (click)="squadExcel.closeUploadGridModal()" [disabled]="squadExcel.isGridProcessing">
+        Cancelar
+      </button>
+    </div>
+  </div>
 </div>

@@ -73,7 +73,13 @@ export class LoadedDataPresenter {
   }
 
   getNestedValue(obj: any, path: string): any {
-    return path.split('.').reduce((current, prop) => current?.[prop], obj);
+    const value = path.split('.').reduce((current, prop) => current?.[prop], obj);
+    // Si el valor es un objeto con label (campo select resolveToFullOption), mostrar el label
+    if (value !== null && typeof value === 'object' && 'label' in value) {
+      return value.label;
+    }
+    // Devolver string vacío en lugar de undefined para evitar que Angular muestre "undefined"
+    return value ?? '';
   }
 
   setNestedValue(obj: any, path: string, value: any): void {
@@ -94,24 +100,6 @@ export class LoadedDataPresenter {
         value?.toString().toLowerCase().includes(term)
       )
     );
-  }
-
-  getColumnUniqueValues(column: TableColumn): string[] {
-    const values = new Set<string>();
-    this.getFilteredEntities().forEach(row => {
-      const val = this.getNestedValue(row.data, column.field);
-      if (val !== null && val !== undefined && val !== '') {
-        values.add(String(val));
-      }
-    });
-    return Array.from(values).sort();
-  }
-
-  applyBulkValue(column: TableColumn, value: string): void {
-    if (!value) return;
-    this.getFilteredEntities().forEach(row => {
-      this.setNestedValue(row.data, column.field, value);
-    });
   }
 
   removeRow(index: number): void {

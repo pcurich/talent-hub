@@ -173,24 +173,6 @@
                   <tr>
                     <th *ngFor="let column of loadedData.getTableColumns(config.mappings)">{{ column.label }}</th>
                   </tr>
-                  <tr class="bulk-edit-row">
-                    <th *ngFor="let column of loadedData.getTableColumns(config.mappings)">
-                      <ng-container *ngIf="column.key !== 'rowNumber' && column.key !== 'status' && column.key !== 'actions'; else emptyHeader">
-                        <div class="bulk-edit-container">
-                          <select
-                            class="bulk-select"
-                            (change)="loadedData.applyBulkValue(column, $any($event.target).value)"
-                            [title]="'Aplicar a toda la columna: ' + column.label">
-                            <option value="">— Aplicar a todos —</option>
-                            <option *ngFor="let option of loadedData.getColumnUniqueValues(column)" [value]="option">
-                              {{ option }}
-                            </option>
-                          </select>
-                        </div>
-                      </ng-container>
-                      <ng-template #emptyHeader></ng-template>
-                    </th>
-                  </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let row of loadedData.getFilteredEntities(); let i = index; trackBy: trackByIndex"

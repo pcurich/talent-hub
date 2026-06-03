@@ -51,8 +51,8 @@ export const routes: Routes = [
       { path: 'notifications', component: NotificationsComponent },
       { path: 'squad-team-grid', component: SquadTeamGridComponent },
       { path: 'create-feedback', component: CreateFeedbackEntityComponent },
-      { path: 'show-feedback', component: ShowFeedbackEntityComponent },
-      { path: 'update-feedback/:id', component: UpdateFeedbackEntityComponent },
+      { path: 'show-feedback/:registration', component: ShowFeedbackEntityComponent },
+      // { path: 'update-feedback/:id', component: UpdateFeedbackEntityComponent },
       { path: 'excel-settings', component: ExcelSettingsComponent },
       { path: 'field-options', component: FieldOptionsManagerComponent },
       { path: 'settings', component: SystemConfigComponent }

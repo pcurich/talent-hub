@@ -10,6 +10,7 @@ import {
   BLANK
 } from "./system-config-entity.model";
 import { Squad, TeamMember } from "./current-user.model";
+import { SYSTEM_CONFIG_KEYS } from "../constants/general.constants";
 
 /**
  * TeamMember enriquecido con sus feedbacks asociados.
@@ -21,15 +22,25 @@ export interface TeamMemberProfile extends TeamMember {
   feedbacks: FeedbackEntity[];
 }
 
-export type ActionPlanStatus = FieldOption;
-export type PerformanceWhat = FieldOption;
-export type PerformanceHow = FieldOption;
-export type PerformanceAchievements = FieldOption;
-export type ActionResponsible = FieldOption;
-export type FeedbackType = FieldOption;
-export type Seniority = FieldOption;
-export type FeedbackProvider = FieldOption;
-export type GeneralRating = FieldOption;
+/**
+ * Valor de un campo de configuración tipado.
+ * Extiende FieldOption con las referencias al grupo y campo de configuración del sistema,
+ * permitiendo rastrear el origen del valor seleccionado en el Excel.
+ */
+export interface ConfigFieldValue extends FieldOption {
+  groupKey: string;  // key del ConfigGroup (ej: 'team_members', 'feedback')
+  fieldKey: string;  // key del ConfigField (ej: 'team_members_company', 'feedback_provider')
+}
+
+export type ActionPlanStatus = ConfigFieldValue;
+export type PerformanceWhat = ConfigFieldValue;
+export type PerformanceHow = ConfigFieldValue;
+export type PerformanceAchievements = ConfigFieldValue;
+export type ActionResponsible = ConfigFieldValue;
+export type FeedbackType = ConfigFieldValue;
+export type Seniority = ConfigFieldValue;
+export type FeedbackProvider = ConfigFieldValue;
+export type GeneralRating = ConfigFieldValue;
 
 export interface Performance {
   what: PerformanceWhat; // ¿Cumple con la entrega del backlog?
@@ -94,14 +105,31 @@ export class FeedbackEntity extends BaseEntity {
 
     this.number = init.number ?? 0;
     this.teamMember = init.teamMember ?? ({} as TeamMember);
-    this.seniority = init.seniority ?? getDefaultFieldOption('team_members_seniority') ?? TEAM_MEMBERS_SENIORITY_OPTIONS.find(o => o.value === BLANK)!;
+    this.seniority = init.seniority ?? {
+      ...(getDefaultFieldOption('team_members_seniority') ?? TEAM_MEMBERS_SENIORITY_OPTIONS.find(o => o.value === BLANK)!),
+      groupKey: SYSTEM_CONFIG_KEYS.TEAM_MEMBERS_CONFIG_GROUP_KEY,
+      fieldKey: SYSTEM_CONFIG_KEYS.TEAM_MEMBERS_SENIORITY_FIELD_KEY
+    };
     this.squad = init.squad ?? ({} as Squad);
     this.poclacDate = init.poclacDate ?? new Date();
-    this.feedbackProvider = init.feedbackProvider ?? getDefaultFieldOption('feedback_provider') ?? FEEDBACK_PROVIDER_OPTIONS.find(o => o.value === BLANK)!;
+    this.feedbackProvider = init.feedbackProvider ?? {
+      ...(getDefaultFieldOption('feedback_provider') ?? FEEDBACK_PROVIDER_OPTIONS.find(o => o.value === BLANK)!),
+      groupKey: SYSTEM_CONFIG_KEYS.FEEDBACK_CONFIG_GROUP_KEY,
+      fieldKey: SYSTEM_CONFIG_KEYS.FEEDBACK_PROVIDER_FIELD_KEY
+    };
 
-    this.generalRating = init.generalRating ?? getDefaultFieldOption('feedback_general_rating') ?? FEEDBACK_GENERAL_RATING_OPTIONS.find(o => o.value === BLANK)!;
+    this.generalRating = init.generalRating ?? {
+      ...(getDefaultFieldOption('feedback_general_rating') ?? FEEDBACK_GENERAL_RATING_OPTIONS.find(o => o.value === BLANK)!),
+      groupKey: SYSTEM_CONFIG_KEYS.FEEDBACK_CONFIG_GROUP_KEY,
+      fieldKey: SYSTEM_CONFIG_KEYS.FEEDBACK_GENERAL_RATING_FIELD_KEY
+    };
 
-    const defaultPerformance = getDefaultFieldOption('feedback_performance_level') ?? PERFORMANCE_LEVEL_OPTIONS.find(o => o.value === BLANK)!;
+    const defaultPerformanceBase = getDefaultFieldOption('feedback_performance_level') ?? PERFORMANCE_LEVEL_OPTIONS.find(o => o.value === BLANK)!;
+    const defaultPerformance: PerformanceWhat = {
+      ...defaultPerformanceBase,
+      groupKey: SYSTEM_CONFIG_KEYS.FEEDBACK_CONFIG_GROUP_KEY,
+      fieldKey: SYSTEM_CONFIG_KEYS.FEEDBACK_PERFORMANCE_LEVEL_FIELD_KEY
+    };
     this.performance = init.performance ?? {
       what: defaultPerformance,
       how: defaultPerformance,
@@ -109,7 +137,11 @@ export class FeedbackEntity extends BaseEntity {
       details: ''
     };
 
-    this.feedbackType = init.feedbackType ?? getDefaultFieldOption('feedback_default_type') ?? FEEDBACK_TYPE_OPTIONS.find(o => o.value === BLANK)!;
+    this.feedbackType = init.feedbackType ?? {
+      ...(getDefaultFieldOption('feedback_default_type') ?? FEEDBACK_TYPE_OPTIONS.find(o => o.value === BLANK)!),
+      groupKey: SYSTEM_CONFIG_KEYS.FEEDBACK_CONFIG_GROUP_KEY,
+      fieldKey: SYSTEM_CONFIG_KEYS.FEEDBACK_TYPE_FIELD_KEY
+    };
     this.feedbackDetails = init.feedbackDetails ?? {
       situation: '',
       behavior: '',

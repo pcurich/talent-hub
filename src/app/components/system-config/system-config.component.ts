@@ -11,7 +11,6 @@ import {
 } from '../../model/system-config-entity.model';
 import { SYSTEM_CONFIG_REPOSITORY } from '../../tokens/repository.tokens';
 import { SystemConfigFieldEditorPresenter } from './presenters/system-config-field-editor.presenter';
-import { STORAGE_KEYS } from '../../constants/general.constants';
 import { ToastService } from '../toast/toast.service';
 
 @Component({
@@ -76,17 +75,23 @@ export class SystemConfigComponent implements OnInit {
    */
   private loadConfigFromRepo(): void {
     const config = this.systemConfigRepo.get()();
-    const values = new Map<string, any>();
+    let values = new Map<string, any>();
 
     if (config?.groups) {
+      // Actualizar configGroups con los datos del repositorio
+      this.configGroups = config.groups;
+
       for (const group of config.groups) {
         for (const field of group.fields || []) {
-          values.set(field.key, field.defaultValue.value);
+          try {
+            values.set(field.key, field.defaultValue?.value);
+          } catch (error) {
+            console.error(`[SystemConfigComponent] Error al cargar valor para campo '${field.key}':`, error);
+          }
         }
       }
     } else {
-      this.loadDefaultValues();
-      return;
+      values = this.loadDefaultValues();
     }
 
     this.configValues.set(values);
@@ -95,7 +100,7 @@ export class SystemConfigComponent implements OnInit {
   /**
    * Carga los valores por defecto en memoria
    */
-  private loadDefaultValues(): void {
+  private loadDefaultValues(): Map<string, any> {
     const defaultConfig = createDefaultSystemConfig();
     const values = new Map<string, any>();
     for (const group of defaultConfig.groups) {
@@ -103,12 +108,9 @@ export class SystemConfigComponent implements OnInit {
         values.set(field.key, field.defaultValue.value);
       }
     }
-    this.configValues.set(values);
+   return values;
   }
 
-  loadConfig(): void {
-    this.loadConfigFromRepo();
-  }
 
   get activeGroup(): ConfigGroup | undefined {
     return this.configGroups.find(g => g.key === this.activeGroupKey());
@@ -274,7 +276,7 @@ export class SystemConfigComponent implements OnInit {
   cancelChanges(): void {
     if (this.hasChanges()) {
       if (confirm('¿Descartar los cambios sin guardar?')) {
-        this.loadConfig();
+        this.loadConfigFromRepo();
         this.hasChanges.set(false);
       }
     }

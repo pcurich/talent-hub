@@ -1,4 +1,5 @@
 import { BaseEntity } from "@pcurich/client-storage-indexeddb";
+import { SYSTEM_CONFIG_KEYS } from "../constants/general.constants";
 
 export type FieldType = 'select' | 'multi-select' | 'text' | 'number' | 'boolean' | 'date' | 'color';
 
@@ -50,7 +51,7 @@ export function blankOption(description: string): FieldOption {
 }
 
 export const TEAM_MEMBERS_COMPANY_OPTIONS: FieldOption[] = [
-  { value: BLANK, label: 'Sin empresa', description: 'No se ha especificado una empresa', order: 1 },
+  blankOption('No se ha especificado una empresa'),
   { value: 'company_internal', label: 'Bcp', description: 'Colaborador interno del BCP', order: 2 },
   { value: 'company_external', label: 'Proveedor', description: 'Colaborador externo que trabaja por contrato de servicio', order: 3 }
 ]
@@ -106,7 +107,7 @@ export const FEEDBACK_ACTIONABLE_STATUS_OPTIONS: FieldOption[] = [
 ];
 
 export const FEEDBACK_TYPE_OPTIONS: FieldOption[] = [
-  { value: BLANK, label: '----------------', description: 'Seleccione un tipo de feedback', icon: 'comment', color: '#ffffff', order: 1 },
+  blankOption('Seleccione un tipo de feedback'),
   { value: 'appreciative', label: 'Apreciativo', description: 'Reconocer logros y buen desempeño', icon: 'star', color: '#ffc107', order: 2 },
   { value: 'constructive', label: 'Constructivo', description: 'Identificar oportunidades de crecimiento', icon: 'trending_up', color: '#17a2b8', order: 3 },
   { value: 'neutral', label: 'Neutro', description: 'Sin connotación positiva ni negativa.', icon: 'flag', color: '#6c757d', order: 4 },
@@ -174,158 +175,147 @@ export const BOOLEAN_OPTIONS: FieldOption[] = [
 ];
 
 export const TEAM_MEMBERS_CONFIG_GROUP: ConfigGroup = {
-  key: 'team_members',
+  key: SYSTEM_CONFIG_KEYS.TEAM_MEMBERS_CONFIG_GROUP_KEY,
   label: 'Team Members',
   description: 'Configuración relacionada con los miembros del equipo de trabajo',
   icon: 'people',
   order: 2,
   fields: [
     {
-      key: 'team_members_company',
+      key: SYSTEM_CONFIG_KEYS.TEAM_MEMBERS_COMPANY_FIELD_KEY,
       label: 'Empresa donde trabajan',
       description: 'Empresa donde están registrados los miembros del equipo',
       type: 'select',
       defaultValue: TEAM_MEMBERS_COMPANY_OPTIONS.find(o => o.value === BLANK)!,
       options: TEAM_MEMBERS_COMPANY_OPTIONS,
       required: true,
-      group: 'team_members',
+      group: SYSTEM_CONFIG_KEYS.TEAM_MEMBERS_CONFIG_GROUP_KEY,
       order: 1
     },
     {
-      key: 'team_members_seniority',
+      key: SYSTEM_CONFIG_KEYS.TEAM_MEMBERS_SENIORITY_FIELD_KEY,
       label: 'Nivel de Seniority',
       description: 'Nivel de experiencia y madurez profesional del colaborador',
       type: 'select',
-      defaultValue: TEAM_MEMBERS_SENIORITY_OPTIONS.find(o => o.value === '0')!,
+      defaultValue: TEAM_MEMBERS_SENIORITY_OPTIONS.find(o => o.value === BLANK)!,
       options: TEAM_MEMBERS_SENIORITY_OPTIONS,
       required: true,
-      group: 'team_members',
+      group: SYSTEM_CONFIG_KEYS.TEAM_MEMBERS_CONFIG_GROUP_KEY,
       order: 2
     },
   ]
 };
 
 export const FEEDBACK_CONFIG_GROUP: ConfigGroup = {
-  key: 'feedback',
+  key: SYSTEM_CONFIG_KEYS.FEEDBACK_CONFIG_GROUP_KEY,
   label: 'Feedback',
   description: 'Configuración relacionada con el sistema de feedback',
   icon: 'feedback',
   order: 1,
   fields: [
     {
-      key: 'feedback_performance_level',
+      key: SYSTEM_CONFIG_KEYS.FEEDBACK_PERFORMANCE_LEVEL_FIELD_KEY,
       label: 'Nivel de Desempeño',
       description: 'Configuración de los niveles de evaluación de desempeño',
       type: 'select',
       defaultValue: PERFORMANCE_LEVEL_OPTIONS.find(o => o.value === BLANK)!,
       options: PERFORMANCE_LEVEL_OPTIONS,
       required: true,
-      group: 'feedback',
+      group: SYSTEM_CONFIG_KEYS.FEEDBACK_CONFIG_GROUP_KEY,
       order: 1
     },
     {
-      key: 'feedback_provider',
+      key: SYSTEM_CONFIG_KEYS.FEEDBACK_PROVIDER_FIELD_KEY,
       label: 'Quién brinda el feedback',
       description: 'Rol de la persona que proporciona el feedback',
       type: 'select',
       defaultValue: FEEDBACK_PROVIDER_OPTIONS.find(o => o.value === BLANK)!,
       options: FEEDBACK_PROVIDER_OPTIONS,
       required: true,
-      group: 'feedback',
+      group: SYSTEM_CONFIG_KEYS.FEEDBACK_CONFIG_GROUP_KEY,
       order: 2
     },
     {
-      key: 'feedback_general_rating',
+      key: SYSTEM_CONFIG_KEYS.FEEDBACK_GENERAL_RATING_FIELD_KEY,
       label: 'Calificación General',
       description: 'Evaluación global del desempeño del colaborador',
       type: 'select',
       defaultValue: FEEDBACK_GENERAL_RATING_OPTIONS.find(o => o.value === BLANK)!,
       options: FEEDBACK_GENERAL_RATING_OPTIONS,
       required: true,
-      group: 'feedback',
+      group: SYSTEM_CONFIG_KEYS.FEEDBACK_CONFIG_GROUP_KEY,
       order: 3
     },
     {
-      key: 'feedback_default_status',
+      key: SYSTEM_CONFIG_KEYS.FEEDBACK_DEFAULT_STATUS_FIELD_KEY,
       label: 'Estado por defecto',
       description: 'Estado inicial asignado a nuevos feedbacks',
       type: 'select',
       defaultValue: FEEDBACK_STATUS_OPTIONS.find(o => o.value === BLANK)!,
       options: FEEDBACK_STATUS_OPTIONS,
       required: true,
-      group: 'feedback',
+      group: SYSTEM_CONFIG_KEYS.FEEDBACK_CONFIG_GROUP_KEY,
       order: 4
     },
     {
-      key: 'feedback_action_status',
+      key: SYSTEM_CONFIG_KEYS.FEEDBACK_ACTION_STATUS_FIELD_KEY,
       label: 'Estado del plan de acción',
       description: 'Configuración del estado del plan de acción asociado a los feedbacks',
       type: 'select',
       defaultValue: FEEDBACK_ACTIONABLE_STATUS_OPTIONS.find(o => o.value === BLANK)!,
       options: FEEDBACK_ACTIONABLE_STATUS_OPTIONS,
       required: true,
-      group: 'feedback',
+      group: SYSTEM_CONFIG_KEYS.FEEDBACK_CONFIG_GROUP_KEY,
       order: 5
     },
     {
-      key: 'feedback_action_responsible',
+      key: SYSTEM_CONFIG_KEYS.FEEDBACK_ACTION_RESPONSIBLE_FIELD_KEY,
       label: 'Responsable del plan de acción',
       description: 'Configuración del responsable del plan de acción asociado a los feedbacks',
       type: 'select',
       defaultValue: FEEDBACK_ACTIONABLE_PROVIDER_OPTIONS.find(o => o.value === BLANK)!,
       options: FEEDBACK_ACTIONABLE_PROVIDER_OPTIONS,
       required: true,
-      group: 'feedback',
+      group: SYSTEM_CONFIG_KEYS.FEEDBACK_CONFIG_GROUP_KEY,
       order: 6
     },
     {
-      key: 'feedback_default_type',
+      key: SYSTEM_CONFIG_KEYS.FEEDBACK_TYPE_FIELD_KEY,
       label: 'Tipo por defecto',
       description: 'Tipo inicial sugerido para nuevos feedbacks',
       type: 'select',
       defaultValue: FEEDBACK_TYPE_OPTIONS.find(o => o.value === BLANK)!,
       options: FEEDBACK_TYPE_OPTIONS,
       required: true,
-      group: 'feedback',
+      group: SYSTEM_CONFIG_KEYS.FEEDBACK_CONFIG_GROUP_KEY,
       order: 2
     },
     {
-      key: 'feedback_default_visibility',
+      key: SYSTEM_CONFIG_KEYS.FEEDBACK_DEFAULT_VISIBILITY_FIELD_KEY,
       label: 'Visibilidad por defecto',
       description: 'Quién puede ver los feedbacks por defecto',
       type: 'select',
       defaultValue: VISIBILITY_OPTIONS.find(o => o.value === BLANK)!,
       options: VISIBILITY_OPTIONS,
       required: true,
-      group: 'feedback',
+      group: SYSTEM_CONFIG_KEYS.FEEDBACK_CONFIG_GROUP_KEY,
       order: 3
     },
     {
-      key: 'feedback_require_acknowledgment',
+      key: SYSTEM_CONFIG_KEYS.FEEDBACK_REQUIRE_ACKNOWLEDGMENT_FIELD_KEY,
       label: 'Requerir confirmación',
       description: 'El destinatario debe confirmar que recibió el feedback',
       type: 'boolean',
       defaultValue: BOOLEAN_OPTIONS.find(o => o.value === BLANK)!,
       options: BOOLEAN_OPTIONS,
-      group: 'feedback',
+      group: SYSTEM_CONFIG_KEYS.FEEDBACK_CONFIG_GROUP_KEY,
       order: 4
     },
-    {
-      key: 'feedback_reminder_days',
-      label: 'Días para recordatorio',
-      description: 'Días después de los cuales enviar un recordatorio si no hay respuesta',
-      type: 'number',
-      defaultValue: { value: '7', label: '7', description: 'Días para recordatorio' },
-      min: 1,
-      max: 30,
-      group: 'feedback',
-      order: 5
-    }
   ]
 };
 
 export const NOTIFICATIONS_CONFIG_GROUP: ConfigGroup = {
-  key: 'notifications',
+  key: SYSTEM_CONFIG_KEYS.NOTIFICATIONS_REMINDER_DAYS_FIELD_KEY,
   label: 'Notificaciones',
   description: 'Preferencias de notificaciones del sistema',
   icon: 'notifications',
@@ -415,55 +405,55 @@ export const EVALUATIONS_CONFIG_GROUP: ConfigGroup = {
   ]
 };
 
-export const APPEARANCE_CONFIG_GROUP: ConfigGroup = {
-  key: 'appearance',
-  label: 'Apariencia',
-  description: 'Personalización visual del sistema',
-  icon: 'palette',
-  order: 5,
-  fields: [
-    {
-      key: 'appearance_theme',
-      label: 'Tema',
-      description: 'Esquema de colores de la interfaz',
-      type: 'select',
-      defaultValue: { value: 'light', label: 'Claro', description: 'Fondo claro con texto oscuro', order: 1 },
-      options: [
-        { value: 'light', label: 'Claro', description: 'Fondo claro con texto oscuro', order: 1 },
-        { value: 'dark', label: 'Oscuro', description: 'Fondo oscuro con texto claro', order: 2 },
-        { value: 'system', label: 'Sistema', description: 'Seguir preferencia del sistema operativo', order: 3 }
-      ],
-      group: 'appearance',
-      order: 1
-    },
-    {
-      key: 'appearance_compact_mode',
-      label: 'Modo compacto',
-      description: 'Reducir espaciado para mostrar más contenido',
-      type: 'boolean',
-      defaultValue: BOOLEAN_OPTIONS.find(o => o.value === BLANK)!,
-      options: BOOLEAN_OPTIONS,
-      group: 'appearance',
-      order: 2
-    },
-    {
-      key: 'appearance_primary_color',
-      label: 'Color primario',
-      description: 'Color principal de la interfaz',
-      type: 'color',
-      defaultValue: { value: '#002a8d', label: '#002a8d', description: 'Color principal de la interfaz' },
-      group: 'appearance',
-      order: 3
-    }
-  ]
-};
+// export const APPEARANCE_CONFIG_GROUP: ConfigGroup = {
+//   key: 'appearance',
+//   label: 'Apariencia',
+//   description: 'Personalización visual del sistema',
+//   icon: 'palette',
+//   order: 5,
+//   fields: [
+//     {
+//       key: 'appearance_theme',
+//       label: 'Tema',
+//       description: 'Esquema de colores de la interfaz',
+//       type: 'select',
+//       defaultValue: { value: 'light', label: 'Claro', description: 'Fondo claro con texto oscuro', order: 1 },
+//       options: [
+//         { value: 'light', label: 'Claro', description: 'Fondo claro con texto oscuro', order: 1 },
+//         { value: 'dark', label: 'Oscuro', description: 'Fondo oscuro con texto claro', order: 2 },
+//         { value: 'system', label: 'Sistema', description: 'Seguir preferencia del sistema operativo', order: 3 }
+//       ],
+//       group: 'appearance',
+//       order: 1
+//     },
+//     {
+//       key: 'appearance_compact_mode',
+//       label: 'Modo compacto',
+//       description: 'Reducir espaciado para mostrar más contenido',
+//       type: 'boolean',
+//       defaultValue: BOOLEAN_OPTIONS.find(o => o.value === BLANK)!,
+//       options: BOOLEAN_OPTIONS,
+//       group: 'appearance',
+//       order: 2
+//     },
+//     {
+//       key: 'appearance_primary_color',
+//       label: 'Color primario',
+//       description: 'Color principal de la interfaz',
+//       type: 'color',
+//       defaultValue: { value: '#002a8d', label: '#002a8d', description: 'Color principal de la interfaz' },
+//       group: 'appearance',
+//       order: 3
+//     }
+//   ]
+// };
 
 export const ALL_CONFIG_GROUPS: ConfigGroup[] = [
   FEEDBACK_CONFIG_GROUP,
   TEAM_MEMBERS_CONFIG_GROUP,
   NOTIFICATIONS_CONFIG_GROUP,
   EVALUATIONS_CONFIG_GROUP,
-  APPEARANCE_CONFIG_GROUP
+  // APPEARANCE_CONFIG_GROUP
 ].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
 export function isFieldOption(value: unknown): value is FieldOption {

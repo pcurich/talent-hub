@@ -123,13 +123,13 @@ export class ExcelSquadModalPresenter {
       const row: Record<string, any> = {};
       fields.forEach(f => {
         switch (f.entityField) {
-          case 'number':       row[f.label] = idx + 1; break;
-          case 'registration': row[f.label] = member.registration; break;
-          case 'teamMember':   row[f.label] = member.name; break;
-          case 'company':      row[f.label] = member.companyValue ?? ''; break;
-          case 'squad':        row[f.label] = squad.name; break;
-          case 'productOwner': row[f.label] = squad.productOwner.name; break;
-          default:             row[f.label] = '';
+          case 'number':                    row[f.label] = idx + 1; break;
+          case 'teamMember.registration':   row[f.label] = member.registration ?? ''; break;
+          case 'teamMember.name':           row[f.label] = member.name ?? ''; break;
+          case 'teamMember.companyKey':     row[f.label] = member.companyValue ?? ''; break;
+          case 'squad.name':               row[f.label] = squad.name ?? ''; break;
+          case 'squad.productOwner.name':  row[f.label] = squad.productOwner?.name ?? ''; break;
+          default:                          row[f.label] = '';
         }
       });
       return row;

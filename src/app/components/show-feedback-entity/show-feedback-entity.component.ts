@@ -1,9 +1,8 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FeedbackIndexeddbRepository } from '../../repository/feedback.indexeddb.repository';
-import { SystemConfigIndexeddbRepository } from '../../repository/system-config.indexeddb.repository';
 import { Squad, TeamMember } from '../../model/current-user.model';
 import {
   ActionPlanStatus,
@@ -17,19 +16,38 @@ import {
   PerformanceWhat,
   Seniority
 } from '../../model/feedback-entity.model';
+import { FeedbackOptionsUtil } from '../../util/feedback-options.util';
+import { ExcelConfigurationPresenter } from '../excel-settings/presenters/excel-configuration.presenter';
+import { ExcelReaderPresenter } from '../excel-settings/presenters/excel-reader.presenter';
+import { LoadedDataPresenter } from '../excel-settings/presenters/loaded-data.presenter';
+import { ExcelSettingsConfig, ExcelColumnMapping } from '../excel-settings/models/excel-settings.models';
 
 @Component({
   selector: 'app-show-feedback-entity',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  providers: [ExcelConfigurationPresenter, ExcelReaderPresenter, LoadedDataPresenter],
   templateUrl: './show-feedback-entity.component.html',
   styleUrl: './show-feedback-entity.component.scss'
 })
 export class ShowFeedbackEntityComponent implements OnInit {
+  @ViewChild('uploadExcelInput') uploadExcelInput!: ElementRef<HTMLInputElement>;
+
   private feedbackService = inject(FeedbackIndexeddbRepository);
-  private systemConfig = inject(SystemConfigIndexeddbRepository);
+  private feedbackOptions = inject(FeedbackOptionsUtil);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
+  private readonly configPresenter = inject(ExcelConfigurationPresenter);
+  private readonly readerPresenter = inject(ExcelReaderPresenter);
+  readonly loadedData = inject(LoadedDataPresenter);
+
+  // Upload modal state
+  showUploadModal = false;
+  uploadFileError = '';
+  isProcessingUpload = false;
+  uploadConfig!: ExcelSettingsConfig;
+  uploadMappings: ExcelColumnMapping[] = [];
 
   squad: Squad = {} as Squad;
   teamMember: TeamMember = {} as TeamMember;
@@ -40,27 +58,31 @@ export class ShowFeedbackEntityComponent implements OnInit {
   showSaveActionButton = true;
 
   // Opciones para los dropdowns desde SystemConfig
-  seniorityOptions: Seniority[] = this.systemConfig.getField('team_members', 'team_members_seniority')?.options || [];
-  feedbackProviderOptions: FeedbackProvider[] = this.systemConfig.getField('feedback', 'feedback_provider')?.options || [];
-  generalRatingOptions: GeneralRating[] = this.systemConfig.getField('feedback', 'feedback_general_rating')?.options || [];
-  performanceWhatOptions: PerformanceWhat[] = this.systemConfig.getField('feedback', 'feedback_performance_level')?.options || [];
-  performanceHowOptions: PerformanceHow[] = this.systemConfig.getField('feedback', 'feedback_performance_level')?.options || [];
-  performanceAchievementsOptions: PerformanceAchievements[] = this.systemConfig.getField('feedback', 'feedback_performance_level')?.options || [];
-  feedbackTypeOptions: FeedbackType[] = this.systemConfig.getField('feedback', 'feedback_default_type')?.options || [];
-  actionResponsibleOptions: ActionResponsible[] = this.systemConfig.getField('feedback', 'feedback_action_responsible')?.options || [];
-  actionStatusOptions: ActionPlanStatus[] = this.systemConfig.getField('feedback', 'feedback_action_status')?.options || [];
+  get seniorityOptions(): Seniority[] { return this.feedbackOptions.seniorityOptions; }
+  get feedbackProviderOptions(): FeedbackProvider[] { return this.feedbackOptions.feedbackProviderOptions; }
+  get generalRatingOptions(): GeneralRating[] { return this.feedbackOptions.generalRatingOptions; }
+  get performanceWhatOptions(): PerformanceWhat[] { return this.feedbackOptions.performanceLevelOptions; }
+  get performanceHowOptions(): PerformanceHow[] { return this.feedbackOptions.performanceLevelOptions; }
+  get performanceAchievementsOptions(): PerformanceAchievements[] { return this.feedbackOptions.performanceLevelOptions; }
+  get feedbackTypeOptions(): FeedbackType[] { return this.feedbackOptions.feedbackTypeOptions; }
+  get actionResponsibleOptions(): ActionResponsible[] { return this.feedbackOptions.actionResponsibleOptions; }
+  get actionStatusOptions(): ActionPlanStatus[] { return this.feedbackOptions.actionStatusOptions; }
 
   // Lista de feedbacks filtrados por teamMember
   feedbacks = computed<FeedbackEntity[]>(() => {
-    const all = this.feedbackService.get()();
+    const all = this.feedbackService.get()() as FeedbackEntity[];
     if (!this.teamMember?.registration) return all;
     return all.filter(fb => fb.teamMember?.registration === this.teamMember.registration);
   });
 
-  ngOnInit() {
+  async ngOnInit() {
+    const registration = this.route.snapshot.params['registration'];
     const state = history.state;
     if (state?.squad) this.squad = state.squad;
     if (state?.teamMember) this.teamMember = state.teamMember;
+
+    // Cargar feedbacks para este teamMember y actualizar el signal
+    await this.feedbackService.findByRegistration(registration ?? this.teamMember.registration);
 
     // Seleccionar el primer feedback automáticamente
     const list = this.feedbacks();
@@ -109,6 +131,7 @@ export class ShowFeedbackEntityComponent implements OnInit {
   }
 
   async onSubmit() {
+    debugger;
     if (this.feedbackForm.invalid) return;
 
     const formValue = this.feedbackForm.getRawValue();
@@ -168,6 +191,59 @@ export class ShowFeedbackEntityComponent implements OnInit {
       entity.actionPlan = this.actionPlan.getRawValue();
     }
     this.addActionDisabled = false;
+  }
+
+  openUploadModal(): void {
+    const { config, fields } = this.configPresenter.loadConfiguration();
+    this.uploadConfig = config;
+    this.uploadMappings = fields;
+    this.loadedData.clear();
+    this.uploadFileError = '';
+    this.showUploadModal = true;
+  }
+
+  closeUploadModal(): void {
+    this.showUploadModal = false;
+    this.uploadFileError = '';
+    this.isProcessingUpload = false;
+  }
+
+  async onUploadFileChange(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+
+    this.uploadFileError = '';
+    this.isProcessingUpload = true;
+    try {
+      const result = await this.readerPresenter.readExcelFile(file, this.uploadConfig);
+      this.loadedData.setImportResult(result);
+    } catch (error) {
+      this.uploadFileError = error instanceof Error ? error.message : 'Error al leer el archivo.';
+    } finally {
+      this.isProcessingUpload = false;
+    }
+  }
+
+  async saveLoadedFeedbacks(): Promise<void> {
+    const validEntities = this.loadedData.importState.result?.entities ?? [];
+    let saved = 0;
+    for (const entity of validEntities) {
+      const ok = await this.feedbackService.create(entity);
+      if (ok) saved++;
+    }
+    alert(`${saved} feedback(s) guardado(s) correctamente.`);
+    this.loadedData.clear();
+    this.closeUploadModal();
+    const registration = this.route.snapshot.params['registration'] ?? this.teamMember.registration;
+    if (registration) {
+      await this.feedbackService.findByRegistration(registration);
+    }
+  }
+
+  removeLoadedRow(index: number): void {
+    this.loadedData.removeRow(index);
   }
 
   goBack() {

@@ -176,9 +176,10 @@ export abstract class BaseIndexeddbRepository<T> implements IInitializable {
    * Carga los datos desde IndexedDB y actualiza el signal interno.
    * Implementación por defecto que puede ser sobrescrita.
    */
-  protected async refreshEntities(): Promise<void> {
+  protected async refreshEntities(registration?: string): Promise<void> {
     try {
-      const httpMocks = await this.httpMockService?.findByServiceCode(this.SERVICE_CODE);
+      const serviceCode = registration ? `${this.SERVICE_CODE}_${registration}` : this.SERVICE_CODE;
+      const httpMocks = await this.httpMockService?.findByServiceCode(serviceCode);
       if (httpMocks && httpMocks.length > 0) {
         if (Array.isArray(this.DEFAULT_VALUE)) {
           const entities = httpMocks.map(mock => JSON.parse(mock.responseBody));

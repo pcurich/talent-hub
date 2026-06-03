@@ -32,7 +32,7 @@ export class FeedbackIndexeddbRepository extends BaseIndexeddbRepository<Feedbac
 
       // Crear en IndexedDB
       const newEntity: Partial<HttpMockEntity> = {
-        serviceCode: this.SERVICE_CODE,
+        serviceCode: this.SERVICE_CODE + '_' + feedBack.teamMember.registration,
         method: 'GET',
         url: `/${this.SERVICE_CODE.toLowerCase()}]/${feedBack.teamMember.registration}  `,
         responseBody: JSON.stringify(entityToSave),
@@ -89,10 +89,16 @@ export class FeedbackIndexeddbRepository extends BaseIndexeddbRepository<Feedbac
   async findByRegistration(registration: string): Promise<TeamMemberProfile | null> {
     await this.ensureDatabase();
 
-    const feedbacks = (this.entity() as FeedbackEntity[])
-      .filter(f => f.teamMember?.registration === registration);
+    const serviceCode = `${this.SERVICE_CODE}_${registration}`;
+    const httpMocks = await this.httpMockService!.findByServiceCode(serviceCode);
 
-    if (feedbacks.length === 0) return null;
+    if (!httpMocks || httpMocks.length === 0) {
+      this.entity.set([] as unknown as FeedbackEntity[]);
+      return null;
+    }
+
+    const feedbacks: FeedbackEntity[] = httpMocks.map(mock => JSON.parse(mock.responseBody));
+    this.entity.set(feedbacks as unknown as FeedbackEntity[]);
 
     const { teamMember, squad } = feedbacks[0];
     return { ...teamMember, squad, feedbacks };

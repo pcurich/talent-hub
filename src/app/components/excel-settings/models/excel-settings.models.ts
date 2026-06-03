@@ -1,4 +1,4 @@
-import { FeedbackEntity } from '@pcurich/client-storage-indexeddb';
+import { FeedbackEntity } from '../../../model/feedback-entity.model';
 
 /**
  * Opción para campos de tipo select
@@ -7,19 +7,23 @@ export interface SelectOption {
   value: string;
   label: string;
   disabled?: boolean;
+  groupKey?: string;
+  fieldKey?: string;
 }
 
 /**
  * Mapeo de una celda/cabecera del Excel a un campo de la entidad
  */
 export interface ExcelColumnMapping {
-  entityField: string; // Campo de FeedbackEntity (ej: 'registration', 'teamMember')
+  entityField: string; // Campo de FeedbackEntity (ej: 'teamMember.registration', 'performance.what')
   excelCell: string; // Referencia a la celda de cabecera (ej: 'A1', 'B1' o nombre de columna)
   fieldType: 'string' | 'number' | 'date' | 'select' | 'nested';
   required: boolean;
   label: string; // Etiqueta para mostrar en UI
   description?: string;
-  options?: SelectOption[]; // Nuevo campo
+  options?: SelectOption[];
+  /** Si true, al resolver el select se guarda el objeto ConfigFieldValue completo en lugar del string value */
+  resolveToFullOption?: boolean;
 }
 
 /**

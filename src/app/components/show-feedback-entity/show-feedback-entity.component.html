@@ -1,7 +1,10 @@
 <div class="show-container">
   <div class="show-header">
     <h2>Feedbacks - {{ teamMember.name }}</h2>
-    <button type="button" class="btn-back" (click)="goBack()">&#8592; Volver</button>
+    <div class="header-actions">
+      <button type="button" class="btn-upload-excel" (click)="openUploadModal()">📤 Cargar Excel</button>
+      <button type="button" class="btn-back" (click)="goBack()">&#8592; Volver</button>
+    </div>
   </div>
 
   <div class="show-layout">
@@ -255,5 +258,90 @@
         </div>
       </main>
     </ng-template>
+  </div>
+</div>
+
+<!-- Modal: Cargar feedbacks desde Excel -->
+<div class="excel-modal-overlay" *ngIf="showUploadModal" (click)="closeUploadModal()">
+  <div class="excel-modal" (click)="$event.stopPropagation()">
+
+    <div class="excel-modal-header">
+      <h3>📤 Cargar Feedbacks desde Excel</h3>
+      <button class="btn-modal-close" (click)="closeUploadModal()">✕</button>
+    </div>
+
+    <div class="excel-modal-body">
+
+      <!-- Selector de archivo (estado inicial) -->
+      <div class="file-selector" *ngIf="loadedData.importState.status === 'idle' || loadedData.importState.status === 'error'">
+        <label class="file-upload-label">
+          <input type="file" accept=".xlsx,.xls" (change)="onUploadFileChange($event)" style="display:none">
+          <span class="file-upload-btn">📁 Seleccionar archivo Excel</span>
+        </label>
+        <p class="file-hint">Seleccione un archivo .xlsx generado desde la plantilla del sistema.</p>
+        <div *ngIf="uploadFileError" class="file-error">⚠️ {{ uploadFileError }}</div>
+        <div *ngIf="isProcessingUpload" class="processing-msg">⏳ Procesando archivo...</div>
+      </div>
+
+      <!-- Datos cargados -->
+      <ng-container *ngIf="loadedData.importState.status === 'completed'">
+
+        <div class="upload-data-stats">
+          <span class="stat-badge valid">✅ {{ loadedData.importState.result?.validRows || 0 }} válidos</span>
+          <span class="stat-badge invalid">❌ {{ loadedData.importState.result?.invalidRows || 0 }} inválidos</span>
+          <span class="stat-badge total">📊 {{ loadedData.results.length }} en vista</span>
+          <input type="text" class="search-input" [(ngModel)]="loadedData.searchTerm" placeholder="🔍 Buscar...">
+        </div>
+
+        <div class="upload-table-container">
+          <table class="upload-data-table">
+            <thead>
+              <tr>
+                <th *ngFor="let col of loadedData.getTableColumns(uploadMappings)">{{ col.label }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of loadedData.getFilteredEntities(); let i = index"
+                  [class.invalid-row]="!row.isValid"
+                  [class.valid-row]="row.isValid">
+                <ng-container *ngFor="let col of loadedData.getTableColumns(uploadMappings)">
+                  <td *ngIf="col.key === 'rowNumber'">{{ row.rowNumber }}</td>
+                  <td *ngIf="col.key === 'status'" class="status-cell">
+                    <span *ngIf="row.isValid" class="status-badge valid" title="Fila válida">✅</span>
+                    <span *ngIf="!row.isValid" class="status-badge invalid"
+                      [title]="loadedData.getErrorMessages(row.errors)">❌</span>
+                  </td>
+                  <td *ngIf="col.key !== 'rowNumber' && col.key !== 'status' && col.key !== 'actions'">
+                    <input type="text" class="editable-cell"
+                      [value]="loadedData.getNestedValue(row.data, col.field)"
+                      readonly
+                      (input)="loadedData.setNestedValue(row.data, col.field, $any($event.target).value)">
+                  </td>
+                  <td *ngIf="col.key === 'actions'" class="actions-cell">
+                    <button class="btn-delete-row" (click)="removeLoadedRow(i)" title="Eliminar fila">🗑️</button>
+                  </td>
+                </ng-container>
+              </tr>
+            </tbody>
+          </table>
+          <div *ngIf="loadedData.getFilteredEntities().length === 0" class="no-results">
+            📭 No se encontraron datos
+          </div>
+        </div>
+
+        <div class="excel-modal-footer">
+          <button class="btn btn-secondary"
+            (click)="loadedData.clear(); uploadFileError = ''">
+            🔄 Cambiar archivo
+          </button>
+          <button class="btn btn-primary"
+            (click)="saveLoadedFeedbacks()"
+            [disabled]="loadedData.getValidRowsCount() === 0">
+            💾 Guardar {{ loadedData.getValidRowsCount() }} Registro(s) Válido(s)
+          </button>
+        </div>
+
+      </ng-container>
+    </div>
   </div>
 </div>

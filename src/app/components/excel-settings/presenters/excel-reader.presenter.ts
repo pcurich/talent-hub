@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FeedbackEntity } from '@pcurich/client-storage-indexeddb';
+import { FeedbackEntity } from '../../../model/feedback-entity.model';
 import * as XLSX from 'xlsx';
 import {
   ExcelSettingsConfig,
@@ -113,7 +113,13 @@ export class ExcelReaderPresenter {
               });
               continue;
             }
-            parsedValue = option.value === 'blank' ? null : option.value;
+            if (option.value === 'blank') {
+              parsedValue = null;
+            } else if (mapping.resolveToFullOption) {
+              parsedValue = { value: option.value, label: option.label, groupKey: option.groupKey ?? '', fieldKey: option.fieldKey ?? '' };
+            } else {
+              parsedValue = option.value;
+            }
           }
         }
 
@@ -220,13 +226,21 @@ export class ExcelReaderPresenter {
 
     for (let i = 0; i < keys.length - 1; i++) {
       const key = keys[i];
-      if (!current[key]) {
-        current[key] = {};
+      const isKeyIndex = /^\d+$/.test(key);
+      const actualKey: string | number = isKeyIndex ? parseInt(key, 10) : key;
+
+      const nextKey = keys[i + 1];
+      const isNextIndex = /^\d+$/.test(nextKey);
+
+      if (current[actualKey] === undefined || current[actualKey] === null) {
+        current[actualKey] = isNextIndex ? [] : {};
       }
-      current = current[key];
+      current = current[actualKey];
     }
 
-    current[keys[keys.length - 1]] = value;
+    const lastKey = keys[keys.length - 1];
+    const isLastIndex = /^\d+$/.test(lastKey);
+    current[isLastIndex ? parseInt(lastKey, 10) : lastKey] = value;
   }
 
   /**
