@@ -1,4 +1,4 @@
-import { xmlEscape } from '../../../util/xml.util';
+import { xmlEscape } from './xml.util';
 
 /**
  * Represents a single Excel data-validation drop-down entry.

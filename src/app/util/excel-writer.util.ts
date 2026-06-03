@@ -1,8 +1,9 @@
 import * as XLSX from 'xlsx';
 import { unzipSync, zipSync, strToU8, strFromU8 } from 'fflate';
-import { ExcelColumnMapping } from '../models/excel-settings.models';
+import { ExcelColumnMapping } from '../model/excel-settings.models';
 import { injectHeaderStyle } from './excel-style.util';
 import { buildDataValidationsXml, DataValidationEntry } from './excel-validation.util';
+
 
 /**
  * Options for {@link buildStyledWorkbook}.

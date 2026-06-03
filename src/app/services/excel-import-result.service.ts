@@ -5,7 +5,7 @@ import {
   ExcelRowError,
   ExcelRowResult,
   ImportState
-} from '../models/excel-settings.models';
+} from '../model/excel-settings.models';
 
 export interface TableColumn {
   key: string;
@@ -14,7 +14,7 @@ export interface TableColumn {
 }
 
 @Injectable()
-export class LoadedDataPresenter {
+export class ExcelImportResultService {
   results: ExcelRowResult[] = [];
   searchTerm = '';
   importState: ImportState = {
@@ -74,11 +74,9 @@ export class LoadedDataPresenter {
 
   getNestedValue(obj: any, path: string): any {
     const value = path.split('.').reduce((current, prop) => current?.[prop], obj);
-    // Si el valor es un objeto con label (campo select resolveToFullOption), mostrar el label
     if (value !== null && typeof value === 'object' && 'label' in value) {
       return value.label;
     }
-    // Devolver string vacío en lugar de undefined para evitar que Angular muestre "undefined"
     return value ?? '';
   }
 
